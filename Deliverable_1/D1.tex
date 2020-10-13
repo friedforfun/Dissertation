@@ -102,8 +102,8 @@ Issues with limited resource computation \autocite{szeEfficientProcessingDeep201
 
 outline the document: We start with ..., then we cover x, y, and z ...
 
-This dissertation is an investigation into the effect of pruning on inference latency and accuracy with 
-hardware without optimisations for processing sparse matrices. proc
+This dissertation is an investigation into the effect of pruning on inference in terms of latency and accuracy using 
+hardware without specific optimisations for processing the resulting sparse matrices from pruning. (Reasoning for statement...). 
 
 \pagebreak
 \subsection{Background}
@@ -111,10 +111,10 @@ hardware without optimisations for processing sparse matrices. proc
 project.}
 
 This Section will be split into 4 subsections:\\
-Hardware Memory architectures~\ref{subsec:hardwareArch} - brief stuff about this section\\
-Edge Computing~\ref{subsec:edgeComputing} - stuff about edge comp\\
-Deep Learning~\ref{subsec:deepLearning} - stuff\\
-Compression Types~\ref{subsec:compressionTypes} - ...\\
+Hardware Memory architectures Section~\ref{subsec:hardwareArch} - brief stuff about this section\\
+Edge Computing Section~\ref{subsec:edgeComputing} - stuff about edge comp\\
+Deep Learning Section~\ref{subsec:deepLearning} - stuff\\
+Compression Types Section~\ref{subsec:compressionTypes} - ...\\
 
 
 \subsubsection{Hardware memory architectures}\label{subsec:hardwareArch}
@@ -125,9 +125,11 @@ Compression Types~\ref{subsec:compressionTypes} - ...\\
 The explosion of Deep Neural Network applications in recent years has prompted the production of a wave of specialised hardware architectures to improve the efficiency and compute of these kinds of workloads. The mainstay of this form of processing has been until recently been dominated by GPUs.\\
 
 \subsubsection{Computing at the edge}\label{subsec:edgeComputing}
-\emph{Some background on edge computing - maybe a detailed definition\\}
+\emph{Some background on edge computing - maybe a detailed definition\\
+ - Challenges of resource bound deep learning\\
+ - Online vs offline learning\\}
 
-\subsubsection{Deep learning}\label{subsec:deepLearning}
+\subsubsection{Neural networks \& Deep learning}\label{subsec:deepLearning}
 \emph{
 Types of deep learning \& inference\\
 Deep Neural Network (DNN)\\
@@ -143,7 +145,9 @@ Convolutional Neural Network (CNN)\\
 Recurrent Neural Network (RNN)\\
 }
 
-\Acrfull{dnn} are a subfield within the category of \Acrfull{ai} computing. \Acrshort{dnn}'s are composed of layers of neurons that pass signals derived from weights through the network, this model of computing was inspired by our understanding of the human brain, an simple example of this can be seen in Fig.~\ref{fig:neuronLabeled} where the weights can be seen corresponding to the synapes and the output of the neruon is labeled as the axon. These weights are connected to all neurons within a \Acrshort{dnn} are intended to mirror the behavour of our synapses value scaling effect by performing a weighted sum of the inputs and their corresponding weights. The neuron then applies an  non-linear activation function to the result, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.
+Neural networks are a subfield within the category of \Acrfull{ai} computing. Neural networkss are composed of layers of neurons that pass signals derived from weights through the network, this model of computing was inspired by our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for a simple example, the weights can be seen corresponding to the synapes and the output of the neruon is labeled as the axon. All neruons in a Neural network have wieghts corresponding to their inputs, these weights are are intended to mirror the behavour of our synapses value scaling effect by performing a weighted sum operation. The neuron then applies an  non-linear activation function to the result, without which a Neural network would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.
+
+
 
 There are many popular deep learning network architectures, this document will focus primarily on the \Acrfull{cnn} and \Acrfull{rnn} architectures
 
