@@ -109,7 +109,6 @@ hardware without specific optimisations for processing the resulting sparse matr
 \section{Background}
 \emph{Discussing related work found in the technical literature and its relevance to your
 project.}
-
 This Section will be split into 4 subsections:\\
 Hardware Memory architectures Section~\ref{subsec:hardwareArch} - brief stuff about this section\\
 Edge Computing Section~\ref{subsec:edgeComputing} - stuff about edge comp\\
@@ -127,8 +126,8 @@ The explosion of Deep Neural Network applications in recent years has prompted t
 \subsection{Computing at the edge}\label{subsec:edgeComputing}
 \emph{Some background on edge computing - maybe a detailed definition\\
  - Challenges of resource bound deep learning\\
- - Online vs offline learning\\}
-
+ - Online vs offline learning
+ }
 \subsection{\Acrlong*{dnn}s}\label{subsec:deepLearning}
 \emph{
 Types of deep learning \& inference\\
@@ -149,15 +148,16 @@ Deep Neural Network (DNN)\\
 }
 \begin{figure}
     \includegraphics[width=1\textwidth]{Perceptron_efficient_proc.png}
-    \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from \autocite{szeEfficientProcessingDeep2017})}}
+    \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from~\autocite{szeEfficientProcessingDeep2017})}}
     \label{fig:neuronLabeled}
 \end{figure}
-Neural networks are a subfield within the category of \Acrlong{ai} computing. Neural networks are composed of layers of neurons that pass signals derived from weights through the network, this model of computing was inspired by our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for the analagous components. Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. All neruons in a Neural network have wieghts corresponding to the inputs to each neuron, these weights are are intended to mirror the behavour of the synapse value scaling effect; by performing a weighted sum operation. The neuron then applies an non-linear activation function to the result, without which a Neural network would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.\\
-Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, generally a network with more than 3 layers is considered a deep neural network.\\
-
+Deep learning is a category of machine learning techniques where a hierarchy of layers that perform some manner of information processsing that computes high level abstractions of the data by identifying low level abstractions in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.
+Neural networks are a subfield within the category of \Acrlong{ai} computing. Neural networks are composed of layers of neurons that pass signals derived from weights through the network, this model of computing was inspired by connectionism and our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for labels of the analagous biological components. Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. All neruons in a Neural network have weights corresponding to their inputs, these weights are are intended to mirror the value scaling effect of a synapse by performing a weighted sum operation. The neuron then applies an non-linear activation function to the result, without which a neural network would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.\\
+Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, generally a network with more than 3 layers is considered a deep neural network, the rest of this paper will refer to \acrshort{dnn}s for consistency.\\
+\acrshort{dnn}s have an input layer, an output layer and many interior layers (between the input and output layer) that are referred to as \emph{hidden layers} \\
 \Acrshort{dnn}s can be categorised as feedforwards, feedback, and self-organising networks depending on their processing method~\autocite{chenDeepLearningMobile2020}.\\
 
-There are many popular deep learning network architectures, the full scope of these are beyond the scope of this document. The next sections will focus primarily on the \Acrshort{cnn} and \Acrshort{rnn} architectures.
+There are many popular deep neural network architectures, the full scope of these are beyond the scope of this document. The next sections will focus primarily on the \Acrshort{cnn} and \Acrshort{rnn} architectures.
 
 
 
@@ -168,7 +168,6 @@ There are many popular deep learning network architectures, the full scope of th
     - CNN consist of: Convolutional Layers, Pooling layers \& fully connected layers.\\
     - Convolutional Layers contain sets of filters/kernels
 }
-
 Much like traditional nerual networks the \Acrshort{cnn} architecture was inspired by human and animal brains, the concept of processing the input with local receptive fields is conceptually similar some functionality of the cat's visual cortex~\autocite{hubelReceptiveFieldsBinocular1962,lecunConvolutionalNetworksImages,pouyanfarSurveyDeepLearning2019}. 
 These local receptive fields (or kernels) enable neurons to extract low level features such as edges, corners, and end-points with respect to their orientation. \Acrshort{cnn}s are robust to input shift or distortion by using receptive fields to identify these low level features across the entire input space, performing local averaging and downsampling in the layers following convolution layers means the absolute location of the features is less important than the position of the features relative to the position of other identified features~\autocite{lecunConvolutionalNetworksImages}. Each layer produces higher degrees of abstraction from the input layer, in doing so these abstractions retain important information about the input, these abstractions are referred to as feature maps.
 The layers performing downsampling are known as pooling layers, they reduce the resolution or dimensions of the feature map which reduces overfitting and speeds up training by reducing the number of parameters in the network~\autocite{pouyanfarSurveyDeepLearning2019}.\\
@@ -176,11 +175,17 @@ The layers performing downsampling are known as pooling layers, they reduce the 
 
 \acrshort{cnn}s have been found to be effective in many different AI domains, popular applications include: computer vision, \Acrshort{nlp}, and speech processing. 
 
+\begin{figure}
+    \includegraphics[width=1\textwidth]{CNN_RNN.png} 
+    \caption{A typical example of a \acrshort*{cnn} (left) and \acrshort{rnn} (right)\\ \textbf{(Adopted figure from~\autocite{chenDeepLearningMobile2020})}}
+    \label{fig:exampleCnnRnn}   
+\end{figure}
+
 \subsubsection{\Acrlong*{rnn}}
 \emph{
     Recurrent Neural Network (RNN)\\
 }
-
+\acrshort{rnn}s are deep learning models that use loops in their layer connections to make predictions with sequential inputs and maintain state over those inputs, this architecture is designed specifically for time series predictions~\autocite{chenDeepLearningEdge2019}.
 
 
 
@@ -240,7 +245,7 @@ Details of the evaluation and analysis to be conducted
 
 \pagebreak
 \section{Project Management}
-\subsection{Timetable}
+\subsection{Plan}
 
 \subsection{Risk Analysis}
 
