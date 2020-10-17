@@ -50,7 +50,7 @@
 
 \begin{document}
 \title{%
-	\bf Computing at the edge\\ 
+	\bf Evaluating memory structures when performing inference on pruned neural networks\\ 
 	\large Deliverable 1: Final year Dissertation \\
 	Bsc Computer Science: Artificial Intelligence}
 
@@ -112,7 +112,7 @@ project.}
 This Section will be split into 4 subsections:\\
 Hardware Memory architectures Section~\ref{subsec:hardwareArch} - brief stuff about this section\\
 Edge Computing Section~\ref{subsec:edgeComputing} - stuff about edge comp\\
-Deep Learning Section~\ref{subsec:deepLearning} - stuff\\
+Deep Learning Section~\ref{subsec:deepLearning} - An overview of the basic components of a neural network and the \acrshort{cnn} \& \acrshort{rnn} models.\\
 Compression Types Section~\ref{subsec:compressionTypes} - ...\\
 
 
@@ -129,13 +129,6 @@ The explosion of Deep Neural Network applications in recent years has prompted t
  - Online vs offline learning
  }
 \subsection{\Acrlong*{dnn}s}\label{subsec:deepLearning}
-\emph{
-Types of deep learning \& inference\\
-Deep Neural Network (DNN)\\
- - Layer structure (Input, Hidden, output)
- - Weight parameters updated using back-propagation
-}
-
 \subsubsection{Neural Networks \& Deep Learning}
 \emph{
     - Summary of NN\\
@@ -145,16 +138,16 @@ Deep Neural Network (DNN)\\
     - Feed Forwards\\
     - Feedback Nerual Network\\
     - Self-organizing Neural Network\\
+    - Weight parameters updated using back-propagation\\
 }
 \begin{figure}
     \includegraphics[width=1\textwidth]{Perceptron_efficient_proc.png}
     \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from~\autocite{szeEfficientProcessingDeep2017})}}
     \label{fig:neuronLabeled}
 \end{figure}
-Deep learning is a category of machine learning techniques where a hierarchy of layers that perform some manner of information processsing that computes high level abstractions of the data by identifying low level abstractions in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.
-Neural networks are a subfield within the category of \Acrlong{ai} computing. Neural networks are composed of layers of neurons that pass signals derived from weights through the network, this model of computing was inspired by connectionism and our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for labels of the analagous biological components. Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. All neruons in a Neural network have weights corresponding to their inputs, these weights are are intended to mirror the value scaling effect of a synapse by performing a weighted sum operation. The neuron then applies an non-linear activation function to the result, without which a neural network would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.\\
-Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, generally a network with more than 3 layers is considered a deep neural network, the rest of this paper will refer to \acrshort{dnn}s for consistency.\\
-\acrshort{dnn}s have an input layer, an output layer and many interior layers (between the input and output layer) that are referred to as \emph{hidden layers} \\
+Deep learning is a category of machine learning techniques where a hierarchy of layers that perform some manner of information processsing that computes high level abstractions of the data by identifying low level abstractions in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.\\
+Neural networks are a subfield within the category of \Acrlong{ai} computing, its purpose simply put is to transform an input vector~$X$ into an output vector~$\hat{Y}$. The output vector~$\hat{Y}$ is some form of classification such as a binary classification or a probability distribution over multiple classes~\autocite{thierry-miegHowFundamentalConcepts}. Between the input layer ($X$) and the output layer ($\hat{Y}$) there exists some number of interior layers that are referred to as hidden layers, the hidden and output layers are composed of neurons that pass signals derived from weights through the network, this model of computing was inspired by connectionism and our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for labels of the analagous biological components. Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. All neruons in a Neural network have weights corresponding to their inputs, these weights are are intended to mirror the value scaling effect of a synapse by performing a weighted sum operation~\autocite{szeEfficientProcessingDeep2017}.\\
+Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, there is no hard rule indicating when a neural network is considered deep but generally a network with more than 3 hidden layers is considered a deep neural network, the rest of this paper will refer to \acrshort{dnn}s for consistency. Each neuron in a \Acrshort{dnn} applies an non-linear activation function to the result of its weighted sum of inputs and weights, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.\\
 \Acrshort{dnn}s can be categorised as feedforwards, feedback, and self-organising networks depending on their processing method~\autocite{chenDeepLearningMobile2020}.\\
 
 There are many popular deep neural network architectures, the full scope of these are beyond the scope of this document. The next sections will focus primarily on the \Acrshort{cnn} and \Acrshort{rnn} architectures.
