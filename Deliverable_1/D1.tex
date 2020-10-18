@@ -1,4 +1,3 @@
-
 \documentclass[11pt]{article}
 \usepackage[table]{xcolor}
 \usepackage[]{geometry} 
@@ -26,7 +25,7 @@
 \addbibresource{D1.bib}
 
 \hypersetup{ linktoc=all}
-\graphicspath{ {./images/} }
+\graphicspath{ {./images/}{../images/}{../../images} }
 
 \makenoidxglossaries
 
@@ -46,11 +45,11 @@
 \newacronym{asic}{ASIC}{Application Specific Integrated Circuit}
 
 
-
+\usepackage{subfiles}
 
 \begin{document}
 \title{%
-	\bf Evaluating memory structures when performing inference on pruned neural networks\\ 
+	\bf Inference at the edge: the impact of compression on performance\\ 
 	\large Deliverable 1: Final year Dissertation \\
 	Bsc Computer Science: Artificial Intelligence}
 
@@ -60,7 +59,7 @@
 }
 
 \maketitle
-
+\thispagestyle{empty}
 \pagebreak
 
 \textbf{DECLARATION}\\
@@ -70,11 +69,12 @@ equations, figures, text, tables, programs) are properly acknowledged at any poi
 use. A list of the references employed is included.\\
 Signed: ......................\\
 Date: .........................
-
+\thispagestyle{empty}
 \pagebreak
 
 \textbf{Abstract:} a short description of the project and the main work to be carried out – probably
 between one and two hundred words
+\thispagestyle{empty}
 \pagebreak
 
 \tableofcontents
@@ -85,166 +85,44 @@ between one and two hundred words
 \setcounter{page}{1}
 
 \section{Introduction}
-\emph{\textbf{Summarising the context of the dissertation project, stating the aim and objectives of the project, identifying the problems to be solved to achieve the objectives, and sketching
-the organisation of the dissertation.}}
-
-Edge devices have never been cheaper *citation*, stuff about how IoT devices are ubiquitous
-
-Mention how there is an increasing trend to perform computing at the Edge - real time applications + privacy\\
-These devices are often equipped with some form of AI application: Photo enhancment ect.\\
-Online vs offline learning\\
-Edge-side inference
-
-These models can have a huge number of parameters so inference can sometimes be impractical.
-\autocite{chenDeepLearningMobile2020} - ``see Table 1"
-
-Issues with limited resource computation \autocite{szeEfficientProcessingDeep2017}
-
-outline the document: We start with ..., then we cover x, y, and z ...
-
-This dissertation is an investigation into the effect of pruning on inference in terms of latency and accuracy using 
-hardware without specific optimisations for processing the resulting sparse matrices from pruning. (Reasoning for statement...). 
+\subfile{Sections/introduction}
 
 \pagebreak
 \section{Background}
-\emph{Discussing related work found in the technical literature and its relevance to your
-project.}
+\emph{Discussing related work found in the technical literature and its relevance to your project.}
 This Section will be split into 4 subsections:\\
-Hardware Memory architectures Section~\ref{subsec:hardwareArch} - brief stuff about this section\\
-Edge Computing Section~\ref{subsec:edgeComputing} - stuff about edge comp\\
-Deep Learning Section~\ref{subsec:deepLearning} - An overview of the basic components of a neural network and the \acrshort{cnn} \& \acrshort{rnn} models.\\
-Compression Types Section~\ref{subsec:compressionTypes} - ...\\
+Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a neural network and the \acrshort{cnn} \& \acrshort{rnn} models.\\
+Section~\ref{subsec:compressionTypes} - \textbf{Compression Types}: ...\\
+Section~\ref{subsec:edgeComputing} - \textbf{Edge Computing}: stuff about edge comp\\
+Section~\ref{subsec:hardwareArch} - \textbf{Hardware Memory architectures}: brief stuff about this section
 
-
-\subsection{Hardware memory architectures}\label{subsec:hardwareArch}
-\emph{
-- Discuss VPU/TPU/APU/GPU/FPGA/ASIC memory arcitecture and how it handles matrix sparsity\\
-- Show ineffectivity of pruning on hardware without optimisations for sparse matrices\\
-}
-The explosion of Deep Neural Network applications in recent years has prompted the production of a wave of specialised hardware architectures to improve the efficiency and compute of these kinds of workloads. The mainstay of this form of processing has been until recently been dominated by GPUs.\\
-
-\subsection{Computing at the edge}\label{subsec:edgeComputing}
-\emph{Some background on edge computing - maybe a detailed definition\\
- - Challenges of resource bound deep learning\\
- - Online vs offline learning
- }
-\subsection{\Acrlong*{dnn}s}\label{subsec:deepLearning}
-\subsubsection{Neural Networks \& Deep Learning}
-\emph{
-    - Summary of NN\\
-    - Structure of NN\\
-    - Training \& Inference stages\\
-    - weight update methodologies\\
-    - Feed Forwards\\
-    - Feedback Nerual Network\\
-    - Self-organizing Neural Network\\
-    - Weight parameters updated using back-propagation\\
-}
-\begin{figure}
-    \includegraphics[width=1\textwidth]{Perceptron_efficient_proc.png}
-    \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from~\autocite{szeEfficientProcessingDeep2017})}}
-    \label{fig:neuronLabeled}
-\end{figure}
-Deep learning is a category of machine learning techniques where a hierarchy of layers that perform some manner of information processsing that computes high level abstractions of the data by identifying low level abstractions in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.\\
-Neural networks are a subfield within the category of \Acrlong{ai} computing, its purpose simply put is to transform an input vector~$X$ into an output vector~$\hat{Y}$. The output vector~$\hat{Y}$ is some form of classification such as a binary classification or a probability distribution over multiple classes~\autocite{thierry-miegHowFundamentalConcepts}. Between the input layer ($X$) and the output layer ($\hat{Y}$) there exists some number of interior layers that are referred to as hidden layers, the hidden and output layers are composed of neurons that pass signals derived from weights through the network, this model of computing was inspired by connectionism and our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for labels of the analagous biological components. Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. All neruons in a Neural network have weights corresponding to their inputs, these weights are are intended to mirror the value scaling effect of a synapse by performing a weighted sum operation~\autocite{szeEfficientProcessingDeep2017}.\\
-Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, there is no hard rule indicating when a neural network is considered deep but generally a network with more than 3 hidden layers is considered a deep neural network, the rest of this paper will refer to \acrshort{dnn}s for consistency. Each neuron in a \Acrshort{dnn} applies an non-linear activation function to the result of its weighted sum of inputs and weights, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.\\
-\Acrshort{dnn}s can be categorised as feedforwards, feedback, and self-organising networks depending on their processing method~\autocite{chenDeepLearningMobile2020}.\\
-
-There are many popular deep neural network architectures, the full scope of these are beyond the scope of this document. The next sections will focus primarily on the \Acrshort{cnn} and \Acrshort{rnn} architectures.
-
-
-
-\subsubsection{\Acrlong*{cnn}}
-\emph{
-    Convolutional Neural Network (CNN)\\
-    - A class of DNN\\
-    - CNN consist of: Convolutional Layers, Pooling layers \& fully connected layers.\\
-    - Convolutional Layers contain sets of filters/kernels
-}
-Much like traditional nerual networks the \Acrshort{cnn} architecture was inspired by human and animal brains, the concept of processing the input with local receptive fields is conceptually similar some functionality of the cat's visual cortex~\autocite{hubelReceptiveFieldsBinocular1962,lecunConvolutionalNetworksImages,pouyanfarSurveyDeepLearning2019}. 
-These local receptive fields (or kernels) enable neurons to extract low level features such as edges, corners, and end-points with respect to their orientation. \Acrshort{cnn}s are robust to input shift or distortion by using receptive fields to identify these low level features across the entire input space, performing local averaging and downsampling in the layers following convolution layers means the absolute location of the features is less important than the position of the features relative to the position of other identified features~\autocite{lecunConvolutionalNetworksImages}. Each layer produces higher degrees of abstraction from the input layer, in doing so these abstractions retain important information about the input, these abstractions are referred to as feature maps.
-The layers performing downsampling are known as pooling layers, they reduce the resolution or dimensions of the feature map which reduces overfitting and speeds up training by reducing the number of parameters in the network~\autocite{pouyanfarSurveyDeepLearning2019}.\\
-
-
-\acrshort{cnn}s have been found to be effective in many different AI domains, popular applications include: computer vision, \Acrshort{nlp}, and speech processing. 
-
-\begin{figure}
-    \includegraphics[width=1\textwidth]{CNN_RNN.png} 
-    \caption{A typical example of a \acrshort*{cnn} (left) and \acrshort{rnn} (right)\\ \textbf{(Adopted figure from~\autocite{chenDeepLearningMobile2020})}}
-    \label{fig:exampleCnnRnn}   
-\end{figure}
-
-\subsubsection{\Acrlong*{rnn}}
-\emph{
-    Recurrent Neural Network (RNN)\\
-}
-\acrshort{rnn}s are deep learning models that use loops in their layer connections to make predictions with sequential inputs and maintain state over those inputs, this architecture is designed specifically for time series predictions~\autocite{chenDeepLearningEdge2019}.
-
-
+\subsection{Deep Neural Networks}\label{subsec:deepLearning}
+\subfile{Sections/Background/DeepNeuralNetworks}
 
 \subsection{Compression types}\label{subsec:compressionTypes}
-pruning\\
-distillation\\
-Quantization\\
-Network design strategies\\
-low-rank factorization\\
+\subfile{Sections/Background/Compression}
+
+\subsection{Computing at the edge}\label{subsec:edgeComputing}
+\subfile{Sections/Background/ComputingEdge}
+
+\subsection{Hardware memory architectures}\label{subsec:hardwareArch}
+\subfile{Sections/Background/HardwareMemArch}
 
 \pagebreak
-\section{Research Methodology/ Requirements Analysis}
-\subsection{Research Methodology}
-This is required for research projects and should be linked
-back to the project aim and objectives. It should describe the research methods that
-will be employed in the project and the research questions that will be investigated.
-
-
-1. build dataset of benchmarks from my systematic benchmark framework from models\\
-2. perform pruning on models\\
-3. run benchmark again with pruning\\
-4. make adjustments to underlaying mechanism of parameter storage\\
-5. verify adjustments do not break the model\\
-5. run benchmarks again\\
-6. draw conclusions\\
-
-Find baselines/benchmarks
-
-How to perform pruneing
-
-
-
-Look at underlaying storage mechanism of parameters in Network
-
- - provide some plots visualising the sparsity of the weights for the pruned matrix
-
-perform some engineering of refactoring/altering these mechanisms
-
-rerun systematic benchmarking framework
-
-
-
-
-
-\subsection{Requirements Analysis}
-This is required for technical projects and should be linked
-back to the project aim and objectives. It should provide a detailed use case scenario
-and suitable use
+\section{Research Methodology}
+\subfile{Sections/ResearchMethodology}
 
 \pagebreak
 \section{Design}
-Initial software design/sketch of research Methodology
+\subfile{Sections/Design}
 
 \pagebreak
 \section{Evaluation Strategy}
-Details of the evaluation and analysis to be conducted
+\subfile{Sections/EvaluationStrat}
 
 \pagebreak
 \section{Project Management}
-\subsection{Plan}
-
-\subsection{Risk Analysis}
-
-mention benchmarking NLP/NLG/Audio - text/text - audio models as a risk to the project
-
-\subsection{Professional, Legal \& Ethical issues}
+\subfile{Sections/ProjectManagement}
 
 \pagebreak
 \appendix
@@ -253,7 +131,7 @@ mention benchmarking NLP/NLG/Audio - text/text - audio models as a risk to the p
 \printbibliography
 
 \subsection{Appendices}
-to include additional material, consult with your supervisor.\\
+to include additional material, consult with your supervisor.
 
 \printnoidxglossary[type=acronym]
 \printacronyms
