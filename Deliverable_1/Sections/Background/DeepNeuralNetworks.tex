@@ -18,24 +18,25 @@
     \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from~\autocite{szeEfficientProcessingDeep2017})}}
     \label{fig:neuronLabeled}
 \end{figure}
-Deep learning is a subcategory of machine learning techniques where a hierarchy of layers perform some manner of information processsing with the goal of computing high level abstractions of the data from low level abstractions identified in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.
+Deep learning is a subcategory of machine learning techniques where a hierarchy of layers perform some manner of information processsing with the goal of computing high level abstractions of the data by utilising low level abstractions identified in the early layers~\autocite{dengTutorialSurveyArchitectures2014}.
 
 
-Neural networks are a subfield within the category of \Acrlong{ai} computing, its purpose is to transform an input vector~$X$ into an output vector~$\hat{Y}$. 
+Neural networks fundamental purpose is to transform an input vector commonly referred to as~$X$ into an output vector~$\hat{Y}$. 
 The output vector~$\hat{Y}$ is some form of classification such as a binary classification or a probability distribution over multiple classes~\autocite{thierry-miegHowFundamentalConcepts}. 
 Between the input layer ($X$) and the output layer ($\hat{Y}$) there exists some number of interior layers that are referred to as hidden layers, the hidden and output layers are composed of neurons that pass signals derived from weights through the network, this model of computing was inspired by connectionism and our understanding of the human brain, see Fig.~\ref{fig:neuronLabeled} for labels of the analagous biological components. 
 Weights in a neural network effectively correspond to the synapses in the brain and the output of the neruon is modelled as the axon. 
 All neruons in a Neural network have weights corresponding to their inputs, these weights are are intended to mirror the value scaling effect of a synapse by performing a weighted sum operation~\autocite{szeEfficientProcessingDeep2017}.
 
 
-Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, there is no hard rule indicating when a neural network is considered deep but generally a network with more than 3 hidden layers is considered a deep neural network, the rest of this paper will refer to \acrshort{dnn}s for consistency. 
-Each neuron in a \Acrshort{dnn} applies an non-linear activation function to the result of its weighted sum of inputs and weights, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}.
+Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, there is no hard rule indicating when a neural network is considered deep but generally a network with more than 3 hidden layers is considered a deep neural network, the rest of this dissertaion will refer to \acrshort{dnn}s for consistency. 
+Each neuron in a \Acrshort{dnn} applies an non-linear activation function to the result of its weighted sum of inputs and weights, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}, the cumulative effect of the activations in each layer results in elabourate causal chains of transormations than influence the aggregate activation of the network.
 
+\textbf{Backpropagation} Although not the first to propose this approach~\autocite{schmidhuberDeepLearningNeural2015} the 1986 paper Learning representations by back-propagating errors~\autocite{rumelhartLearningRepresentationsBackpropagating1986} popularised back-propagation for updating weights during training multi-layer networks.
 
 \Acrshort{dnn}s can be categorised as feedforwards, feedback, and self-organising networks depending on their processing method~\autocite{chenDeepLearningMobile2020}.
 
 
-There are many popular deep neural network architectures, this document will continue to outline the \Acrshort{cnn} \& \Acrshort{rnn} architectures because these provivde a high level overview of the architectures that will be used for testing the research question.
+There are many popular deep neural network architectures, this document will continue to outline the \Acrshort{cnn} \& \Acrshort{rnn} architectures because these provide a high level overview of the type of models that will be used for the research posed in this dissertation.
 
 
 
