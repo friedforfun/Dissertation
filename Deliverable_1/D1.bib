@@ -868,6 +868,19 @@
   series = {{{FPGA}} '16}
 }
 
+@inproceedings{raduPerformanceAwareConvolutional2019,
+  title = {Performance {{Aware Convolutional Neural Network Channel Pruning}} for {{Embedded GPUs}}},
+  booktitle = {2019 {{IEEE International Symposium}} on {{Workload Characterization}} ({{IISWC}})},
+  author = {Radu, V. and Kaszyk, K. and Wen, Y. and Turner, J. and Cano, J. and Crowley, E. J. and Franke, B. and Storkey, A. and O'Boyle, M.},
+  date = {2019-11},
+  pages = {24--34},
+  doi = {10.1109/IISWC47752.2019.9042000},
+  abstract = {Convolutional Neural Networks (CNN) are becoming a common presence in many applications and services, due to their superior recognition accuracy. They are increasingly being used on mobile devices, many times just by porting large models designed for server space, although several model compression techniques have been considered. One model compression technique intended to reduce computations is channel pruning. Mobile and embedded systems now have GPUs which are ideal for the parallel computations of neural networks and for their lower energy cost per operation. Specialized libraries perform these neural network computations through highly optimized routines. As we find in our experiments, these libraries are optimized for the most common network shapes, making uninstructed channel pruning inefficient. We evaluate higher level libraries, which analyze the input characteristics of a convolutional layer, based on which they produce optimized OpenCL (Arm Compute Library and TVM) and CUDA (cuDNN) code. However, in reality, these characteristics and subsequent choices intended for optimization can have the opposite effect. We show that a reduction in the number of convolutional channels, pruning 12\% of the initial size, is in some cases detrimental to performance, leading to 2× slowdown. On the other hand, we also find examples where performance-aware pruning achieves the intended results, with performance speedups of 3× with cuDNN and above 10× with Arm Compute Library and TVM. Our findings expose the need for hardware-instructed neural network pruning.},
+  eventtitle = {2019 {{IEEE International Symposium}} on {{Workload Characterization}} ({{IISWC}})},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\YVWWIQWX\\Radu et al. - 2019 - Performance Aware Convolutional Neural Network Cha.pdf;C\:\\Users\\fried\\Zotero\\storage\\NCHTSHJT\\9042000.html},
+  keywords = {Arm Compute Library,channel pruning,convolutional channels,convolutional layer,convolutional neural nets,convolutional neural network channel pruning,convolutional neural networks,data compression,embedded GPU,embedded GPUs,graphics processing units,hardware-instructed neural network pruning,mobile devices,model compression technique,multiprocessing systems,neural network computations,OpenCL,parallel architectures,parallel computations,performance-aware pruning,software libraries}
+}
+
 @inproceedings{reagenMinervaEnablingLowPower2016,
   title = {Minerva: {{Enabling Low}}-{{Power}}, {{Highly}}-{{Accurate Deep Neural Network Accelerators}}},
   shorttitle = {Minerva},
@@ -1042,6 +1055,21 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\6ZRWVHNL\\Tiwari and Mondal - 2019 - NCS based ultra low power optimized machine learni.pdf},
   isbn = {978-1-72810-297-9},
   langid = {english}
+}
+
+@online{turnerDistillingPerformanceEnhanced2019,
+  title = {Distilling with {{Performance Enhanced Students}}},
+  author = {Turner, Jack and Crowley, Elliot J. and Radu, Valentin and Cano, José and Storkey, Amos and O'Boyle, Michael},
+  date = {2019-03-07},
+  url = {http://arxiv.org/abs/1810.10460},
+  urldate = {2020-11-04},
+  abstract = {The task of accelerating large neural networks on general purpose hardware has, in recent years, prompted the use of channel pruning to reduce network size. However, the efficacy of pruning based approaches has since been called into question. In this paper, we turn to distillation for model compression---specifically, attention transfer---and develop a simple method for discovering performance enhanced student networks. We combine channel saliency metrics with empirical observations of runtime performance to design more accurate networks for a given latency budget. We apply our methodology to residual and densely-connected networks, and show that we are able to find resource-efficient student networks on different hardware platforms while maintaining very high accuracy. These performance-enhanced student networks achieve up to 10\% boosts in top-1 ImageNet accuracy over their channel-pruned counterparts for the same inference time.},
+  archivePrefix = {arXiv},
+  eprint = {1810.10460},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\USMPE4XH\\Turner et al. - 2019 - Distilling with Performance Enhanced Students.pdf},
+  keywords = {Computer Science - Machine Learning,Computer Science - Performance,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
 }
 
 @article{umurogluFINNFrameworkFast2017,

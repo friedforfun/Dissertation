@@ -20,7 +20,8 @@ $base$ simply loads the full model into the GPU memory, consequently providing o
 Each of $base$, $conv$ and $all$ are evaluated using two distinct convolutional algorithms - memory-optimal ($m$) and performance-optimal ($p$).
 Finally the $dyn$ allocation policy chooses ($m$) and ($p$) dynamically at runtime.
 
-Observing the results in Fig.~\ref{fig:vDNNperf}~a significant ($58\%$ and $55\%$) performance loss is evident compared to baseline, this loss is caused because no effort is made to optimise location of network parameters in memory. In this example the memory locality is compared between memory in the GPU (VRAM) and host memory (DRAM) accessed via the PCI lanes.
+Observing the results in Fig.~\ref{fig:vDNNperf}~where performance is characterized by latency during feature extraction layers; a significant performance loss is evident in the $all$ policy compared to baseline, this loss is caused because no effort is made to optimise the location of network parameters in memory.
+In this example the memory allocations are being measured between memory in the GPU (VRAM) and host memory (DRAM) accessed via the PCI lanes. This does show how important the latency in memory access can be crucial for model throughput.
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{MemoryAlloc.png} 
