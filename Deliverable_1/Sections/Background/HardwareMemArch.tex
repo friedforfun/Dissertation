@@ -2,8 +2,11 @@
 
 \begin{document}
 \emph{
-- Discuss VPU/TPU/APU/GPU/FPGA/ASIC memory arcitecture and how it handles matrix sparsity\\
-- Show ineffectivity of pruning on hardware without optimisations for sparse matrices\\
+- Show that techniques to break the memory wall should result in higher throughput\\
+- How does memory locality affect inference latency?\\
+- How much cpu time is spent accessing memory?\\
+- How do we use compression techniques to improve inference time (speedup)?\\
+- Why does pruning not reduce inference time?
 }
 %The explosion of Deep Neural Network applications in recent years has prompted the production of a wave of specialised hardware architectures to improve the efficiency and compute of these kinds of workloads. The mainstay of this form of processing has been until recently been dominated by GPUs.\\
 
@@ -14,6 +17,7 @@
     \caption{vDNN performance, showing the throughput using various memory allocation strategies. \\ \textbf{(Adopted figure from~\autocite{rhuVDNNVirtualizedDeep2016})}}
     \label{fig:vDNNperf}   
 \end{figure}
+
 While designed specifically for training networks that would otherwise be to large for a GPU, the memory manager vDNN proposed by Rhu et al~\autocite{rhuVDNNVirtualizedDeep2016}~does provide some insight into the importance of memory locality to neural network throughput.
 Fig.~\ref{fig:vDNNperf}~summarizes the performance of neural networks using vDNN to manage memory compared to a baseline memory management policy ($base$). The vDNN policies include: static policies (denoted as $all$ and $conv$) and a dynamic policy ($dyn$).
 $base$ simply loads the full model into the GPU memory, consequently providing optimal memory locality. $all$ refers to a policy of moving all $X$s out of GPU memory, and $conv$ only offloads $X$s from convolutional layers, $X$s are the input matrices to each layer, denoted by the red arrows in Fig.~\ref{fig:memAllocInf}.
@@ -46,14 +50,23 @@ Justifies the need for compression ... pruning
 
 A significant portion of DNN computation is matrix-vector multiplication, ideally weight reuse techniques can speed up these operations.
 However some DNNs feature FC layers with more than a hundred million weights (Fig.~\ref{fig:CNNcomplexity}), memory bandwidth here can be an issue since loading these weights can be a significant bottleneck~\autocite{qiuGoingDeeperEmbedded2016}. 
-When the cache capacity is insufficient to store the weight matrix this bottleneck is expounded, causing memory accesses for every operation since the weight matrix cannot be reused~\autocite{hanEIEEfficientInference2016}.
-As observed in Section~\ref{sec:MemAlloc} this indicates that compression techniques should help alliviate this bottleneck by making more parameters avaliable for cache reuse. The paper proposing EIE (an inference engine for compressed networks~\autocite{hanEIEEfficientInference2016}) shows that while compression does reduce the total number of operations, the irregular memory access patterns required when accessing sparse matrices mitigates improvements in inference performance, see Fig.~\ref{fig:wallClockEIE}.
+As observed in Section~\ref{sec:MemAlloc} this indicates that compression (Section~\ref{subsec:compressionTypes}) techniques could help alliviate this bottleneck by making parameters avaliable for cache reuse.
+However often modern networks are so large and complex there can still be an insufficient cache capacity for the full network parameters even when using modern compression techniques such as described in~\autocite{hanDeepCompressionCompressing2016}, in a follow up paper Han et al.~\autocite{hanEIEEfficientInference2016} discuss this case where memory accesses occur for every operation because the codebook (from a pruned and then quantised network) cannot be reused properly.
+This paper proposes EIE (an inference engine for compressed networks) also shows that while compression does reduce the total number of operations, the irregular memory access patterns required when accessing a weight codebook via their indices mitigates the expected improvements in inference performance, see Fig.~\ref{fig:wallClockEIE}, this is due to the \acrshort{blas} library for CPU and GPU not supporting indirect look-up and relative indexing~\autocite{hanDeepCompressionCompressing2016}.
+
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{wallClockEIE.png} 
     \caption{Wall clock time comparison for sparse and dense matrices between CPU, GPU, mGPU and EIE (an FPGA custom accelerator)\\ \textbf{(Adopted figure from~\autocite{hanEIEEfficientInference2016})}}
     \label{fig:wallClockEIE}   
 \end{figure}
+
+\subsubsection{Optimisation Techniques}
+\emph{
+- What can we do between out of box pruning and achieving a speedup?\\
+- What changes can be made to the underlaying structures?
+}
+
 
  Han et al~\autocite{hanEIEEfficientInference2016} provide a clear description of a technique for exploiting the sparity of activations by storing an encoded sparse weight matrix in a variant of compressed sparse column format~\autocite{vuducAutomaticPerformanceTuning}.
 

@@ -260,6 +260,25 @@
   langid = {english}
 }
 
+@article{duffOverviewSparseBasic2002,
+  title = {An Overview of the Sparse Basic Linear Algebra Subprograms: {{The}} New Standard from the {{BLAS}} Technical Forum},
+  shorttitle = {An Overview of the Sparse Basic Linear Algebra Subprograms},
+  author = {Duff, Iain S. and Heroux, Michael A. and Pozo, Roldan},
+  date = {2002-06-01},
+  journaltitle = {ACM Transactions on Mathematical Software},
+  shortjournal = {ACM Trans. Math. Softw.},
+  volume = {28},
+  pages = {239--267},
+  issn = {0098-3500},
+  doi = {10.1145/567806.567810},
+  url = {https://doi.org/10.1145/567806.567810},
+  urldate = {2020-11-15},
+  abstract = {We discuss the interface design for the Sparse Basic Linear Algebra Subprograms (BLAS), the kernels in the recent standard from the BLAS Technical Forum that are concerned with unstructured sparse matrices. The motivation for such a standard is to encourage portable programming while allowing for library-specific optimizations. In particular, we show how this interface can shield one from concern over the specific storage scheme for the sparse matrix. This design makes it easy to add further functionality to the sparse BLAS in the future.We illustrate the use of the Sparse BLAS with examples in the three supported programming languages, Fortran 95, Fortran 77, and C.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\QBRQLIN2\\Duff et al. - 2002 - An overview of the sparse basic linear algebra sub.pdf},
+  keywords = {Algorithms,computational kernels,software,sparse BLAS,sparse iterative methods,sparse matrices},
+  number = {2}
+}
+
 @article{el-sayedEdgeThingsBig2018,
   title = {Edge of {{Things}}: {{The Big Picture}} on the {{Integration}} of {{Edge}}, {{IoT}} and the {{Cloud}} in a {{Distributed Computing Environment}}},
   shorttitle = {Edge of {{Things}}},
@@ -323,6 +342,32 @@
   publisher = {{MIT Press}}
 }
 
+@online{GoogleWinsMLPerf,
+  title = {Google Wins {{MLPerf}} Benchmark Contest with Fastest {{ML}} Training Supercomputer},
+  journaltitle = {Google Cloud Blog},
+  url = {https://cloud.google.com/blog/products/ai-machine-learning/google-breaks-ai-performance-records-in-mlperf-with-worlds-fastest-training-supercomputer/},
+  urldate = {2020-11-15},
+  abstract = {Google set performance records in six out of the eight MLPerf benchmarks at the latest MLPerf benchmark contest},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\MSJU7NAZ\\google-breaks-ai-performance-records-in-mlperf-with-worlds-fastest-training-supercomputer.html},
+  langid = {english}
+}
+
+@online{hanDeepCompressionCompressing2016,
+  title = {Deep {{Compression}}: {{Compressing Deep Neural Networks}} with {{Pruning}}, {{Trained Quantization}} and {{Huffman Coding}}},
+  shorttitle = {Deep {{Compression}}},
+  author = {Han, Song and Mao, Huizi and Dally, William J.},
+  date = {2016-02-15},
+  url = {http://arxiv.org/abs/1510.00149},
+  urldate = {2020-11-06},
+  abstract = {Neural networks are both computationally intensive and memory intensive, making them difficult to deploy on embedded systems with limited hardware resources. To address this limitation, we introduce "deep compression", a three stage pipeline: pruning, trained quantization and Huffman coding, that work together to reduce the storage requirement of neural networks by 35x to 49x without affecting their accuracy. Our method first prunes the network by learning only the important connections. Next, we quantize the weights to enforce weight sharing, finally, we apply Huffman coding. After the first two steps we retrain the network to fine tune the remaining connections and the quantized centroids. Pruning, reduces the number of connections by 9x to 13x; Quantization then reduces the number of bits that represent each connection from 32 to 5. On the ImageNet dataset, our method reduced the storage required by AlexNet by 35x, from 240MB to 6.9MB, without loss of accuracy. Our method reduced the size of VGG-16 by 49x from 552MB to 11.3MB, again with no loss of accuracy. This allows fitting the model into on-chip SRAM cache rather than off-chip DRAM memory. Our compression method also facilitates the use of complex neural networks in mobile applications where application size and download bandwidth are constrained. Benchmarked on CPU, GPU and mobile GPU, compressed network has 3x to 4x layerwise speedup and 3x to 7x better energy efficiency.},
+  archivePrefix = {arXiv},
+  eprint = {1510.00149},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\TBRGS48R\\Han et al. - 2016 - Deep Compression Compressing Deep Neural Networks.pdf;C\:\\Users\\fried\\Zotero\\storage\\3GF87AF3\\1510.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Neural and Evolutionary Computing},
+  primaryClass = {cs}
+}
+
 @inproceedings{hanEIEEfficientInference2016,
   title = {{{EIE}}: {{Efficient Inference Engine}} on {{Compressed Deep Neural Network}}},
   shorttitle = {{{EIE}}},
@@ -357,6 +402,39 @@
   keywords = {Compression,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,Pruning},
   langid = {english},
   primaryClass = {cs}
+}
+
+@online{hanLearningBothWeights2015a,
+  title = {Learning Both {{Weights}} and {{Connections}} for {{Efficient Neural Networks}}},
+  author = {Han, Song and Pool, Jeff and Tran, John and Dally, William J.},
+  date = {2015-10-30},
+  url = {http://arxiv.org/abs/1506.02626},
+  urldate = {2020-11-13},
+  abstract = {Neural networks are both computationally intensive and memory intensive, making them difficult to deploy on embedded systems. Also, conventional networks fix the architecture before training starts; as a result, training cannot improve the architecture. To address these limitations, we describe a method to reduce the storage and computation required by neural networks by an order of magnitude without affecting their accuracy by learning only the important connections. Our method prunes redundant connections using a three-step method. First, we train the network to learn which connections are important. Next, we prune the unimportant connections. Finally, we retrain the network to fine tune the weights of the remaining connections. On the ImageNet dataset, our method reduced the number of parameters of AlexNet by a factor of 9x, from 61 million to 6.7 million, without incurring accuracy loss. Similar experiments with VGG-16 found that the number of parameters can be reduced by 13x, from 138 million to 10.3 million, again with no loss of accuracy.},
+  archivePrefix = {arXiv},
+  eprint = {1506.02626},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\TCVV58GI\\Han et al. - 2015 - Learning both Weights and Connections for Efficien.pdf;C\:\\Users\\fried\\Zotero\\storage\\YHELZTA8\\1506.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing},
+  primaryClass = {cs}
+}
+
+@article{hansonComparingBiasesMinimal,
+  title = {Comparing {{Biases}} for {{Minimal Network Construction}} with {{Back}}-{{Propagation}}},
+  author = {Hanson, Stephen Jose and Pratt, Lorien Y},
+  pages = {9},
+  abstract = {Rumelhart (1987). has proposed a method for choosing minimal or "simple" representations during learning in Back-propagation networks. This approach can be used to (a) dynamically select the number of hidden units. (b) construct a representation that is appropriate for the problem and (c) thus improve the generalization ability of Back-propagation networks. The method Rumelhart suggests involves adding penalty terms to the usual error function. In this paper we introduce Rumelhart·s minimal networks idea and compare two possible biases on the weight search space. These biases are compared in both simple counting problems and a speech recognition problem. In general. the constrained search does seem to minimize the number of hidden units required with an expected increase in local minima.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\I8WCHJLJ\\Hanson and Pratt - Comparing Biases for Minimal Network Construction .pdf},
+  langid = {english}
+}
+
+@article{hassibiSecondOrderDerivatives,
+  title = {Second {{Order Derivatives}} for {{Network Pruning}}: {{Optimal Brain Surgeon}}},
+  author = {Hassibi, Babak and Stork, David G},
+  pages = {8},
+  abstract = {We investigate the use of information from all second order derivatives of the error function to perfonn network pruning (i.e., removing unimportant weights from a trained network) in order to improve generalization, simplify networks, reduce hardware or storage requirements, increase the speed of further training, and in some cases enable rule extraction. Our method, Optimal Brain Surgeon (OBS), is Significantly better than magnitude-based methods and Optimal Brain Damage [Le Cun, Denker and Sol1a, 1990], which often remove the wrong weights. OBS permits the pruning of more weights than other methods (for the same error on the training set), and thus yields better generalization on test data. Crucial to OBS is a recursion relation for calculating the inverse Hessian matrix H-I from training data and structural information of the net. OBS permits a 90\%, a 76\%, and a 62\% reduction in weights over backpropagation with weighL decay on three benchmark MONK's problems [Thrun et aI., 1991]. Of OBS, Optimal Brain Damage, and magnitude-based methods, only OBS deletes the correct weights from a trained XOR network in every case. Finally, whereas Sejnowski and Rosenberg [1987J used 18,000 weights in their NETtalk network, we used OBS to prune a network to just 1560 weights, yielding better generalization.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\PTKYTYB2\\Hassibi and Stork - Second Order Derivatives for Network Pruning Opti.pdf},
+  langid = {english}
 }
 
 @incollection{heAMCAutoMLModel2018,
@@ -442,6 +520,17 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\LCDXZNIV\\Im et al. - 2004 - Sparsity Optimization Framework for Sparse Matrix.pdf},
   langid = {english},
   number = {1}
+}
+
+@online{IntelMyriadVision2017,
+  title = {Intel’s {{Myriad X Vision Chip Incorporates Neural Network}}},
+  date = {2017-08-30},
+  journaltitle = {Electronic Design},
+  url = {https://www.electronicdesign.com/industrial-automation/article/21805511/intels-myriad-x-vision-chip-incorporates-neural-network},
+  urldate = {2020-11-12},
+  abstract = {The company’s latest visual processing unit (VPU) incorporates a hardware neural network along with hardware accelerators.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\2Z6CM8AS\\movidius-myriad-x.png;C\:\\Users\\fried\\Zotero\\storage\\U7YZGYC6\\intels-myriad-x-vision-chip-incorporates-neural-network.html},
+  langid = {american}
 }
 
 @online{jainCheckmateBreakingMemory2020,
@@ -577,6 +666,15 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\73B3Y9MQ\\Lecun et al. - 1998 - Gradient-based learning applied to document recogn.pdf},
   langid = {english},
   number = {11}
+}
+
+@article{lecunOptimalBrainDamage,
+  title = {Optimal {{Brain Damage}}},
+  author = {LeCun, Yann and Denker, John S and Solla, Sara A},
+  pages = {8},
+  abstract = {We have used information-theoretic ideas to derive a class of practical and nearly optimal schemes for adapting the size of a neural network. By removing unimportant weights from a network, several improvements can be expected: better generalization, fewer training examples required, and improved speed of learning and/or classification. The basic idea is to use second-derivative information to make a tradeoff between network complexity and training set error. Experiments confirm the usefulness of the methods on a real-world application.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\58AF5J8Q\\LeCun et al. - Optimal Brain Damage.pdf},
+  langid = {english}
 }
 
 @inproceedings{liangEvolutionaryNeuralAutoML2019,
@@ -1012,6 +1110,18 @@
   langid = {english}
 }
 
+@online{stromPhonemeProbabilityEstimation1997,
+  title = {Phoneme Probability Estimation with Dynamic Sparsely Connected Artificial Neural Networks},
+  author = {Strom, N.},
+  date = {1997},
+  journaltitle = {undefined},
+  url = {/paper/Phoneme-probability-estimation-with-dynamic-neural-Strom/a9392b9299972452ea6fbc3c605f76bb1e21ae42},
+  urldate = {2020-11-13},
+  abstract = {This paper presents new methods for training large neural networks for phoneme probabilit y estimation. An architecture combining time-delay windows and recurrent connections is used to capture the important dynamic information of the speech signal. Because the number of connections in a fully connected recurrent network grows super-linear with the number of hidden units, schemes for sparse connection and connection pruning are explored. It is found that sparsely connected networks outperform their fully connected counterparts with an equal number of connections. The implementation of the combined architecture and training scheme is described in detail . The networks are evaluated in a hybrid HMM/ANN system for phoneme recognition on the TIMIT database, and for word recognition on the WAXHOLM database. The achieved phone error-rate, 27.8\%, for the standard 39 phoneme set on the core test-set of the TIMIT database is in the range of the lowest reported. All training and simulation software used is made freely available by the author, and detailed information about the software and the training process is given in an Appendix. Nikko Ström, Phoneme Probability Estimation with Dynamic Sparsely Connected Artificial Neural Networks 2 Table of contents Abstract...........................................................................................................................1},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\KNAVNR24\\a9392b9299972452ea6fbc3c605f76bb1e21ae42.html},
+  langid = {english}
+}
+
 @article{szeEfficientProcessingDeep2017,
   title = {Efficient {{Processing}} of {{Deep Neural Networks}}: {{A Tutorial}} and {{Survey}}},
   shorttitle = {Efficient {{Processing}} of {{Deep Neural Networks}}},
@@ -1067,7 +1177,7 @@
   archivePrefix = {arXiv},
   eprint = {1810.10460},
   eprinttype = {arxiv},
-  file = {C\:\\Users\\fried\\Zotero\\storage\\USMPE4XH\\Turner et al. - 2019 - Distilling with Performance Enhanced Students.pdf},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\USMPE4XH\\Turner et al. - 2019 - Distilling with Performance Enhanced Students.pdf;C\:\\Users\\fried\\Zotero\\storage\\6IUA2X46\\1810.html},
   keywords = {Computer Science - Machine Learning,Computer Science - Performance,Statistics - Machine Learning},
   primaryClass = {cs, stat}
 }
@@ -1115,6 +1225,21 @@
   pages = {455},
   file = {C\:\\Users\\fried\\Zotero\\storage\\RLLSEHDV\\Vuduc - Automatic Performance Tuning of Sparse Matrix Kern.pdf},
   langid = {english}
+}
+
+@online{wangBenchmarkingTPUGPU2019,
+  title = {Benchmarking {{TPU}}, {{GPU}}, and {{CPU Platforms}} for {{Deep Learning}}},
+  author = {Wang, Yu Emma and Wei, Gu-Yeon and Brooks, David},
+  date = {2019-10-22},
+  url = {http://arxiv.org/abs/1907.10701},
+  urldate = {2020-11-15},
+  abstract = {Training deep learning models is compute-intensive and there is an industry-wide trend towards hardware specialization to improve performance. To systematically benchmark deep learning platforms, we introduce ParaDnn, a parameterized benchmark suite for deep learning that generates end-to-end models for fully connected (FC), convolutional (CNN), and recurrent (RNN) neural networks. Along with six real-world models, we benchmark Google's Cloud TPU v2/v3, NVIDIA's V100 GPU, and an Intel Skylake CPU platform. We take a deep dive into TPU architecture, reveal its bottlenecks, and highlight valuable lessons learned for future specialized system design. We also provide a thorough comparison of the platforms and find that each has unique strengths for some types of models. Finally, we quantify the rapid performance improvements that specialized software stacks provide for the TPU and GPU platforms.},
+  archivePrefix = {arXiv},
+  eprint = {1907.10701},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\EAR8RQA5\\Wang et al. - 2019 - Benchmarking TPU, GPU, and CPU Platforms for Deep .pdf},
+  keywords = {Computer Science - Machine Learning,Computer Science - Performance,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
 }
 
 @article{wangDeepNeuralNetwork2019,

@@ -29,21 +29,23 @@
 
 \makenoidxglossaries
 
-\newacronym{ai}{AI}{Artifical Intelligence}
-\newacronym{fc}{FC}{Fully Connected}
-\newacronym{dnn}{DNN}{Deep Neural Network}
-\newacronym{cnn}{CNN}{Convolutional Neural Network}
-\newacronym{rnn}{RNN}{Recurrent Neural Network}
-\newacronym{lstm}{LSTM}{Long Term Short Term Memory Network}
-\newacronym{nlp}{NLP}{Natural Language Processing}
+\newacronym{ai}{AI}{artifical intelligence}
+\newacronym{fc}{FC}{fully connected}
+\newacronym{dnn}{DNN}{deep neural network}
+\newacronym{cnn}{CNN}{convolutional neural network}
+\newacronym{rnn}{RNN}{recurrent neural network}
+\newacronym{lstm}{LSTM}{long term short term memory network}
+\newacronym{nlp}{NLP}{natural language processing}
 
-\newacronym{ncs}{NCS}{Neural Compute Stick}
-\newacronym{tpu}{TPU}{Tensor Processing Unit}
-\newacronym{vpu}{VPU}{Video Processing Unit}
-\newacronym{gpu}{GPU}{Graphics Processing Unit}
-\newacronym{apu}{APU}{Associative Processing Unit}
-\newacronym{fpga}{FPGA}{Field Programmable Gate Array}
-\newacronym{asic}{ASIC}{Application Specific Integrated Circuit}
+\newacronym{ncs}{NCS}{neural compute stick}
+\newacronym{tpu}{TPU}{tensor processing unit}
+\newacronym{vpu}{VPU}{video processing unit}
+\newacronym{gpu}{GPU}{graphics processing unit}
+\newacronym{apu}{APU}{associative processing unit}
+\newacronym{fpga}{FPGA}{field programmable gate array}
+\newacronym{asic}{ASIC}{application specific integrated circuit}
+
+\newacronym{blas}{BLAS}{basic linear algebra subprograms}
 
 
 \usepackage{subfiles}
@@ -94,17 +96,19 @@ between one and two hundred words
 This Section will be split into 4 subsections:\\
 Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a neural network and the \acrshort{cnn} \& \acrshort{rnn} models.\\
 Section~\ref{subsec:compressionTypes} - \textbf{Compression Types}: ...\\
-Section~\ref{subsec:edgeComputing} - \textbf{Edge Computing}: stuff about edge comp\\
+Section~\ref{subsec:AIaccelerators} - \textbf{AI accelerators} stuff about AI accelerators\\
 Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Networks}: brief stuff about this section
 
 \subsection{Deep Neural Networks}\label{subsec:deepLearning}
 \subfile{Sections/Background/DeepNeuralNetworks}
 
-\subsection{Compression types}\label{subsec:compressionTypes}
+\newpage
+\subsection{Neural Network Compression}\label{subsec:compressionTypes}
 \subfile{Sections/Background/Compression}
 
-\subsection{Computing at the edge}\label{subsec:edgeComputing}
-\subfile{Sections/Background/ComputingEdge}
+\newpage
+\subsection{AI accelerators}\label{subsec:AIaccelerators}
+\subfile{Sections/Background/AIaccelerators}
 
 \subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
 \subfile{Sections/Background/HardwareMemArch}
