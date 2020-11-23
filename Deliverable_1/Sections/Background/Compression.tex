@@ -1,10 +1,30 @@
 \documentclass[../../D1.tex]{subfiles}
 
 \begin{document}
+Neural network compression is necessary due to storage related issues (particularly on resource contrained systems) that often arise with the high number of parameters that modern DNNs tend to use, state-of-the-art CNNs can have upwards of hundreds of millions of parameters. 
+Different compression methods can result in variuous underlaying representations of the weight matrices, particularly with respect to its sparsity. 
+Compression techniques that preserve the density of the weight matrix tend to result in inference acceleration on general-purpose processors\autocite{lebedevSpeedingupConvolutionalNeural2015,zhangAcceleratingVeryDeep2016}, not all techniques preserve this density and can result in weight matrices with various degrees of sparsity which in turn have varing degrees of regularity. 
+These techniques, the resulting representations, and their consequences will be discussed in this section.
 
 \subsubsection{Pruning}\label{sec:Pruning}
 Network pruning is the process of removing unimportant connections, leaving only the most informative connections.
 There has been a substantial amount of research into how pruning can be used to reduce overfitting and network complexity~\autocite{hansonComparingBiasesMinimal,hassibiSecondOrderDerivatives,lecunOptimalBrainDamage,stromPhonemeProbabilityEstimation1997}, but more recent research shows that some pruning methodologies can produce pruned networks with no loss of accuracy~\autocite{hanLearningBothWeights2015}.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=1\textwidth]{sparsity_structure.png} 
+    \end{center}
+    
+    \caption{Sparse structures in a 4-dimensional weight tensor. Regular sparsity makes hardware acceleration easier.\\ \textbf{(Adopted figure from~\autocite{maoExploringRegularitySparse2017})}}
+    \label{fig:QuantizationClust}   
+\end{figure}
+
+This process of pruning the weight matrix within a DNN results in a sparse matrix representation of weights, where the degree of sparsity is determined by the pruning algorithm being used and hyperparameters that can be tuned for the situation, such as how much accuracy loss is considered acceptable, and to what degree the neural network needs to be compressed. 
+The pattern of sparsity in a weight matrix is a fundamental factor when considering how to accelerate a pruned neural network~\autocite{maoExploringRegularitySparse2017}, this is known as the \textbf{granularity of sparsity}.
+The granularity of sparsity is usually categorised as either \textbf{fine-grained} or \textbf{course-grained}, pruning techniques are also categorised by the aformentioned granularities.
+Research shows that accelerating networks with very course-grained pruning is straightforward
+
+
 
 \subsubsection{Quantization and Weight Sharing}\label{sec:Quantization}
 
@@ -21,6 +41,8 @@ The paper Deep Compression by Han et al~\autocite{hanDeepCompressionCompressing2
     \caption{Weight sharing by quantization with centroid fine-tuning using gradients\\ \textbf{(Adopted figure from~\autocite{hanDeepCompressionCompressing2016})}}
     \label{fig:QuantizationClust}   
 \end{figure}
+
+
 
 \subsubsection{Distillation}\label{sec:Distillation}
 

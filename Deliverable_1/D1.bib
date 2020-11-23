@@ -344,12 +344,12 @@
 
 @online{GoogleWinsMLPerf,
   title = {Google Wins {{MLPerf}} Benchmark Contest with Fastest {{ML}} Training Supercomputer},
-  journaltitle = {Google Cloud Blog},
   url = {https://cloud.google.com/blog/products/ai-machine-learning/google-breaks-ai-performance-records-in-mlperf-with-worlds-fastest-training-supercomputer/},
   urldate = {2020-11-15},
   abstract = {Google set performance records in six out of the eight MLPerf benchmarks at the latest MLPerf benchmark contest},
   file = {C\:\\Users\\fried\\Zotero\\storage\\MSJU7NAZ\\google-breaks-ai-performance-records-in-mlperf-with-worlds-fastest-training-supercomputer.html},
-  langid = {english}
+  langid = {english},
+  organization = {{Google Cloud Blog}}
 }
 
 @online{hanDeepCompressionCompressing2016,
@@ -525,12 +525,12 @@
 @online{IntelMyriadVision2017,
   title = {Intel’s {{Myriad X Vision Chip Incorporates Neural Network}}},
   date = {2017-08-30},
-  journaltitle = {Electronic Design},
   url = {https://www.electronicdesign.com/industrial-automation/article/21805511/intels-myriad-x-vision-chip-incorporates-neural-network},
   urldate = {2020-11-12},
   abstract = {The company’s latest visual processing unit (VPU) incorporates a hardware neural network along with hardware accelerators.},
   file = {C\:\\Users\\fried\\Zotero\\storage\\2Z6CM8AS\\movidius-myriad-x.png;C\:\\Users\\fried\\Zotero\\storage\\U7YZGYC6\\intels-myriad-x-vision-chip-incorporates-neural-network.html},
-  langid = {american}
+  langid = {american},
+  organization = {{Electronic Design}}
 }
 
 @online{jainCheckmateBreakingMemory2020,
@@ -602,6 +602,21 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\TNSWR3SE\\Kasturi et al. - 2020 - Hybrid Fusion Learning A Hierarchical Learning Mo.pdf},
   isbn = {978-1-4503-8073-7},
   langid = {english}
+}
+
+@online{lebedevSpeedingupConvolutionalNeural2015,
+  title = {Speeding-up {{Convolutional Neural Networks Using Fine}}-Tuned {{CP}}-{{Decomposition}}},
+  author = {Lebedev, Vadim and Ganin, Yaroslav and Rakhuba, Maksim and Oseledets, Ivan and Lempitsky, Victor},
+  date = {2015-04-24},
+  url = {http://arxiv.org/abs/1412.6553},
+  urldate = {2020-11-23},
+  abstract = {We propose a simple two-step approach for speeding up convolution layers within large convolutional neural networks based on tensor decomposition and discriminative fine-tuning. Given a layer, we use non-linear least squares to compute a low-rank CP-decomposition of the 4D convolution kernel tensor into a sum of a small number of rank-one tensors. At the second step, this decomposition is used to replace the original convolutional layer with a sequence of four convolutional layers with small kernels. After such replacement, the entire network is fine-tuned on the training data using standard backpropagation process. We evaluate this approach on two CNNs and show that it is competitive with previous approaches, leading to higher obtained CPU speedups at the cost of lower accuracy drops for the smaller of the two networks. Thus, for the 36-class character classification CNN, our approach obtains a 8.5x CPU speedup of the whole network with only minor accuracy drop (1\% from 91\% to 90\%). For the standard ImageNet architecture (AlexNet), the approach speeds up the second convolution layer by a factor of 4x at the cost of \$1\textbackslash\%\$ increase of the overall top-5 classification error.},
+  archivePrefix = {arXiv},
+  eprint = {1412.6553},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\YXR6B7QN\\Lebedev et al. - 2015 - Speeding-up Convolutional Neural Networks Using Fi.pdf;C\:\\Users\\fried\\Zotero\\storage\\G589BYIC\\1412.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning},
+  primaryClass = {cs}
 }
 
 @article{lecunConvolutionalNetworksImages,
@@ -823,7 +838,22 @@
   archivePrefix = {arXiv},
   eprint = {1705.08922},
   eprinttype = {arxiv},
-  file = {C\:\\Users\\fried\\Zotero\\storage\\SHWPEPCC\\Mao et al. - 2017 - Exploring the Regularity of Sparse Structure in Co.pdf},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\SHWPEPCC\\Mao et al. - 2017 - Exploring the Regularity of Sparse Structure in Co.pdf;C\:\\Users\\fried\\Zotero\\storage\\VE6UDJDW\\1705.html},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
+}
+
+@online{maoExploringRegularitySparse2017a,
+  title = {Exploring the {{Regularity}} of {{Sparse Structure}} in {{Convolutional Neural Networks}}},
+  author = {Mao, Huizi and Han, Song and Pool, Jeff and Li, Wenshuo and Liu, Xingyu and Wang, Yu and Dally, William J.},
+  date = {2017-06-04},
+  url = {http://arxiv.org/abs/1705.08922},
+  urldate = {2020-11-23},
+  abstract = {Sparsity helps reduce the computational complexity of deep neural networks by skipping zeros. Taking advantage of sparsity is listed as a high priority in next generation DNN accelerators such as TPU. The structure of sparsity, i.e., the granularity of pruning, affects the efficiency of hardware accelerator design as well as the prediction accuracy. Coarse-grained pruning creates regular sparsity patterns, making it more amenable for hardware acceleration but more challenging to maintain the same accuracy. In this paper we quantitatively measure the trade-off between sparsity regularity and prediction accuracy, providing insights in how to maintain accuracy while having more a more structured sparsity pattern. Our experimental results show that coarse-grained pruning can achieve a sparsity ratio similar to unstructured pruning without loss of accuracy. Moreover, due to the index saving effect, coarse-grained pruning is able to obtain a better compression ratio than fine-grained sparsity at the same accuracy threshold. Based on the recent sparse convolutional neural network accelerator (SCNN), our experiments further demonstrate that coarse-grained sparsity saves about 2x the memory references compared to fine-grained sparsity. Since memory reference is more than two orders of magnitude more expensive than arithmetic operations, the regularity of sparse structure leads to more efficient hardware design.},
+  archivePrefix = {arXiv},
+  eprint = {1705.08922},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\MV9VW3K7\\Mao et al. - 2017 - Exploring the Regularity of Sparse Structure in Co.pdf;C\:\\Users\\fried\\Zotero\\storage\\CKDDCQVZ\\1705.html},
   keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
   primaryClass = {cs, stat}
 }
@@ -1129,12 +1159,12 @@
   title = {Phoneme Probability Estimation with Dynamic Sparsely Connected Artificial Neural Networks},
   author = {Strom, N.},
   date = {1997},
-  journaltitle = {undefined},
   url = {/paper/Phoneme-probability-estimation-with-dynamic-neural-Strom/a9392b9299972452ea6fbc3c605f76bb1e21ae42},
   urldate = {2020-11-13},
   abstract = {This paper presents new methods for training large neural networks for phoneme probabilit y estimation. An architecture combining time-delay windows and recurrent connections is used to capture the important dynamic information of the speech signal. Because the number of connections in a fully connected recurrent network grows super-linear with the number of hidden units, schemes for sparse connection and connection pruning are explored. It is found that sparsely connected networks outperform their fully connected counterparts with an equal number of connections. The implementation of the combined architecture and training scheme is described in detail . The networks are evaluated in a hybrid HMM/ANN system for phoneme recognition on the TIMIT database, and for word recognition on the WAXHOLM database. The achieved phone error-rate, 27.8\%, for the standard 39 phoneme set on the core test-set of the TIMIT database is in the range of the lowest reported. All training and simulation software used is made freely available by the author, and detailed information about the software and the training process is given in an Appendix. Nikko Ström, Phoneme Probability Estimation with Dynamic Sparsely Connected Artificial Neural Networks 2 Table of contents Abstract...........................................................................................................................1},
   file = {C\:\\Users\\fried\\Zotero\\storage\\KNAVNR24\\a9392b9299972452ea6fbc3c605f76bb1e21ae42.html},
-  langid = {english}
+  langid = {english},
+  organization = {{undefined}}
 }
 
 @article{szeEfficientProcessingDeep2017,
@@ -1276,6 +1306,21 @@
   number = {2}
 }
 
+@online{wenLearningStructuredSparsity2016,
+  title = {Learning {{Structured Sparsity}} in {{Deep Neural Networks}}},
+  author = {Wen, Wei and Wu, Chunpeng and Wang, Yandan and Chen, Yiran and Li, Hai},
+  date = {2016-10-18},
+  url = {http://arxiv.org/abs/1608.03665},
+  urldate = {2020-11-23},
+  abstract = {High demand for computation resources severely hinders deployment of large-scale Deep Neural Networks (DNN) in resource constrained devices. In this work, we propose a Structured Sparsity Learning (SSL) method to regularize the structures (i.e., filters, channels, filter shapes, and layer depth) of DNNs. SSL can: (1) learn a compact structure from a bigger DNN to reduce computation cost; (2) obtain a hardware-friendly structured sparsity of DNN to efficiently accelerate the DNNs evaluation. Experimental results show that SSL achieves on average 5.1x and 3.1x speedups of convolutional layer computation of AlexNet against CPU and GPU, respectively, with off-the-shelf libraries. These speedups are about twice speedups of non-structured sparsity; (3) regularize the DNN structure to improve classification accuracy. The results show that for CIFAR-10, regularization on layer depth can reduce 20 layers of a Deep Residual Network (ResNet) to 18 layers while improve the accuracy from 91.25\% to 92.60\%, which is still slightly higher than that of original ResNet with 32 layers. For AlexNet, structure regularization by SSL also reduces the error by around \textasciitilde 1\%. Open source code is in https://github.com/wenwei202/caffe/tree/scnn},
+  archivePrefix = {arXiv},
+  eprint = {1608.03665},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\I7DZG3ZI\\Wen et al. - 2016 - Learning Structured Sparsity in Deep Neural Networ.pdf},
+  keywords = {Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,I.2.6,I.5.1,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
+}
+
 @article{williamsRooflineInsightfulVisual2009,
   title = {Roofline: An Insightful Visual Performance Model for Multicore Architectures},
   shorttitle = {Roofline},
@@ -1346,6 +1391,22 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\R8UW7U2G\\Yakovlev et al. - 2020 - Oracle AutoML a fast and predictive AutoML pipeli.pdf;C\:\\Users\\fried\\Zotero\\storage\\U4BUL9QI\\Yakovlev et al. - 2020 - Oracle AutoML a fast and predictive AutoML pipeli.pdf},
   langid = {english},
   number = {12}
+}
+
+@article{zhangAcceleratingVeryDeep2016,
+  title = {Accelerating {{Very Deep Convolutional Networks}} for {{Classification}} and {{Detection}}},
+  author = {Zhang, X. and Zou, J. and He, K. and Sun, J.},
+  date = {2016-10},
+  journaltitle = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume = {38},
+  pages = {1943--1955},
+  issn = {1939-3539},
+  doi = {10.1109/TPAMI.2015.2502579},
+  abstract = {This paper aims to accelerate the test-time computation of convolutional neural networks (CNNs), especially very deep CNNs [1] that have substantially impacted the computer vision community. Unlike previous methods that are designed for approximating linear filters or linear responses, our method takes the nonlinear units into account. We develop an effective solution to the resulting nonlinear optimization problem without the need of stochastic gradient descent (SGD). More importantly, while previous methods mainly focus on optimizing one or two layers, our nonlinear method enables an asymmetric reconstruction that reduces the rapidly accumulated error when multiple (e.g., \$\textbackslash ge\$ 10) layers are approximated. For the widely used very deep VGG-16 model [1] , our method achieves a whole-model speedup of 4\$\textbackslash times\$ with merely a 0.3 percent increase of top-5 error in ImageNet classification. Our 4\$\textbackslash times\$ accelerated VGG-16 model also shows a graceful accuracy degradation for object detection when plugged into the Fast R-CNN detector [2] .},
+  eventtitle = {{{IEEE Transactions}} on {{Pattern Analysis}} and {{Machine Intelligence}}},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\ZF5NSZH9\\Zhang et al. - 2016 - Accelerating Very Deep Convolutional Networks for .pdf;C\:\\Users\\fried\\Zotero\\storage\\SQZPH434\\7332968.html},
+  keywords = {acceleration,Acceleration,Accuracy,Convolutional neural networks,Covariance matrices,image classification,Image reconstruction,Life estimation,object detection,Object detection,Optimization},
+  number = {10}
 }
 
 
