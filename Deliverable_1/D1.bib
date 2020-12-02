@@ -205,6 +205,21 @@
   number = {3}
 }
 
+@online{courbariauxTrainingDeepNeural2015,
+  title = {Training Deep Neural Networks with Low Precision Multiplications},
+  author = {Courbariaux, Matthieu and Bengio, Yoshua and David, Jean-Pierre},
+  date = {2015-09-22},
+  url = {http://arxiv.org/abs/1412.7024},
+  urldate = {2020-12-02},
+  abstract = {Multipliers are the most space and power-hungry arithmetic operators of the digital implementation of deep neural networks. We train a set of state-of-the-art neural networks (Maxout networks) on three benchmark datasets: MNIST, CIFAR-10 and SVHN. They are trained with three distinct formats: floating point, fixed point and dynamic fixed point. For each of those datasets and for each of those formats, we assess the impact of the precision of the multiplications on the final error after training. We find that very low precision is sufficient not just for running trained networks but also for training them. For example, it is possible to train Maxout networks with 10 bits multiplications.},
+  archivePrefix = {arXiv},
+  eprint = {1412.7024},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\2AG4ELFH\\Courbariaux et al. - 2015 - Training deep neural networks with low precision m.pdf;C\:\\Users\\fried\\Zotero\\storage\\TR7SXS4T\\1412.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing},
+  primaryClass = {cs}
+}
+
 @article{dengTutorialSurveyArchitectures2014,
   title = {A Tutorial Survey of Architectures, Algorithms, and Applications for Deep Learning},
   author = {Deng, Li},
@@ -533,6 +548,17 @@
   organization = {{Electronic Design}}
 }
 
+@inproceedings{jacobQuantizationTrainingNeural2018,
+  title = {Quantization and {{Training}} of {{Neural Networks}} for {{Efficient Integer}}-{{Arithmetic}}-{{Only Inference}}},
+  author = {Jacob, Benoit and Kligys, Skirmantas and Chen, Bo and Zhu, Menglong and Tang, Matthew and Howard, Andrew and Adam, Hartwig and Kalenichenko, Dmitry},
+  date = {2018},
+  pages = {2704--2713},
+  url = {https://openaccess.thecvf.com/content_cvpr_2018/html/Jacob_Quantization_and_Training_CVPR_2018_paper.html},
+  urldate = {2020-12-02},
+  eventtitle = {Proceedings of the {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\XJQKFK2F\\Jacob et al. - 2018 - Quantization and Training of Neural Networks for E.pdf;C\:\\Users\\fried\\Zotero\\storage\\HUQCRZE3\\Jacob_Quantization_and_Training_CVPR_2018_paper.html}
+}
+
 @online{jainCheckmateBreakingMemory2020,
   title = {Checkmate: {{Breaking}} the {{Memory Wall}} with {{Optimal Tensor Rematerialization}}},
   shorttitle = {Checkmate},
@@ -602,6 +628,22 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\TNSWR3SE\\Kasturi et al. - 2020 - Hybrid Fusion Learning A Hierarchical Learning Mo.pdf},
   isbn = {978-1-4503-8073-7},
   langid = {english}
+}
+
+@online{krishnamoorthiQuantizingDeepConvolutional2018,
+  title = {Quantizing Deep Convolutional Networks for Efficient Inference: {{A}} Whitepaper},
+  shorttitle = {Quantizing Deep Convolutional Networks for Efficient Inference},
+  author = {Krishnamoorthi, Raghuraman},
+  date = {2018-06-21},
+  url = {http://arxiv.org/abs/1806.08342},
+  urldate = {2020-12-02},
+  abstract = {We present an overview of techniques for quantizing convolutional neural networks for inference with integer weights and activations. Per-channel quantization of weights and per-layer quantization of activations to 8-bits of precision post-training produces classification accuracies within 2\% of floating point networks for a wide variety of CNN architectures. Model sizes can be reduced by a factor of 4 by quantizing weights to 8-bits, even when 8-bit arithmetic is not supported. This can be achieved with simple, post training quantization of weights.We benchmark latencies of quantized networks on CPUs and DSPs and observe a speedup of 2x-3x for quantized implementations compared to floating point on CPUs. Speedups of up to 10x are observed on specialized processors with fixed point SIMD capabilities, like the Qualcomm QDSPs with HVX. Quantization-aware training can provide further improvements, reducing the gap to floating point to 1\% at 8-bit precision. Quantization-aware training also allows for reducing the precision of weights to four bits with accuracy losses ranging from 2\% to 10\%, with higher accuracy drop for smaller networks.We introduce tools in TensorFlow and TensorFlowLite for quantizing convolutional networks and review best practices for quantization-aware training to obtain high accuracy with quantized weights and activations. We recommend that per-channel quantization of weights and per-layer quantization of activations be the preferred quantization scheme for hardware acceleration and kernel optimization. We also propose that future processors and hardware accelerators for optimized inference support precisions of 4, 8 and 16 bits.},
+  archivePrefix = {arXiv},
+  eprint = {1806.08342},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\JF3TQYHL\\Krishnamoorthi - 2018 - Quantizing deep convolutional networks for efficie.pdf;C\:\\Users\\fried\\Zotero\\storage\\P3M8TLA5\\1806.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
 }
 
 @online{lebedevSpeedingupConvolutionalNeural2015,
@@ -856,6 +898,24 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\MV9VW3K7\\Mao et al. - 2017 - Exploring the Regularity of Sparse Structure in Co.pdf;C\:\\Users\\fried\\Zotero\\storage\\CKDDCQVZ\\1705.html},
   keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
   primaryClass = {cs, stat}
+}
+
+@inproceedings{maOptimizingLoopOperation2017,
+  title = {Optimizing {{Loop Operation}} and {{Dataflow}} in {{FPGA Acceleration}} of {{Deep Convolutional Neural Networks}}},
+  booktitle = {Proceedings of the 2017 {{ACM}}/{{SIGDA International Symposium}} on {{Field}}-{{Programmable Gate Arrays}}},
+  author = {Ma, Yufei and Cao, Yu and Vrudhula, Sarma and Seo, Jae-sun},
+  date = {2017-02-22},
+  pages = {45--54},
+  publisher = {{Association for Computing Machinery}},
+  location = {{New York, NY, USA}},
+  doi = {10.1145/3020078.3021736},
+  url = {https://doi.org/10.1145/3020078.3021736},
+  urldate = {2020-12-02},
+  abstract = {As convolution layers contribute most operations in convolutional neural network (CNN) algorithms, an effective convolution acceleration scheme significantly affects the efficiency and performance of a hardware CNN accelerator. Convolution in CNNs involves three-dimensional multiply and accumulate (MAC) operations with four levels of loops, which results in a large design space. Prior works either employ limited loop optimization techniques, e.g. loop unrolling, tiling and interchange, or only tune some of the design variables after the accelerator architecture and dataflow are already fixed. Without fully studying the convolution loop optimization before the hardware design phase, the resulting accelerator can hardly exploit the data reuse and manage data movement efficiently. This work overcomes these barriers by quantitatively analyzing and optimizing the design objectives (e.g. required memory access) of the CNN accelerator based on multiple design variables. We systematically explore the trade-offs of hardware cost by searching the design variable configurations, and propose a specific dataflow of hardware CNN acceleration to minimize the memory access and data movement while maximizing the resource utilization to achieve high performance. The proposed CNN acceleration scheme and architecture are demonstrated on a standalone Altera Arria 10 GX 1150 FPGA by implementing end-to-end VGG-16 CNN model and achieved 645.25 GOPS of throughput and 47.97 ms of latency, which is a {$>$}3.2× enhancement compared to state-of-the-art FPGA implementations of VGG model.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\B9Y7PVIQ\\Ma et al. - 2017 - Optimizing Loop Operation and Dataflow in FPGA Acc.pdf},
+  isbn = {978-1-4503-4354-1},
+  keywords = {convolutional neural networks,FPGA,hardware acceleration},
+  series = {{{FPGA}} '17}
 }
 
 @article{mayerScalableDeepLearning2020,
@@ -1316,7 +1376,7 @@
   archivePrefix = {arXiv},
   eprint = {1608.03665},
   eprinttype = {arxiv},
-  file = {C\:\\Users\\fried\\Zotero\\storage\\I7DZG3ZI\\Wen et al. - 2016 - Learning Structured Sparsity in Deep Neural Networ.pdf},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\I7DZG3ZI\\Wen et al. - 2016 - Learning Structured Sparsity in Deep Neural Networ.pdf;C\:\\Users\\fried\\Zotero\\storage\\XJSJZQT4\\1608.html},
   keywords = {Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing,I.2.6,I.5.1,Statistics - Machine Learning},
   primaryClass = {cs, stat}
 }
@@ -1407,6 +1467,22 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\ZF5NSZH9\\Zhang et al. - 2016 - Accelerating Very Deep Convolutional Networks for .pdf;C\:\\Users\\fried\\Zotero\\storage\\SQZPH434\\7332968.html},
   keywords = {acceleration,Acceleration,Accuracy,Convolutional neural networks,Covariance matrices,image classification,Image reconstruction,Life estimation,object detection,Object detection,Optimization},
   number = {10}
+}
+
+@online{zhouIncrementalNetworkQuantization2017,
+  title = {Incremental {{Network Quantization}}: {{Towards Lossless CNNs}} with {{Low}}-{{Precision Weights}}},
+  shorttitle = {Incremental {{Network Quantization}}},
+  author = {Zhou, Aojun and Yao, Anbang and Guo, Yiwen and Xu, Lin and Chen, Yurong},
+  date = {2017-08-25},
+  url = {http://arxiv.org/abs/1702.03044},
+  urldate = {2020-12-02},
+  abstract = {This paper presents incremental network quantization (INQ), a novel method, targeting to efficiently convert any pre-trained full-precision convolutional neural network (CNN) model into a low-precision version whose weights are constrained to be either powers of two or zero. Unlike existing methods which are struggled in noticeable accuracy loss, our INQ has the potential to resolve this issue, as benefiting from two innovations. On one hand, we introduce three interdependent operations, namely weight partition, group-wise quantization and re-training. A well-proven measure is employed to divide the weights in each layer of a pre-trained CNN model into two disjoint groups. The weights in the first group are responsible to form a low-precision base, thus they are quantized by a variable-length encoding method. The weights in the other group are responsible to compensate for the accuracy loss from the quantization, thus they are the ones to be re-trained. On the other hand, these three operations are repeated on the latest re-trained group in an iterative manner until all the weights are converted into low-precision ones, acting as an incremental network quantization and accuracy enhancement procedure. Extensive experiments on the ImageNet classification task using almost all known deep CNN architectures including AlexNet, VGG-16, GoogleNet and ResNets well testify the efficacy of the proposed method. Specifically, at 5-bit quantization, our models have improved accuracy than the 32-bit floating-point references. Taking ResNet-18 as an example, we further show that our quantized models with 4-bit, 3-bit and 2-bit ternary weights have improved or very similar accuracy against its 32-bit floating-point baseline. Besides, impressive results with the combination of network pruning and INQ are also reported. The code is available at https://github.com/Zhouaojun/Incremental-Network-Quantization.},
+  archivePrefix = {arXiv},
+  eprint = {1702.03044},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\PINA8KRV\\Zhou et al. - 2017 - Incremental Network Quantization Towards Lossless.pdf;C\:\\Users\\fried\\Zotero\\storage\\FDYPFGZG\\1702.html},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Neural and Evolutionary Computing},
+  primaryClass = {cs}
 }
 
 
