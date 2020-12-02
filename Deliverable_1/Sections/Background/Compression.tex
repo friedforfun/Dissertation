@@ -16,13 +16,21 @@ There has been a substantial amount of research into how pruning can be used to 
     \end{center}
     
     \caption{Sparse structures in a 4-dimensional weight tensor. Regular sparsity makes hardware acceleration easier.\\ \textbf{(Adopted figure from~\autocite{maoExploringRegularitySparse2017})}}
-    \label{fig:QuantizationClust}   
+    \label{fig:SparsityRegularity}   
 \end{figure}
 
 This process of pruning the weight matrix within a DNN results in a sparse matrix representation of weights, where the degree of sparsity is determined by the pruning algorithm being used and hyperparameters that can be tuned for the situation, such as how much accuracy loss is considered acceptable, and to what degree the neural network needs to be compressed. 
 The pattern of sparsity in a weight matrix is a fundamental factor when considering how to accelerate a pruned neural network~\autocite{maoExploringRegularitySparse2017}, this is known as the \textbf{granularity of sparsity}.
-The granularity of sparsity is usually categorised as either \textbf{fine-grained} or \textbf{course-grained}, pruning techniques are also categorised by the aformentioned granularities.
-Research shows that accelerating networks with very course-grained pruning is straightforward
+Figure~\ref{fig:SparsityRegularity} provides a visual representation of granularity of sparsity, the spectrum of granularity usually falls between either \textbf{fine-grained} or \textbf{course-grained}, pruning techniques are also categorised by the aformentioned granularities.
+
+
+The influential paper Optimal Brain Damage by LeCun et al~\autocite{lecunOptimalBrainDamage} was the first to propose a very fine-grained pruning technique by identifying and deleting individual weights within a network.
+Fine-grained pruning results in a network that can be challenging to accelerate without custom hardware such as proposed in~\autocite{hanEIEEfficientInference2016,parasharSCNNAcceleratorCompressedsparse2017}, a software solution has been theorized by Han et al~\autocite{hanDeepCompressionCompressing2016} that would involve developing a customized GPU kernel that supports indirect matrix entry lookup and a relative matrix indexing format, see Section~\ref{sec:Quantization} for further details on this technique.
+
+
+Coarse-grained pruning techniques such as channel and filter reduction preserve the density of the network by altering the dimensionality of the input/output vectors or removing entire layers. 
+Wen et al~\autocite{wenLearningStructuredSparsity2016}~showed that accelerating networks with very course-grained pruning is straightforward because the model smaller but still dense, so libraries such as~\acrshort{blas} are able to take full advantage of the structure. 
+
 
 
 
@@ -31,7 +39,8 @@ Research shows that accelerating networks with very course-grained pruning is st
 Quantization is the process of limiting the number of bits used to represent each weight within a network, this process results in many weights using identical or very close weight values. 
 These repeated weight values creates an ideal situation to use weight sharing techniques.
 
-The paper Deep Compression by Han et al~\autocite{hanDeepCompressionCompressing2016} weight sharing is taken a step further and clustering is employed to gather the quantized weights into bins (whose value is denoted by the centroid of that bin) then an index is assigned to each weight that points to the weights corresponding bin, the bins value is the centroid of that cluster, which is further fine-tuned by subtracting the sum of the gradients for each weight in the bin their respective centroid see Fig.~\ref{fig:QuantizationClust}.  
+The paper Deep Compression by Han et al~\autocite{hanDeepCompressionCompressing2016} weight sharing is taken a step further.
+First the weights are pruned and quantized, next clustering is employed to gather the quantized weights into bins (whose value is denoted by the centroid of that bin) finally an index is assigned to each weight that points to the weights corresponding bin, the bins value is the centroid of that cluster, which is further fine-tuned by subtracting the sum of the gradients for each weight in the bin their respective centroid see Fig.~\ref{fig:QuantizationClust}.  
 
 \begin{figure}[H]
     \begin{center}

@@ -52,12 +52,16 @@ A significant portion of DNN computation is matrix-vector multiplication, ideall
 However some DNNs feature FC layers with more than a hundred million weights (Fig.~\ref{fig:CNNcomplexity}), memory bandwidth here can be an issue since loading these weights can be a significant bottleneck~\autocite{qiuGoingDeeperEmbedded2016}. 
 As observed in Section~\ref{sec:MemAlloc} this indicates that compression (Section~\ref{subsec:compressionTypes}) techniques could help alliviate this bottleneck by making parameters avaliable for cache reuse.
 However often modern networks are so large and complex there can still be an insufficient cache capacity for the full network parameters even when using modern compression techniques such as described in~\autocite{hanDeepCompressionCompressing2016}, in a follow up paper Han et al.~\autocite{hanEIEEfficientInference2016} discuss this case where memory accesses occur for every operation because the codebook (from a pruned and then quantised network) cannot be reused properly.
-This paper proposes EIE (an inference engine for compressed networks) also shows that while compression does reduce the total number of operations, the irregular memory access patterns required when accessing a weight codebook via their indices mitigates the expected improvements in inference performance, see Fig.~\ref{fig:wallClockEIE}, this is due to the \acrshort{blas} library for CPU and GPU not supporting indirect look-up and relative indexing~\autocite{hanDeepCompressionCompressing2016}.
+This paper proposes EIE (an \acrshort{fpga} inference engine for compressed networks) also shows that while compression does reduce the total number of operations and a tangible speedup can be observed in the FC layers see Fig.~\ref{fig:wallClockEIE}, this technique when applied to convolutional layers has some issues.
+This is due to the irregular memory access patterns, lack of library and kernel level support for this style of sparse matrices (as discussed in Section~\ref{sec:Pruning}). 
+
+It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general purpose compute hardware with a custom built \acrshort{fpga}, so the speedup while impressive would be more appropriate compared to other \acrshort{fpga}s for DNNs.
+
 
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{wallClockEIE.png} 
-    \caption{Wall clock time comparison for sparse and dense matrices between CPU, GPU, mGPU and EIE (an FPGA custom accelerator)\\ \textbf{(Adopted figure from~\autocite{hanEIEEfficientInference2016})}}
+    \caption{Wall clock time ($\mu$) comparison for sparse and dense matrices in FC layers between CPU, GPU, mGPU and EIE (an FPGA custom accelerator)\\ \textbf{(Adopted figure from~\autocite{hanEIEEfficientInference2016})}}
     \label{fig:wallClockEIE}   
 \end{figure}
 
