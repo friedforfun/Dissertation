@@ -36,20 +36,31 @@ This style of pruning however can have a significant impact on the accuracy of t
 
 
 
-\subsubsection{Quantisation and Weight Sharing}\label{sec:Quantisation}
+\subsubsection{Quantisation}\label{sec:Quantisation}
 %Define Quantisation
 Most off-the-shelf DNNs utilise floating-point-quantisation for their parameters, providing arbitrary precision, the cost of this precision can be quite high in terms of arithmetic operation latency, high resource use and higher power consumption.
 However this arbitrary precision is often unnecesssary, extensive research~\autocite{jacobQuantizationTrainingNeural2018,maOptimizingLoopOperation2017} has shown reducing the precision of parameters can have an extremely small impact on the accuracy.
-
-Fixed-point quantisation is the process of limiting the floating point precision of each parameter within a network to a fixed point. 
-
-In the extreme fixed-point quantisation can represent each parameter with only 1 bit (also known as binary quantisation), Umuroglu et al.~\autocite{umurogluFINNFrameworkFast2017} used binary quantisation with an \acrshort{fpga} and achieved startling classification latencies (0.31$\mu$s on the MINIST dataset) while maintaining 95.8\% accuracy, this is largely because the entire model can be stored in on-chip memory this is discussed further in Section~\ref{sec:MemAlloc}.
+Quantisation can be broadly categorised into two groups: non-linear quantisation and fixed-point (linear) quantisation. 
 
 
-Utilising fixed-point and binary quantisation can result in many weights using identical or very close weight values, these repeated weight values creates an ideal situation to use weight sharing techniques.
-%Define weight sharing
+\textbf{Fixed-point quantisation} is the process of limiting the floating point precision of each parameter (and potentially each activation) within a network to a fixed point. 
 
-The paper Deep Compression by Han et al~\autocite{hanDeepCompressionCompressing2016} weight sharing is taken a step further.
+In the extreme fixed-point quantisation can represent each parameter with only 1 bit (also known as binary quantisation) with up to a theoretical 32x compression rate (in practice this is often closer to 10.3x)~\autocite{chenDeepLearningMobile2020}, Umuroglu et al.~\autocite{umurogluFINNFrameworkFast2017} used binary quantisation with an \acrshort{fpga} and achieved startling classification latencies (0.31$\mu$s on the MINIST dataset) while maintaining 95.8\% accuracy, this is largely because the entire model can be stored in on-chip memory this is discussed further in Section~\ref{sec:MemAlloc}.
+
+\begin{figure}[H]
+    \begin{center}
+        \includegraphics[width=1\textwidth]{QuantisationSpeedup.png} 
+    \end{center}
+    
+    \caption{Comparison of the speed-up when quantising a convolutional layer in Alexnet, 3 different methods.\\ \textbf{(Adopted figure from~\autocite{wuQuantizedConvolutionalNeural2016})}}
+    \label{fig:QuantisationSpeedup}   
+\end{figure}
+
+\textbf{Non-linear Quantisation} is a technique where the weights are split into groups and then assigned a single weight, this grouping can be accomplished in a number of ways, Gong et al.~\autocite{gongCompressingDeepConvolutional2014} used vector quantisation with $k$-means clustering and achieved compression rates of up to 24x while keeping the difference of top-five accuracy within 1\%. Wu et al.~\autocite{wuQuantizedConvolutionalNeural2016} quantised both FC and convolutional layers in Alexnet using their Q-CNN framework
+
+
+
+The paper Deep Compression by Han et al~\autocite{hanDeepCompressionCompressing2016} quantisation and weight sharing is taken a step further.
 First the weights are pruned and quantized, next clustering is employed to gather the quantized weights into bins (whose value is denoted by the centroid of that bin) finally an index is assigned to each weight that points to the weights corresponding bin, the bins value is the centroid of that cluster, which is further fine-tuned by subtracting the sum of the gradients for each weight in the bin their respective centroid see Fig.~\ref{fig:QuantisationClust}.  
 
 \begin{figure}[H]
