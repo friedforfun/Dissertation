@@ -1,13 +1,7 @@
 \documentclass[../../D1.tex]{subfiles}
 
 \begin{document}
-\emph{
-- Show that techniques to break the memory wall should result in higher throughput\\
-- How does memory locality affect inference latency?\\
-- How much cpu time is spent accessing memory?\\
-- How do we use compression techniques to improve inference time (speedup)?\\
-- Why does pruning not reduce inference time?
-}
+
 %The explosion of Deep Neural Network applications in recent years has prompted the production of a wave of specialised hardware architectures to improve the efficiency and compute of these kinds of workloads. The mainstay of this form of processing has been until recently been dominated by GPUs.\\
 
 
@@ -34,17 +28,17 @@ In this example the memory allocations are being measured between memory in the 
 \end{figure}
 
 
-Justifies the need for compression ... pruning
+\textbf{Justifies the need for compression ... pruning}
 
 
 \subsubsection{Memory Access}
 
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[width=0.7\textwidth]{complexityCNNModels.png} 
+        \includegraphics[width=0.7\textwidth]{OperationDemand.png} 
     \end{center}
     
-    \caption{Complexity distribution of CNN models\\ \textbf{(Adopted figure from~\autocite{qiuGoingDeeperEmbedded2016})}}
+    \caption{Operations demanded in different layers (GOP)\\ \textbf{(Adopted figure from~\autocite{qiuGoingDeeperEmbedded2016})}}
     \label{fig:CNNcomplexity}   
 \end{figure}
 
@@ -53,9 +47,8 @@ However some DNNs feature FC layers with more than a hundred million weights (Fi
 As observed in Section~\ref{sec:MemAlloc} this indicates that compression (Section~\ref{subsec:compressionTypes}) techniques could help alliviate this bottleneck by making parameters avaliable for cache reuse.
 However often modern networks are so large and complex there can still be an insufficient cache capacity for the full network parameters even when using modern compression techniques such as described in~\autocite{hanDeepCompressionCompressing2016}, in a follow up paper Han et al.~\autocite{hanEIEEfficientInference2016} discuss this case where memory accesses occur for every operation because the codebook (from a pruned and then quantised network) cannot be reused properly.
 This paper proposes EIE (an \acrshort{fpga} inference engine for compressed networks) also shows that while compression does reduce the total number of operations and a tangible speedup can be observed in the FC layers see Fig.~\ref{fig:wallClockEIE}, this technique when applied to convolutional layers has some issues.
-This is due to the irregular memory access patterns, lack of library and kernel level support for this style of sparse matrices (as discussed in Section~\ref{sec:Pruning}). 
-
-It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general purpose compute hardware with a custom built \acrshort{fpga}, so the speedup while impressive would be more appropriate compared to other \acrshort{fpga}s for DNNs.
+This is due to the irregular memory access patterns, lack of library and kernel level support for this style of sparse matrix (as discussed in Section~\ref{sec:Pruning}). 
+It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general purpose compute hardware with a custom built \acrshort{fpga}, so the speedup while impressive would be more appropriate compared to other purpose built \acrshort{fpga}s, however the most pertinent part of this Figure are the single batch size \acrshort{fc} layers with dense and sparse matrices.
 
 
 
