@@ -30,4 +30,15 @@ Look at underlaying storage mechanism of parameters in Network
 perform some engineering of refactoring/altering these mechanisms
 
 rerun systematic benchmarking framework
+
+
+
+\begin{enumerate}
+    \item \textbf{Determine models, and test datasets}: A small number of popular pretrained models will be selected, the models structure should be considered when selecting this models. Model depth, number of parameters, and number of convolutional\/FC layers will be taken into account. A couple of datasets will be used with these models, at least one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally these models should have pretrained weights for all datasets (however this may not be possible for all models), if necessary we will train and store the models ourselves.
+    \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a baseline. The end to end latency, individual layer latency and also the overall accuracy will be recored for each model/dataset pairing.
+    \item \textbf{Select compression algorithms}: Select at least 2 algorims that each applies at least one of the following compression domains: Pruning, and Quantisation. If feasable additional algorithms will be explored.
+    \item \textbf{Apply compression and gather inference data}: Compress the models used in the baseline tests and, using the same testing data, perform inference with the compressed models. The same metrics will be logged as in the baseline.
+    \item \textbf{Analyse the results}: 
+\end{enumerate}
+
 \end{document}
