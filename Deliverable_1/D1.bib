@@ -350,6 +350,21 @@
   number = {4}
 }
 
+@online{gongCompressingDeepConvolutional2014,
+  title = {Compressing {{Deep Convolutional Networks}} Using {{Vector Quantization}}},
+  author = {Gong, Yunchao and Liu, Liu and Yang, Ming and Bourdev, Lubomir},
+  date = {2014-12-18},
+  url = {http://arxiv.org/abs/1412.6115},
+  urldate = {2020-12-03},
+  abstract = {Deep convolutional neural networks (CNN) has become the most promising method for object recognition, repeatedly demonstrating record breaking results for image classification and object detection in recent years. However, a very deep CNN generally involves many layers with millions of parameters, making the storage of the network model to be extremely large. This prohibits the usage of deep CNNs on resource limited hardware, especially cell phones or other embedded devices. In this paper, we tackle this model storage issue by investigating information theoretical vector quantization methods for compressing the parameters of CNNs. In particular, we have found in terms of compressing the most storage demanding dense connected layers, vector quantization methods have a clear gain over existing matrix factorization methods. Simply applying k-means clustering to the weights or conducting product quantization can lead to a very good balance between model size and recognition accuracy. For the 1000-category classification task in the ImageNet challenge, we are able to achieve 16-24 times compression of the network with only 1\% loss of classification accuracy using the state-of-the-art CNN.},
+  archivePrefix = {arXiv},
+  eprint = {1412.6115},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\HTPL3ZQR\\Gong et al. - 2014 - Compressing Deep Convolutional Networks using Vect.pdf;C\:\\Users\\fried\\Zotero\\storage\\DNDI4VJT\\1412.html},
+  keywords = {Computer Science - Computer Vision and Pattern Recognition,Computer Science - Machine Learning,Computer Science - Neural and Evolutionary Computing},
+  primaryClass = {cs}
+}
+
 @book{Goodfellow-et-al-2016,
   title = {Deep Learning},
   author = {Goodfellow, Ian and Bengio, Yoshua and Courville, Aaron},
@@ -1071,6 +1086,24 @@
   series = {{{FPGA}} '16}
 }
 
+@inproceedings{qiuGoingDeeperEmbedded2016b,
+  title = {Going {{Deeper}} with {{Embedded FPGA Platform}} for {{Convolutional Neural Network}}},
+  booktitle = {Proceedings of the 2016 {{ACM}}/{{SIGDA International Symposium}} on {{Field}}-{{Programmable Gate Arrays}}},
+  author = {Qiu, Jiantao and Wang, Jie and Yao, Song and Guo, Kaiyuan and Li, Boxun and Zhou, Erjin and Yu, Jincheng and Tang, Tianqi and Xu, Ningyi and Song, Sen and Wang, Yu and Yang, Huazhong},
+  date = {2016-02-21},
+  pages = {26--35},
+  publisher = {{Association for Computing Machinery}},
+  location = {{New York, NY, USA}},
+  doi = {10.1145/2847263.2847265},
+  url = {https://doi.org/10.1145/2847263.2847265},
+  urldate = {2020-12-03},
+  abstract = {In recent years, convolutional neural network (CNN) based methods have achieved great success in a large number of applications and have been among the most powerful and widely used techniques in computer vision. However, CNN-based methods are com-putational-intensive and resource-consuming, and thus are hard to be integrated into embedded systems such as smart phones, smart glasses, and robots. FPGA is one of the most promising platforms for accelerating CNN, but the limited bandwidth and on-chip memory size limit the performance of FPGA accelerator for CNN. In this paper, we go deeper with the embedded FPGA platform on accelerating CNNs and propose a CNN accelerator design on embedded FPGA for Image-Net large-scale image classification. We first present an in-depth analysis of state-of-the-art CNN models and show that Convolutional layers are computational-centric and Fully-Connected layers are memory-centric. Then the dynamic-precision data quantization method and a convolver design that is efficient for all layer types in CNN are proposed to improve the bandwidth and resource utilization. Results show that only 0.4\% accuracy loss is introduced by our data quantization flow for the very deep VGG16 model when 8/4-bit quantization is used. A data arrangement method is proposed to further ensure a high utilization of the external memory bandwidth. Finally, a state-of-the-art CNN, VGG16-SVD, is implemented on an embedded FPGA platform as a case study. VGG16-SVD is the largest and most accurate network that has been implemented on FPGA end-to-end so far. The system on Xilinx Zynq ZC706 board achieves a frame rate at 4.45 fps with the top-5 accuracy of 86.66\% using 16-bit quantization. The average performance of convolutional layers and the full CNN is 187.8 GOP/s and 137.0 GOP/s under 150MHz working frequency, which outperform previous approaches significantly.},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\FTAHGKCR\\Qiu et al. - 2016 - Going Deeper with Embedded FPGA Platform for Convo.pdf},
+  isbn = {978-1-4503-3856-1},
+  keywords = {bandwidth utilization,convolutional neural network (cnn),dynamic-precision data quantization,embedded fpga},
+  series = {{{FPGA}} '16}
+}
+
 @inproceedings{raduPerformanceAwareConvolutional2019,
   title = {Performance {{Aware Convolutional Neural Network Channel Pruning}} for {{Embedded GPUs}}},
   booktitle = {2019 {{IEEE International Symposium}} on {{Workload Characterization}} ({{IISWC}})},
@@ -1366,6 +1399,20 @@
   number = {2}
 }
 
+@inproceedings{wangFlexibleNetworkBinarization2018,
+  title = {Flexible {{Network Binarization}} with {{Layer}}-{{Wise Priority}}},
+  booktitle = {2018 25th {{IEEE International Conference}} on {{Image Processing}} ({{ICIP}})},
+  author = {Wang, H. and Xu, Y. and Ni, B. and Zhuang, L. and Xu, H.},
+  date = {2018-10},
+  pages = {2346--2350},
+  issn = {2381-8549},
+  doi = {10.1109/ICIP.2018.8451576},
+  abstract = {How to effectively approximate real-valued parameters with binary codes plays a central role in neural network binarization. In this work, we reveal an important fact that binarizing different layers has a widely varied effect on the compression ratio of network and the loss of performance. Based on this fact, we propose a novel and flexible neural network binarization method by introducing the concept of layer-wise priority which binarizes parameters in inverse order of their layer depth. In each training step, our method selects a specific network layer, minimizes the discrepancy between the original real-valued weights and its binary approximations following block coordinate descent scheme. During the iteration of the above process, it is significant that we can flexibly decide whether to binarize the remaining floating layers or not and explore a trade-off between the loss of performance and the compression ratio of model. The resulting binary network is applied for efficient pedestrian detection. Experimental results on several benchmarks show that under the same compression ratio, the model compressed by our method achieves much lower miss rate and faster detection speed than those obtained by the state-of-the-art neural network binarization method.},
+  eventtitle = {2018 25th {{IEEE International Conference}} on {{Image Processing}} ({{ICIP}})},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\QGXU6XMY\\Wang et al. - 2018 - Flexible Network Binarization with Layer-Wise Prio.pdf},
+  keywords = {binary approximations,binary codes,Computational modeling,Convolution,flexible network binarization,floating layers,Image coding,iterative methods,Layer-wise network binarization,layer-wise priority,learning (artificial intelligence),neural nets,neural network binarization method,neural network compression,Neural networks,object detection,Optimization,pedestrian detection,pedestrians,real-valued weights,Task analysis,Training}
+}
+
 @online{wenLearningStructuredSparsity2016,
   title = {Learning {{Structured Sparsity}} in {{Deep Neural Networks}}},
   author = {Wen, Wei and Wu, Chunpeng and Wang, Yandan and Chen, Yiran and Li, Hai},
@@ -1433,6 +1480,17 @@
   number = {1}
 }
 
+@inproceedings{wuQuantizedConvolutionalNeural2016,
+  title = {Quantized {{Convolutional Neural Networks}} for {{Mobile Devices}}},
+  author = {Wu, Jiaxiang and Leng, Cong and Wang, Yuhang and Hu, Qinghao and Cheng, Jian},
+  date = {2016},
+  pages = {4820--4828},
+  url = {https://www.cv-foundation.org/openaccess/content_cvpr_2016/html/Wu_Quantized_Convolutional_Neural_CVPR_2016_paper.html},
+  urldate = {2020-12-03},
+  eventtitle = {Proceedings of the {{IEEE Conference}} on {{Computer Vision}} and {{Pattern Recognition}}},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\E7ZEUTVH\\Wu et al. - 2016 - Quantized Convolutional Neural Networks for Mobile.pdf;C\:\\Users\\fried\\Zotero\\storage\\7ULJSVGN\\Wu_Quantized_Convolutional_Neural_CVPR_2016_paper.html}
+}
+
 @article{yakovlevOracleAutoMLFast2020,
   ids = {yakovlevOracleAutoMLFast2020a},
   title = {Oracle {{AutoML}}: A Fast and Predictive {{AutoML}} Pipeline},
@@ -1483,6 +1541,22 @@
   file = {C\:\\Users\\fried\\Zotero\\storage\\PINA8KRV\\Zhou et al. - 2017 - Incremental Network Quantization Towards Lossless.pdf;C\:\\Users\\fried\\Zotero\\storage\\FDYPFGZG\\1702.html},
   keywords = {Computer Science - Artificial Intelligence,Computer Science - Computer Vision and Pattern Recognition,Computer Science - Neural and Evolutionary Computing},
   primaryClass = {cs}
+}
+
+@online{zhuPruneNotPrune2017,
+  title = {To Prune, or Not to Prune: Exploring the Efficacy of Pruning for Model Compression},
+  shorttitle = {To Prune, or Not to Prune},
+  author = {Zhu, Michael and Gupta, Suyog},
+  date = {2017-11-13},
+  url = {http://arxiv.org/abs/1710.01878},
+  urldate = {2020-12-04},
+  abstract = {Model pruning seeks to induce sparsity in a deep neural network's various connection matrices, thereby reducing the number of nonzero-valued parameters in the model. Recent reports (Han et al., 2015; Narang et al., 2017) prune deep networks at the cost of only a marginal loss in accuracy and achieve a sizable reduction in model size. This hints at the possibility that the baseline models in these experiments are perhaps severely over-parameterized at the outset and a viable alternative for model compression might be to simply reduce the number of hidden units while maintaining the model's dense connection structure, exposing a similar trade-off in model size and accuracy. We investigate these two distinct paths for model compression within the context of energy-efficient inference in resource-constrained environments and propose a new gradual pruning technique that is simple and straightforward to apply across a variety of models/datasets with minimal tuning and can be seamlessly incorporated within the training process. We compare the accuracy of large, but pruned models (large-sparse) and their smaller, but dense (small-dense) counterparts with identical memory footprint. Across a broad range of neural network architectures (deep CNNs, stacked LSTM, and seq2seq LSTM models), we find large-sparse models to consistently outperform small-dense models and achieve up to 10x reduction in number of non-zero parameters with minimal loss in accuracy.},
+  archivePrefix = {arXiv},
+  eprint = {1710.01878},
+  eprinttype = {arxiv},
+  file = {C\:\\Users\\fried\\Zotero\\storage\\5DXFGJTU\\Zhu and Gupta - 2017 - To prune, or not to prune exploring the efficacy .pdf},
+  keywords = {Computer Science - Machine Learning,Statistics - Machine Learning},
+  primaryClass = {cs, stat}
 }
 
 
