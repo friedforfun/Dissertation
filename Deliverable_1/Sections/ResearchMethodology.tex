@@ -5,37 +5,42 @@ This is required for research projects and should be linked
 back to the project aim and objectives. It should describe the research methods that
 will be employed in the project and the research questions that will be investigated.
 
-1. build dataset of benchmarks from my systematic benchmark framework from models\\
-2. perform pruning on models\\
-3. run benchmark again with pruning\\
-4. make adjustments to underlaying mechanism of parameter storage\\
-5. verify adjustments do not break the model\\
-5. run benchmarks again\\
-6. draw conclusions\\
-
-
 \subsection{Research questions}
 
 
-\subsection{Research steps}
+To develop a systematic approach to compression algorithm selection when the goal is to minimize latency
 
+Using a bayseian optimisation strategy combined with random forest we will identify the most important set of parameters to achieve a minimal latency while retaining a target accuracy 
+
+\subsection{Research methodology}
+
+\subsubsection{Preliminary considerations}
 \textbf{Environment}
 
-\textbf{Determine models, and test datasets}: A small number of popular pretrained models will be selected, the models structure should be considered when selecting this models. Model depth, number of parameters, and number of convolutional\/FC layers will be taken into account. A couple of datasets will be used with these models, at least one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally these models should have pretrained weights for all datasets (however this may not be possible for all models), if necessary we will train and store the models ourselves.
+\textbf{Determine models, and test datasets}: 2 popular pretrained models will be selected, the models structure should be considered when selecting this models. Model depth, number of parameters, and number of convolutional\/FC layers will be taken into account. A couple of datasets will be used with these models, at least one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally these models should have pretrained weights for all datasets (however this may not be possible for all models), if necessary we will train and store the models ourselves.
 
-\textbf{Select compression algorithms}: Select at least 2 algorims that each applies at least one of the following compression domains: Pruning, and Quantisation. If feasable additional algorithms will be explored, but they should be algorithms that are possible to apply to a specific layer (for example distillation techniques would not be suitable here).
-The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller framework, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{automated\_gradual\_pruner} works on a diverse set of neural network architectures~\autocite{zhuPruneNotPrune2017} so it would be a good choice.
+\textbf{Select compression algorithms}: Select at least 4 algorithms that are members of the following compression domains: Pruning, and Quantisation. If feasable additional algorithms will be explored, prioritising unexplored sub-domains of Pruning and Quantisation (such as fine-grained pruning vs course-grained pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason distillation techniques would not be suitable here).
+The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller framework, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures~\autocite{zhuPruneNotPrune2017} so it would be a good choice.
+Once our algorithms are in hand we will examine prior work using these algorithms and select a pool of parameters for testing.
 
-
+\subsubsection{Experiment stages}
+\textbf{Experiment stage 1: Initial data gathering}
 \begin{enumerate}
-    \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a baseline. The end to end latency, individual layer latency and also the overall accuracy will be recored for each model/dataset pairing.
-    \item \textbf{Apply compression and gather full compression data}: Compress the models used in the baseline tests and, using the same testing data, perform inference with the compressed models. The same metrics will be logged as in the baseline. We will refer to this test as full compression.
-    \item \textbf{Analyse the results}: We will make observations about the resulting data, first we will make general comparisons with the end-to-end latency and accuracy against the baseline. Next we will take a close look at the layer by layer latency against the baseline, to try and identify patterns with respect to the type of each layer and the changes in latency.
-    \item \textbf{Apply combinations of compression techniques}
-    \item \textbf{Develop a layer-by-layer compression strategy}: By default most of the off-the-shelf compression algorithms avaliable in the chosen framework (Intel Distiller) perform compression on the entire model (or predefined parts of the model) for a given epoch. We intend to either subclass the existing classes or in the case of an imperative implementation copy and modify, in each case we will make the algorithm layer aware such that the compression algorithm can skip layers based on a set of parameters. Some implemenations rely on the compression schedulerAdditionally tweaks to the compression scheduler may be required for compatibility.
-    \item \textbf{Initial tests}: Following development of the layer-by-layer compression strategy we will perform two tests. First we will use the modified layer-aware compression algorithms without skipping any layers, this test should be functionally the same as the full compression tests. Then for each compression algorithm where inference latency shows a consistent pattern of improvement for a given layer type we will apply that compression algorithm to only those layers and leave the other layers untouched. We do these test for verification purposes and compatibility testing. All testing metrics from the baseline will be evaluated in these tests
-    \item \textbf{Evaluate initial tests} We will check the tests to ensure that the modifications do not result in worse performance, these tests should be (within margin of error) equal or better than the latency recorded in the full compression part of the experiment.
-    \item \textbf{Apply Full layer aware compression and gather data}: This experiment will use the data acquired in the full compression tests to apply a given compression algorithm only to layers within a model that have shown improvement over baseline during full and combined testing.
+    \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a \emph{baseline}. The end to end latency, individual layer latency and also the Top1/Top5 accuracy will be recored for each model/dataset pairing.
+    \item \textbf{Apply compression and gather full compression data}: For each compression algorithm and preselected parameters compress the models used in the \emph{baseline} tests by aggressively applying the compression technique to all relevant layers (i.e. layers which the algorithm can be applied). Next using the same testing data from \emph{baseline}, perform inference with the compressed models. The same metrics will be logged as in the \emph{baseline}. We will refer to this test as \emph{full compression}.
+    \item \textbf{Evaluate full compression}: We will make observations about the resulting data, the key metric we are interested in is latency at this stage. First we will make general comparisons with the end-to-end latency and accuracy against the \emph{baseline}. Next we will take a close look at the layer by layer latency against the \emph{baseline}, to try and identify patterns with respect to the size and type of each layer, its location in the neural network, and varience in latency. 
+    \item \textbf{Apply combinations of compression techniques}: Based on the results in the previous step we will cherry pick the best agorithm/parameter pairings, with respect to latency reduction for each domain represented in the selected algorithms. 
+    \item \textbf{Evaluate combined compression}:
+\end{enumerate}
+
+
+\textbf{Experiment stage 2: strategise compression}
+\begin{enumerate}
+    \item \textbf{Parameterise compression algorithms}: Programatically define compression schedule based on parameters for distiller for the most effective compression algorithms at reducing latency based on evaluating the results from Experiment stage 1.
+    \item \textbf{Develop a layer-by-layer compression strategy}: We intend to either subclass the existing classes or in the case of an imperative implementation copy and modify, in each case we will make the algorithm layer aware such that the compression algorithm can skip layers based on a set of parameters. Some implemenations rely on the compression schedulerAdditionally tweaks to the compression scheduler may be required for compatibility.
+    \item \textbf{Initial tests}: Following development of the layer-by-layer compression strategy we will perform two tests. First we will use the modified layer-aware compression algorithms without skipping any layers, this test should be functionally the same as the \emph{full compression} tests. Then for each compression algorithm where inference latency shows a consistent pattern of improvement for a given layer type we will apply that compression algorithm to only those layers and leave the other layers untouched. We do these test for verification purposes and compatibility testing. All testing metrics from the \emph{baseline} will be evaluated in these tests
+    \item \textbf{Evaluate initial tests} We will check the tests to ensure that the modifications do not result in worse performance, these tests should be (within margin of error) equal or better than the latency recorded in the\emph{full compression} part of the experiment.
+    \item \textbf{Apply Full layer aware compression and gather data}: This experiment will use the data acquired in the \emph{full compression} tests to apply a given compression algorithm only to layers within a model that have shown improvement over \emph{baseline} during full and combined testing.
 \end{enumerate}
 
 \end{document}
