@@ -15,32 +15,37 @@ Using a bayseian optimisation strategy combined with random forest we will ident
 \subsection{Research methodology}
 
 \subsubsection{Preliminary considerations}
-\textbf{Environment}
+\textbf{Environment}-To simulate an edge compute environment we will use the Intel Neural Compute stick
 
-\textbf{Determine models, and test datasets}: 2 popular pretrained models will be selected, the models structure should be considered when selecting this models. Model depth, number of parameters, and number of convolutional\/FC layers will be taken into account. A couple of datasets will be used with these models, at least one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally these models should have pretrained weights for all datasets (however this may not be possible for all models), if necessary we will train and store the models ourselves.
+\textbf{Determine models, and test datasets}- 1 popular pretrained models will be selected, the model structure should be considered when selecting this model. Model depth, number of parameters, and number of convolutional\/FC layers will be taken into account. Two datasets will be used with these models, one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally the selected model should have pretrained weights for both datasets, if necessary we will train and store the models ourselves.
 
-\textbf{Select compression algorithms}: Select at least 4 algorithms that are members of the following compression domains: Pruning, and Quantisation. If feasable additional algorithms will be explored, prioritising unexplored sub-domains of Pruning and Quantisation (such as fine-grained pruning vs course-grained pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason distillation techniques would not be suitable here).
+\textbf{Select compression algorithms}- Select at least 4 algorithms that are members of the following compression domains: Pruning, and Quantisation. If feasable additional algorithms will be explored, prioritising unexplored sub-domains of Pruning and Quantisation (such as fine-grained pruning vs course-grained pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason knowledge distillation techniques would not be suitable here).
 The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller framework, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures~\autocite{zhuPruneNotPrune2017} so it would be a good choice.
-Once our algorithms are in hand we will examine prior work using these algorithms and select a pool of parameters for testing.
+
 
 \subsubsection{Experiment stages}
-\textbf{Experiment stage 1: Initial data gathering}
+\textbf{\large~Experiment stage 1: Initial data gathering}
 \begin{enumerate}
     \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a \emph{baseline}. The end to end latency, individual layer latency and also the Top1/Top5 accuracy will be recored for each model/dataset pairing.
-    \item \textbf{Apply compression and gather full compression data}: For each compression algorithm and preselected parameters compress the models used in the \emph{baseline} tests by aggressively applying the compression technique to all relevant layers (i.e. layers which the algorithm can be applied). Next using the same testing data from \emph{baseline}, perform inference with the compressed models. The same metrics will be logged as in the \emph{baseline}. We will refer to this test as \emph{full compression}.
+    \item \textbf{Apply compression and gather full compression data}: For each compression algorithm and preselected parameters compress the models used in the \emph{baseline} tests by selectively applying the compression technique to a subset of relevant layers (i.e. layers which the algorithm can be applied). Next using the same testing data from \emph{baseline}, perform inference with the compressed models. The same metrics will be logged as in the \emph{baseline}. We will refer to this test as \emph{full compression}.
     \item \textbf{Evaluate full compression}: We will make observations about the resulting data, the key metric we are interested in is latency at this stage. First we will make general comparisons with the end-to-end latency and accuracy against the \emph{baseline}. Next we will take a close look at the layer by layer latency against the \emph{baseline}, to try and identify patterns with respect to the size and type of each layer, its location in the neural network, and varience in latency. 
-    \item \textbf{Apply combinations of compression techniques}: Based on the results in the previous step we will cherry pick the best agorithm/parameter pairings, with respect to latency reduction for each domain represented in the selected algorithms. 
-    \item \textbf{Evaluate combined compression}:
+    \item \textbf{Apply combinations of compression techniques}: Based on the results in the previous step we will cherry pick the best agorithm/parameter pairings, with respect to latency reduction for each domain represented in the selected algorithms. We will then apply a composition of these sucessful compression techinques to the models, using the same compression application strategies from \emph{full compression}.
+    \item \textbf{Evaluate combined compression}: We will evaluate latency changes from \emph{full compression} and \emph{baseline}. Of particular interest will be any changes in the individual layer latencies.
 \end{enumerate}
 
-
-\textbf{Experiment stage 2: strategise compression}
+\newpage
+\textbf{\large~Experiment stage 2: Develop optimisation framework}
 \begin{enumerate}
-    \item \textbf{Parameterise compression algorithms}: Programatically define compression schedule based on parameters for distiller for the most effective compression algorithms at reducing latency based on evaluating the results from Experiment stage 1.
-    \item \textbf{Develop a layer-by-layer compression strategy}: We intend to either subclass the existing classes or in the case of an imperative implementation copy and modify, in each case we will make the algorithm layer aware such that the compression algorithm can skip layers based on a set of parameters. Some implemenations rely on the compression schedulerAdditionally tweaks to the compression scheduler may be required for compatibility.
-    \item \textbf{Initial tests}: Following development of the layer-by-layer compression strategy we will perform two tests. First we will use the modified layer-aware compression algorithms without skipping any layers, this test should be functionally the same as the \emph{full compression} tests. Then for each compression algorithm where inference latency shows a consistent pattern of improvement for a given layer type we will apply that compression algorithm to only those layers and leave the other layers untouched. We do these test for verification purposes and compatibility testing. All testing metrics from the \emph{baseline} will be evaluated in these tests
-    \item \textbf{Evaluate initial tests} We will check the tests to ensure that the modifications do not result in worse performance, these tests should be (within margin of error) equal or better than the latency recorded in the\emph{full compression} part of the experiment.
-    \item \textbf{Apply Full layer aware compression and gather data}: This experiment will use the data acquired in the \emph{full compression} tests to apply a given compression algorithm only to layers within a model that have shown improvement over \emph{baseline} during full and combined testing.
+    \item \textbf{Parameterise compression algorithms}: Develop an interface to define the compression algorithm and its (distiller) scheduler settings. This will be a thin layer on top of distillers pre-existing scheduler api, the purpose of which will be to facilitate communication between an external parameter optimisation tool and distiller.
+    \item \textbf{Implement interface}: We will select the most performant aglorithms from Experiment stage 1 and include select parameters in the aforementioned interface. The parameters selection criteria will be based on observed layerwise latency improvement from Experiment stage 1.
+    \item \textbf{Define optimisation metric}: We will define an optimisation metric using an accuracy threshold as a user defined parameter. This will be the optimisation target.
+    \item \textbf{Integrate interface with benchmark suite}: link optimised distiller model generated via the interface with openvino to run benchmarks
+\end{enumerate}
+
+\textbf{\large~Experiment stage 3: Testing Compression optimisation}
+\begin{enumerate}
+    \item \textbf{Run the optimiser}: Using the framework developed in stage 2 we will utilise a bayseian search strategy with random forest to identify parameter importance and correlation with the optimisation metric. This will show us which compression parameters are the most important with respect the the metric, and in what direction to tweak them to find an appropriate set of compression parameter values that will result in faster inference within a minimal accuracy threshold.
+    \item 
 \end{enumerate}
 
 \end{document}
