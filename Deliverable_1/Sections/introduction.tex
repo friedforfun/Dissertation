@@ -7,22 +7,28 @@ identifying the problems to be solved to achieve the objectives, and sketching t
 \subsection{Motivation}
 With the continued revolution of AI technologies a desire to perform inference at the edge is becoming ever more prevalent.
 The argument for localising inference is only becoming stronger with the ever increasing avaliablilty of computation resources alongside new and constatnly evolving AI applications, inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
-Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not the case.
+Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not always the case.
+
 
 \subsection{Hypothesis}
-\emph{An appropriate combination of compression techniques applied in a layer-context-aware manner can improve inference latency without reducing accuracy significantly, whilst constrained within a typical edge computing environment.}
+\emph{Using a systematic model selection process combined with a bayesian optimisation algorithm we can imporve inference latency above an accuracy threshold in a typical edge computing environment.}
 
-\subsection{Research Aims}
-This dissertation will research methodologies for reducing inference latency with a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the internal structure of the neural network.
+\subsection{Research Aim}
+This dissertation will research methodologies for reducing inference latency with a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the internal structure of the neural network. 
+We will use this contextual information to apply a baysian optimisation strategy on the compression parameters.\\
+\textbf{\large~Objectives}
+\begin{itemize}
+    \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
+    \item \textbf{O1:}\label{obj:ModelSel} Select at least 1 computer vision model to use for testing.
+    \item \textbf{O2:}\label{obj:DataSel} Select 2 suitable datasets for testing with a significant distinction between the  cardinality of classes.
+    \item \textbf{O3:}\label{obj:EvalE2E} Evaluate a pool of compression algorithms with respect to end-to-end latency.
+    \item \textbf{O4:}\label{obj:EvalLayer} Measure latency for individual layers during inference.
+    \item \textbf{O5:}\label{obj:EvalComp} Investigate the effect of composing select algorithms from different compression categories. 
+    \item \textbf{O6:}\label{obj:ParaSel} Select compression parameters to optimise.
+    \item \textbf{O7:}\label{obj:CompPara} Develop a framework to parameterise select compression methods.
+    \item \textbf{O8:}\label{obj:TestOpt} Evaluate a model using a bayesian optimisation approach on compression parameters.
+\end{itemize}
 
-\begin{enumerate}
-    \item This research project will explore a pool of compression techniques and apply a varied composition of them in a manner that is sensitive to the context of the individual layer structures within a network.
-    \item We will seek to optimise inference latency within a typical edge environment.
-    \item The reasearch will attempt to provide evidence of effective compression techniques for a given layer type within a conventional neural network.
-\end{enumerate}
-
-
-Issues with limited resource computation \autocite{szeEfficientProcessingDeep2017}
 
 
 outline the document: We start with ..., then we cover x, y, and z ...
