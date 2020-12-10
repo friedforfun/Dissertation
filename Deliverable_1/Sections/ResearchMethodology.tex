@@ -53,8 +53,9 @@ Using the layerwise benchmarking data we will attempt to filter out pruning algo
 
 \subsubsection{Optimisation}
 To automate compression parameter tuning (Objective \hyperref[obj:CompPara]{O7}) we will use a bayesian optimisation technique that models the performance as a sample from a Gaussian process~\autocite{snoekPracticalBayesianOptimization2012}.
-Convienently this process is neatly implemented in a machine learning data collection and visualisation tool know as Weights and Biases.
+Convienently this process is neatly implemented in a machine learning data collection and visualisation tool know as Weights and Biases~\autocite{biewaldExperimentTrackingWeights}.
 
-
+\subsubsection{Training Benchmark Pipeline}
+Once the parameter tuner is ready we will need to produce a pipeline to move the models from the training host to the device hosting the neural compute stick, we will use a FIFO queue with a Redis store to accomplish this, a key advantage of this strategy is that it decouples the training system from the inference system, making it easy to add additional training agents. 
 
 \end{document}

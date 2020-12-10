@@ -1,4 +1,5 @@
-\documentclass[../../D1.tex]{subfiles}
+\documentclass[../D1.tex]{subfiles}
+
 
 \begin{document}
 
@@ -12,8 +13,8 @@
 
 \subsection{Risk Analysis}
 The following displays the anticipated risks with their accompanying mitigation strategies.
-\begin{enumerate}
-    \item Cannot compress model in Distiller.
+\begin{enumerate}[label={\textbf{R\theenumi}},leftmargin=*]
+    \item Cannot compress model in Distiller (see Section~\ref{sec:prelimEval}). 
     \begin{itemize}
         \item Investigate alternative compression libraries.
     \end{itemize}
@@ -47,26 +48,26 @@ The following displays the anticipated risks with their accompanying mitigation 
         \item Reduce scope of complexity by removing layer selection from the programatic definition and using a static layer definition.
     \end{itemize}
 
-    \item Illness
+    \item Hardware failure
     \begin{itemize}
-        \item Compensate for unexpected delays in the project plan
+        \item In the event of training agent hardware failure cloud resources can be accessed to perform training, the design plan is flexible to this.
+        \item In the event of the NCS failing either a replacement will be sought out, or we could move inference off an edge environment and seek to continue latency optimisation there.
     \end{itemize}
 \end{enumerate}
 
 
-\begin{table}[]
-    \begin{tabular}{@{}|l|l|l|l|l|l|l|@{}}
-        \toprule
-        \multirow{7}{*}{Likelihood} & Near Certainty $\sim$90\% &            &       &          &         &          \\ \cmidrule(l){2-7} 
-                                    & Highly Likely $\sim$70\%  &            &       &          &         &          \\ \cmidrule(l){2-7} 
-                                    & Likely $\sim$50\%         &            &       &          &         &          \\ \cmidrule(l){2-7} 
-                                    & Low likelihood $\sim$30\% &            &       &          &         &          \\ \cmidrule(l){2-7} 
-                                    & Not Likely $\sim$10\%     &            &       &          &         &          \\ \cmidrule(l){2-7} 
-                                    & \multirow{2}{*}{}         & Negligible & Minor & Moderate & Serious & Critical \\ \cmidrule(l){3-7} 
-                                    &                           & \multicolumn{5}{l|}{Impact of unmitigated Risk}  \\ \bottomrule
-        \end{tabular}
-    \caption{Unmitigated risk trace}
-\end{table}
+\begin{table}[H]
+    \begin{tabular}{|l|l|l|l|l|l|l|}
+    \hline
+    \multirow{7}{*}{Likelihood} & Near Certainty $\sim$90\% &            &       & R1       &         &          \\ \cline{2-7} 
+                                & Highly Likely $\sim$70\%  &            &       & R2       &         &          \\ \cline{2-7} 
+                                & Likely $\sim$50\%         &            & R3    & R5       & R6      &          \\ \cline{2-7} 
+                                & Low likelihood $\sim$30\% &            &       &          &         &          \\ \cline{2-7} 
+                                & Not Likely $\sim$10\%     &            &       & R4       & R7      &          \\ \cline{2-7} 
+                                & \multirow{2}{*}{}         & Negligible & Minor & Moderate & Serious & Critical \\ \cline{3-7} 
+                                &                           & \multicolumn{5}{l|}{Impact of Non-Mitigated Risk}  \\ \hline
+    \end{tabular}
+    \end{table}
 
 
 

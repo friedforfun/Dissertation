@@ -19,6 +19,7 @@
 \usepackage{caption}
 \usepackage{booktabs}
 \usepackage{multirow}
+\usepackage{enumitem}
 
 \usepackage[backend=biber,style=ieee]{biblatex}
 \usepackage[toc]{appendix}
@@ -49,6 +50,8 @@
 
 \newacronym{blas}{BLAS}{basic linear algebra subprograms}
 \newacronym{csc}{CSC}{compressed sparse column}
+\newacronym{tops}{TOPS}{trillion operations per second}
+\newacronym{soc}{SoC}{system on a chip}
 
 
 \usepackage{subfiles}
@@ -137,6 +140,7 @@ According to the literature covered in section~\ref{sec:Pruning} course-grained 
 Likewise given the hardware requirements quantisation is an even more consistent in its ability to reduce inference latency (see section~\ref{sec:Quantisation}).
 
 Table~\ref{tab:PrelimResults} presents findings when benchmarking inference of resnet20 with the CIFAR10 dataset on the NCS (table ref), these results show no real change between compression methods, this is an unexpected result.
+A run-to-run variance of 20ms was observed when running the same model repeatedly, so we can reasonably say that all these results are within margin of error.
 
 \begin{table}[H]
     \begin{tabular}{@{}|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|@{}}
