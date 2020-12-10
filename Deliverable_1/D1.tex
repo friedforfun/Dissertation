@@ -18,6 +18,7 @@
 \usepackage{mwe}
 \usepackage{caption}
 \usepackage{booktabs}
+\usepackage{multirow}
 
 \usepackage[backend=biber,style=ieee]{biblatex}
 \usepackage[toc]{appendix}
@@ -103,7 +104,6 @@ Summarise most significant body of work
 
 \pagebreak
 \section{Background}
-\emph{Discussing related work found in the technical literature and its relevance to your project.}
 This Section will be split into 4 subsections:\\
 Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a deep neural network and the \acrshort{cnn} model.\\
 Section~\ref{subsec:compressionTypes} - \textbf{Neural Network Compression}: Discusses neural network compression techniques and on how they change the underlying representations of DNNs.\\
@@ -121,22 +121,51 @@ Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Netwo
 \subsection{AI accelerators}\label{subsec:AIaccelerators}
 \subfile{Sections/Background/AIaccelerators}
 
+\newpage
 \subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
 \subfile{Sections/Background/HardwareMemArch}
 
-\pagebreak
+\newpage
 \section{Research}
 \subfile{Sections/ResearchMethodology}
 
-\pagebreak
+\newpage
+\section{Preliminary Evaluation}\label{sec:prelimEval}
+To demonstrate the necessity of \hyperref[obj:VerifyComp]{objective O0}, this section presents findings from a series of preliminary benchmarks. 
+According to the literature covered in section~\ref{sec:Pruning} course-grained pruning algorithms should provide a demonstrable improvement in latency during inference.
+Likewise given the hardware requirements quantisation is an even more consistent in its ability to reduce inference latency (see section~\ref{sec:Quantisation}).
+
+Table~\ref{tab:PrelimResults} presents findings when benchmarking inference of resnet20 with the CIFAR10 dataset on the NCS (table ref), these results show no real change between compression methods, this is an unexpected result.
+
+\begin{table}[H]
+    \begin{tabular}{@{}|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|@{}}
+    \toprule
+    Compression algorithm                     & Top 1 Accuracy & Top 5 Accuracy & Latency (ms) & Throughput (FPS) \\ \midrule
+    N/A (baseline)                            & 91.120         & 99.660         & 10.19        & 392.22           \\ \midrule
+    AGP filter, fine-grained, and row pruning & 91.110         & 99.700         & 10.15        & 394.14           \\ \midrule
+    ssl channels removal training             & 90.700         & 99.680         & 10.03        & 398.22           \\ \midrule
+    ssl channels removal finetuning           & 91.610         & 99.780         & 10.17        & 389.17           \\
+    \bottomrule
+    \end{tabular}
+    \caption{Preliminary NCS inference results, Resnet20 trained and tested with the CIFAR10 dataset.}
+    \label{tab:PrelimResults}
+\end{table}
+
+\emph{Experiment stage 0} in Section~\ref{sec:Experiment0} will investigate this further with the aim of verifying proper application of the compression scheduler to the model, and assessing factors in transferring the model to the NCS.
+
+\newpage
 \section{Evaluation Strategy}
 \subfile{Sections/EvaluationStrat}
 
-\pagebreak
+\newpage
+\section{Design}
+\subfile{Sections/Design}
+
+\newpage
 \section{Project Management}
 \subfile{Sections/ProjectManagement}
 
-\pagebreak
+\newpage
 \appendix
 \section{Back matter}
 \subsection{References}

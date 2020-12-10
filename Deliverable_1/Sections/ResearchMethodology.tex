@@ -1,54 +1,58 @@
 \documentclass[../D1.tex]{subfiles}
 
 \begin{document}
-This is required for research projects and should be linked
-back to the project aim and objectives. It should describe the research methods that
-will be employed in the project and the research questions that will be investigated.
-
 \subsection{Research questions}
-The following are the research questions this research will seek to cover:
+The following are the questions this research will seek to investigate:
 
 \begin{itemize}
-    \item Application of pruning algorithms on neural networks: how does the compression paradigm impact latency?
-    \item Can we apply hyperparameter optimisation methods to neural network compression to minimize latency?
-    \item 
+    \item Application of pruning algorithms on neural networks: how does changing the pruning paradigm impact latency? (Objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5})
+    \item Can we apply hyperparameter optimisation methods to neural network pruners to minimize latency? (Objective \hyperref[obj:CompPara]{O7})
+    \item To what degree can we improve latency (if at all) using an automated strategy while keeping the accuracy metrics above a set threshold? (Objective \hyperref[obj:TestOpt]{O8})
+\end{itemize}
+
+\subsection{Research Methodology}
+\subsubsection{Core Technology Summary}
+This sections provides a brief summary of the core technologies that will be utilised, the core functionality will be written in Python, a combination of different Python versions will be necessary to properly utilise Distiller and OpenVINO.
+This versioning issue is one of the reasons we use Redis, it can act as a message broker between Distiller and OpenVINO, we can facilitate a more flexible development by adopting this strategy (inference and training will be completely decoupled).  
+\begin{itemize}
+    \item \href{https://github.com/IntelLabs/distiller}{Distiller} - A neural network compression library.
+    \item \href{https://github.com/openvinotoolkit/openvino}{OpenVINO} - A toolkit to perform inference.
+    \item \href{https://github.com/wandb/client}{Weights \& Biases} - A tool for metric recording, visualisation, and parameter optimisation \autocite{biewaldExperimentTrackingWeights}.
+    \item \href{https://redis.io/}{Redis} - A fast data structure store (used for FIFO queue).
 \end{itemize}
 
 
-\subsection{Preliminary Evaluation}\label{sec:prelimEval}
-To demonstrate the necessity of \hyperref[obj:VerifyComp]{objective O0}, this section presents findings from a series of preliminary benchmarks. 
-According to the literature covered in section~\ref{sec:Pruning} course-grained pruning algorithms should provide a demonstrable improvement in latency during inference.
-Likewise given the hardware requirements quantisation is an even more consistent in its ability to reduce inference latency (see section~\ref{sec:Quantisation}).
-
-Table~\ref{tab:PrelimResults} presents findings when benchmarking inference of resnet20 with the CIFAR10 dataset on the NCS (table ref), these results show no real change between compression methods, this is an unexpected result.
-
-\begin{table}[H]
-    \begin{tabular}{@{}|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|@{}}
-    \toprule
-    Compression algorithm                     & Top 1 Accuracy & Top 5 Accuracy & Latency (ms) & Throughput (FPS) \\ \midrule
-    N/A (baseline)                            & 91.120         & 99.660         & 10.19        & 392.22           \\ \midrule
-    AGP filter, fine-grained, and row pruning & 91.110         & 99.700         & 10.15        & 394.14           \\ 
-    \midrule
-    ssl channels removal                      & 91.610         & 99.780         & 10.17        & 389.17           \\
-    \bottomrule
-    \end{tabular}
-    \caption{Preliminary NCS inference results, Resnet20 trained and tested with the CIFAR10 dataset.}
-    \label{tab:PrelimResults}
-\end{table}
-
-\emph{Experiment stage 0} in Section~\ref{sec:Experiment0} will investigate this further with the aim of verifying proper application of the compression scheduler to the model, and assessing factors in transferring the model to the NCS.
-
-\subsection{Research methodology}
+\subsubsection{Compression}
+The Distiller library was selected as the platform of choice to perform compression because it functions as a convienent toolbox to test a selection of compression methods under a common environment, and critically a larg collection of compression methods~~\autocite{zmoraNeuralNetworkDistiller2019}.
+The decision to use Distiller is reinforced by \hyperref[Aim1]{Aim 1}, there is a rich selection of already-implemented (off-the-shelf) algorithms to choose from, the parameters of these compression algorithms are all defined according to a ``scheduling recipe'' that can be defined programmaatically~\autocite{zmoraNeuralNetworkDistiller2019}.
+This project focuses specifically on the pruning methods within distiller, thus we refer to the parts of the scheduling recipe concerned with pruners as the compression parameters, depending on the compression method being used these can be lists of layers to apply the method, initial \& final sparsity, and groupings of the layer structure (channel vs filter).
 
 
-\subsubsection{Compressing}
-Distiller LR scheduling
+We will need to consider the schedule for the learning-rate decay class to properly fine tune the model, we will define a fixed learning-rate decay for all experiments to imporove reliability of our results and reduce the search dimensions for our own optimiser.
+
+Fig.~\ref{fig:DistillerArch} Shows a high level view of the Distiller library, to accomplish objective \hyperref[obj:CompPara]{O7} we will primarily be interacting with the scheduler via the framework specified in objective \hyperref[obj:CompPara]{O7}.
+
+\begin{figure}[h]
+    \includegraphics[width=1\textwidth]{DistillerArch.png}
+    \caption{Distiller high-level architecture.\\ \textbf{Figure adopted from~\autocite{zmoraNeuralNetworkDistiller2019}}}
+    \label{fig:DistillerArch}
+\end{figure}
+
+Upon finishing training the Top1 and Top5 metrics will be recorded, ready to be sent to Weights and Biases once the benchmarks are finished. 
 
 \subsubsection{Benchmarking}
-Openvino benchmarking tool
+Openvino benchmarking tool (Objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5})
+
+Benchmarking will be performed using OpenVINO's built in benchmarking tool, we can record infernece latency, individual layer latency, and a throughput metric (FPS). 
+
+
+\subsubsection{Compression parameter selection}
+(Aim 2)
 
 \subsubsection{Optimisation}
 bayesian optimisation \autocite{snoekPracticalBayesianOptimization2012}
+(Aim 4)
+(Objective \hyperref[obj:CompPara]{O7})
 
 
 

@@ -28,10 +28,11 @@ In this example the memory allocations are being measured between memory in the 
 \end{figure}
 
 
-\textbf{Justifies the need for compression ... pruning}
-
-
 \subsubsection{Memory Access}
+
+A significant portion of DNN computation is matrix-vector multiplication, ideally weight reuse techniques can speed up these operations.
+However some DNNs feature FC layers with more than a hundred million weights (Fig.~\ref{fig:CNNcomplexity}), memory bandwidth here can be an issue since loading these weights can be a significant bottleneck~\autocite{qiuGoingDeeperEmbedded2016}. 
+As observed in Section~\ref{sec:MemAlloc} this indicates that compression (Section~\ref{subsec:compressionTypes}) techniques could help alliviate this bottleneck by making parameters avaliable for cache reuse.
 
 \begin{figure}[H]
     \begin{center}
@@ -42,14 +43,12 @@ In this example the memory allocations are being measured between memory in the 
     \label{fig:CNNcomplexity}   
 \end{figure}
 
-A significant portion of DNN computation is matrix-vector multiplication, ideally weight reuse techniques can speed up these operations.
-However some DNNs feature FC layers with more than a hundred million weights (Fig.~\ref{fig:CNNcomplexity}), memory bandwidth here can be an issue since loading these weights can be a significant bottleneck~\autocite{qiuGoingDeeperEmbedded2016}. 
-As observed in Section~\ref{sec:MemAlloc} this indicates that compression (Section~\ref{subsec:compressionTypes}) techniques could help alliviate this bottleneck by making parameters avaliable for cache reuse.
-However often modern networks are so large and complex there can still be an insufficient cache capacity for the full network parameters even when using modern compression techniques such as described in~\autocite{hanDeepCompressionCompressing2016}, in a follow up paper Han et al.~\autocite{hanEIEEfficientInference2016} discuss this case where memory accesses occur for every operation because the codebook (from a pruned and then quantised network) cannot be reused properly.
-This paper proposes EIE (an \acrshort{fpga} inference engine for compressed networks) also shows that while compression does reduce the total number of operations and a tangible speedup can be observed in the FC layers see Fig.~\ref{fig:wallClockEIE}, this technique when applied to convolutional layers has some issues.
-This is due to the irregular memory access patterns, lack of library and kernel level support for this style of sparse matrix (as discussed in Section~\ref{sec:Pruning}). 
-It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general purpose compute hardware with a custom built \acrshort{fpga}, so the speedup while impressive would be more appropriate compared to other purpose built \acrshort{fpga}s, however the most pertinent part of this Figure are the single batch size \acrshort{fc} layers with dense and sparse matrices.
+Often modern networks are so large and complex there can still be an insufficient cache capacity for the full network parameters even when using modern compression techniques such as described in~\autocite{hanDeepCompressionCompressing2016}, in a follow up paper Han et al.~\autocite{hanEIEEfficientInference2016} discuss this case where memory accesses occur for every operation because the codebook (from a pruned and then quantised network) cannot be reused properly.
+This paper proposes EIE (an \acrshort{fpga} inference engine for compressed networks) also shows that while compression does reduce the total number of operations, and a tangible speedup can be observed in the FC layers see Fig.~\ref{fig:wallClockEIE}, this technique when applied to convolutional layers has some issues.
 
+
+Han et al~\autocite{hanEIEEfficientInference2016} provide an elegant description of a technique for exploiting the sparity of activations by storing an encoded sparse weight matrix in a variant of compressed sparse column format~\autocite{vuducAutomaticPerformanceTuning}, however implementing this is problematic (particularly in convolutional layers) due to the irregular memory access patterns, lack of library and kernel level support for this style of sparse matrix (as discussed in Section~\ref{sec:Pruning}). 
+It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general purpose compute hardware with a custom built \acrshort{fpga}, so the speedup while impressive would be more appropriate compared to other purpose built \acrshort{fpga}s, however the most pertinent part of this Figure is the single batch size \acrshort{fc} layer comparison between dense and sparse matrices.
 
 
 \begin{figure}[H]
@@ -58,13 +57,5 @@ It should also be noted that Fig.~\ref{fig:wallClockEIE} is comparing general pu
     \label{fig:wallClockEIE}   
 \end{figure}
 
-\subsubsection{Optimisation Techniques}
-\emph{
-- What can we do between out of box pruning and achieving a speedup?\\
-- What changes can be made to the underlaying structures?
-}
-
-
- Han et al~\autocite{hanEIEEfficientInference2016} provide a clear description of a technique for exploiting the sparity of activations by storing an encoded sparse weight matrix in a variant of compressed sparse column format~\autocite{vuducAutomaticPerformanceTuning}.
 
 \end{document}

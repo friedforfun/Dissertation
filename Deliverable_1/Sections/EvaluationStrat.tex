@@ -10,7 +10,7 @@ This section presents practical details of the evaluation process and how analys
 Two datasets will be used with these models, one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally the selected model should have pretrained weights for both datasets, if necessary we will train and store the models ourselves.
 
 \textbf{Select compression algorithms} - Select at least 4 algorithms that utilise different pruning methods. If feasable these algorithms should explore a spectrum of sub-domains of Pruning (such as fine-grained pruning vs filter or channel pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason knowledge distillation techniques would not be suitable here).
-For compatibility reasons with the ONNX intermediate representation quantisation may not be supported yet, \emph{Experiment stage 0} (Section~\ref{sec:Experiment0}) will present a good opportunity to investigate this.
+For compatibility reasons with the ONNX intermediate representation quantisation may not be exporeted from Distiller (as of Oct 2019)~\autocite{zmoraNeuralNetworkDistiller2019}, \emph{Experiment stage 0} (Section~\ref{sec:Experiment0}) will present a good opportunity to test if this is still the case.
 The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller framework, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures so it would be a suitable choice~\autocite{zhuPruneNotPrune2017}.
 
 \newpage
@@ -26,7 +26,7 @@ This experimental stage is necessary due to the preliminary evaluation reported 
 \end{enumerate}
 
 \subsubsection{Experiment stage 1: Initial data gathering}\label{sec:Experiment1}
-Completion of the following stages will satisfy objectives \hyperref[obj:EvalComp]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5}
+Completion of the following stages will satisfy objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5}
 \begin{enumerate}
     \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a \emph{baseline}. The end to end latency, individual layer latency and also the Top1/Top5 accuracy will be recored for each model/dataset pairing.
     \item \textbf{Apply compression and gather full compression data}: For each compression algorithm and preselected parameters compress the models used in the \emph{baseline} tests by selectively applying the compression technique to a subset of relevant layers (i.e. layers which the algorithm can be applied). Next using the same testing data from \emph{baseline}, perform inference with the compressed models. The same metrics will be logged as in the \emph{baseline}. We will refer to this test as \emph{full compression}.
@@ -36,6 +36,7 @@ Completion of the following stages will satisfy objectives \hyperref[obj:EvalCom
 \end{enumerate}
 
 \subsubsection{Experiment stage 2: Develop optimisation framework}\label{sec:Experiment2}
+These stages concern objectives \hyperref[obj:ParaSel]{O6} and \hyperref[obj:CompPara]{O7}
 \begin{enumerate}
     \item \textbf{Parameterise compression algorithms}: Develop an interface to define the compression algorithm and its (distiller) scheduler settings. This will be a thin layer on top of distillers pre-existing scheduler api, the purpose of which will be to facilitate communication between an external parameter optimisation tool and distiller.
     \item \textbf{Implement interface}: We will select the most performant aglorithms from Experiment stage 1 and include select parameters in the aforementioned interface. The parameters selection criteria will be based on observed layerwise latency improvement from Experiment stage 1.
@@ -44,6 +45,7 @@ Completion of the following stages will satisfy objectives \hyperref[obj:EvalCom
 \end{enumerate}
 
 \subsubsection{Experiment stage 3: Testing Compression optimisation}\label{sec:Experiment3}
+This stage of research will complete objective \hyperref[obj:TestOpt]{O8}
 \begin{enumerate}
     \item \textbf{Run the optimiser}: Using the framework developed in stage 2 we will utilise a bayseian search strategy with random forest to identify parameter importance and correlation with the optimisation metric. This will show us which compression parameters are the most important with respect the the metric, and in what direction to tweak them to find an appropriate set of compression parameter values that will result in faster inference within a minimal accuracy threshold.
     \item 

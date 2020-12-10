@@ -7,23 +7,25 @@ The argument for localising inference is only becoming stronger with the ever in
 
 
 Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not always the case.
-Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression.
-This alone can make compression a daunting task, even for experienced machine learning practicioners, however these compression algorithms often feature complex parameters that make compression even less accessible.
+Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression because compression techniques such as pruning can have cascading effects througout a neural network.
+This alone can make compression a daunting task, even for experienced machine learning practicioners, it gets worse however, these compression algorithms often feature complex parameters with implications that may not be revealed until a substantial amount of time has already been invested in retraining a compressed model.
+
+
 
 \subsection{Hypothesis}
-\emph{Using a systematic model selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and imporve inference latency above an accuracy threshold in a typical edge computing environment.}
+\emph{Using a systematic compression method selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and imporve inference latency based on an accuracy threshold in a typical edge computing environment.}
 
 \newpage
 \subsection{Research Aims}
 \textbf{Aim 1}\label{Aim1} - This dissertation will research methodologies for reducing inference latency using a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the layer structure of the neural network.\\ 
 \noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select compression methodologies and apply a baysian optimisation strategy on the compression parameters.\\
 \noindent\textbf{Aim 3}\label{Aim3} - Maintain a valid testing environment by using an edge based ai accelerator to perform inference, while training and compression will be performed on a GPU.\\
-\noindent\textbf{Aim 4}\label{Aim4} - Develop a framework to optimise compression parameters according to a single metric.\\
+\noindent\textbf{Aim 4}\label{Aim4} - Develop a framework to optimise compression parameters according to a metric representing the union of accuracy and latency.\\
 \textbf{\large~Objectives}
 \begin{itemize}
     \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
-    \item \textbf{O1:}\label{obj:ModelSel} Select at least 1 computer vision model to use for testing.
-    \item \textbf{O2:}\label{obj:DataSel} Select 2 suitable datasets for testing with a significant distinction between the  cardinality of classes.
+    \item \textbf{O1:}\label{obj:ModelSel} Select at least 1 neural network model to use for testing.
+    \item \textbf{O2:}\label{obj:DataSel} Select 2 suitable datasets for testing with a significant distinction between the cardinality of categories.
     \item \textbf{O3:}\label{obj:EvalE2E} Evaluate a pool of compression algorithms with respect to end-to-end latency.
     \item \textbf{O4:}\label{obj:EvalLayer} Measure latency for individual layers during inference.
     \item \textbf{O5:}\label{obj:EvalComp} Investigate the effect of composing select algorithms from different compression categories. 
