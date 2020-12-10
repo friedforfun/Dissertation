@@ -30,7 +30,7 @@ This project focuses specifically on the pruning methods within distiller, thus 
 
 We will need to consider the schedule for the learning-rate decay class to properly fine tune the model, we will define a fixed learning-rate decay for all experiments to imporove reliability of our results and reduce the search dimensions for our own optimiser.
 
-Fig.~\ref{fig:DistillerArch} Shows a high level view of the Distiller library, to accomplish objective \hyperref[obj:CompPara]{O7} we will primarily be interacting with the scheduler via the framework specified in objective \hyperref[obj:CompPara]{O7}.
+Fig.~\ref{fig:DistillerArch} Shows a high level view of the Distiller library, to accomplish objective \hyperref[obj:CompPara]{O7} we will primarily be interacting with the scheduler via the interface specified in objective \hyperref[obj:CompPara]{O7}.
 
 \begin{figure}[h]
     \includegraphics[width=1\textwidth]{DistillerArch.png}
@@ -38,21 +38,22 @@ Fig.~\ref{fig:DistillerArch} Shows a high level view of the Distiller library, t
     \label{fig:DistillerArch}
 \end{figure}
 
-Upon finishing training the Top1 and Top5 metrics will be recorded, ready to be sent to Weights and Biases once the benchmarks are finished. 
+Upon finishing training the Top1 and Top5 metrics will be recorded, ready to be recorded using Weights and Biases with the benchmark metrics when they are ready. 
 
 \subsubsection{Benchmarking}
-Openvino benchmarking tool (Objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5})
+OpenVINO will be the means by which we perform inference, and evaluate the latency of the compressed models (Objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5}).
+OpenVINO provides a deep learning deployment toolkit via an inference engine, it is compatible with the Neural Compute Stick and has many useful tools to produce metrics related to model and hardware performance.
 
-Benchmarking will be performed using OpenVINO's built in benchmarking tool, we can record infernece latency, individual layer latency, and a throughput metric (FPS). 
+Benchmarking will be performed using OpenVINO's built in benchmarking tool, we will record inference latency, individual layer latency, and a throughput metric (FPS). 
+These metrics can be dumped into an easiliy processable .csv format, we will pass this data back to the training agent once the inference benchmark completes.
 
 
-\subsubsection{Compression parameter selection}
-(Aim 2)
+\subsubsection{Manual Compression Parameter Selection}
+Using the layerwise benchmarking data we will attempt to filter out pruning algorithms that show a detrimental or negative imporvement in latency (\hyperref[Aim1]{Aim 1}), this will reduce the scope of the problem and provide a narrower search space for optimisation (\hyperref[Aim2]{Aim 2}).
 
 \subsubsection{Optimisation}
-bayesian optimisation \autocite{snoekPracticalBayesianOptimization2012}
-(Aim 4)
-(Objective \hyperref[obj:CompPara]{O7})
+To automate compression parameter tuning (Objective \hyperref[obj:CompPara]{O7}) we will use a bayesian optimisation technique that models the performance as a sample from a Gaussian process~\autocite{snoekPracticalBayesianOptimization2012}.
+Convienently this process is neatly implemented in a machine learning data collection and visualisation tool know as Weights and Biases.
 
 
 

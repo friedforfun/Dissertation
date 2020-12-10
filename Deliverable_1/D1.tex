@@ -78,12 +78,13 @@ Date: .........................
 \thispagestyle{empty}
 \pagebreak
 
-\textbf{Abstract:} a short description of the project and the main work to be carried out – probably
-between one and two hundred words
+\textbf{Abstract:} 
+Pruning neural networks is a complex task in its own right, sucessful implementations require intricate knowledge of layer intedependencies and can be a daunting task even to the machine learning expert. 
+This dissertation hypothesises that a classic hyperparameter optimisation algorithm can be applied to the domain of neural network pruning with the goal of reducing latency. 
+We outline a plan to perform experiments that will highlight which pruning algorithms are most suitible to reduce inference latency.
+This paper constructs a methodology to develop a framework to automate the tuning of compression parameters, and test the results. 
 
-State research question and aims
-Give a brief description of the methodology
-Summarise most significant body of work
+
 
 
 \thispagestyle{empty}
@@ -158,7 +159,7 @@ Table~\ref{tab:PrelimResults} presents findings when benchmarking inference of r
 \subfile{Sections/EvaluationStrat}
 
 \newpage
-\section{Design}
+\section{Design}\label{sec:Design}
 \subfile{Sections/Design}
 
 \newpage
@@ -170,9 +171,6 @@ Table~\ref{tab:PrelimResults} presents findings when benchmarking inference of r
 \section{Back matter}
 \subsection{References}
 \printbibliography
-
-\subsection{Appendices}
-to include additional material, consult with your supervisor.
 
 
 \end{document}

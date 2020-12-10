@@ -11,7 +11,7 @@ Two datasets will be used with these models, one with a small number of classes 
 
 \textbf{Select compression algorithms} - Select at least 4 algorithms that utilise different pruning methods. If feasable these algorithms should explore a spectrum of sub-domains of Pruning (such as fine-grained pruning vs filter or channel pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason knowledge distillation techniques would not be suitable here).
 For compatibility reasons with the ONNX intermediate representation quantisation may not be exporeted from Distiller (as of Oct 2019)~\autocite{zmoraNeuralNetworkDistiller2019}, \emph{Experiment stage 0} (Section~\ref{sec:Experiment0}) will present a good opportunity to test if this is still the case.
-The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller framework, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures so it would be a suitable choice~\autocite{zhuPruneNotPrune2017}.
+The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller library, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures so it would be a suitable choice~\autocite{zhuPruneNotPrune2017}.
 
 \newpage
 \subsection{Experiment tasks}\label{sec:ExperimentTasks}
@@ -35,7 +35,7 @@ Completion of the following stages will satisfy objectives \hyperref[obj:EvalE2E
     \item \textbf{Evaluate combined compression}: We will evaluate latency changes from \emph{full compression} and \emph{baseline}. Of particular interest will be any changes in the individual layer latencies.
 \end{enumerate}
 
-\subsubsection{Experiment stage 2: Develop optimisation framework}\label{sec:Experiment2}
+\subsubsection{Experiment stage 2: Develop optimisation interface}\label{sec:Experiment2}
 These stages concern objectives \hyperref[obj:ParaSel]{O6} and \hyperref[obj:CompPara]{O7}
 \begin{enumerate}
     \item \textbf{Parameterise compression algorithms}: Develop an interface to define the compression algorithm and its (distiller) scheduler settings. This will be a thin layer on top of distillers pre-existing scheduler api, the purpose of which will be to facilitate communication between an external parameter optimisation tool and distiller.
@@ -47,7 +47,8 @@ These stages concern objectives \hyperref[obj:ParaSel]{O6} and \hyperref[obj:Com
 \subsubsection{Experiment stage 3: Testing Compression optimisation}\label{sec:Experiment3}
 This stage of research will complete objective \hyperref[obj:TestOpt]{O8}
 \begin{enumerate}
-    \item \textbf{Run the optimiser}: Using the framework developed in stage 2 we will utilise a bayseian search strategy with random forest to identify parameter importance and correlation with the optimisation metric. This will show us which compression parameters are the most important with respect the the metric, and in what direction to tweak them to find an appropriate set of compression parameter values that will result in faster inference within a minimal accuracy threshold.
-    \item 
+    \item \textbf{Run the optimiser}: Using the interface developed in stage 2 we will utilise a bayseian optimisation strategy (a sweep) that shows how a each parameter correlates with the target metric, this strategy will also reveal parameter importance metrics.
+    \item \textbf{Collect data}: We will gather the data aqcuired in the final experiment and draw conclusions based on the improvement (or lack of it) over the baseline and manual parameter selection. At this point we should be able to answer our hypothesis one way or another.
+    \item Extended evaulation of the data may be worthwhile, observations of the parameter importance and correlation metrics may shed some light on a direction of future research.
 \end{enumerate}
 \end{document}

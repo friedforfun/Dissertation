@@ -2,18 +2,8 @@
 
 \begin{document}
 \subsubsection{Neural Networks \& Deep Learning}
-\emph{
-    - Summary of NN\\
-    - Structure of NN\\
-    - Training \& Inference stages\\
-    - weight update methodologies\\
-    - Feed Forwards\\
-    - Feedback Nerual Network\\
-    - Self-organizing Neural Network\\
-    - Weight parameters updated using back-propagation}
 
-
-\begin{figure}
+\begin{figure}[H]
     \includegraphics[width=1\textwidth]{Perceptron_efficient_proc.png}
     \caption{Neuron with corresponding biologically inspired labels.\\ \textbf{(Adopted figure from~\autocite{szeEfficientProcessingDeep2017})}}
     \label{fig:neuronLabeled}
@@ -42,15 +32,8 @@ Begin by passing some training data through the network, next the gap between th
 
 \subsubsection{Convolutional Neural Networks}
 
-\emph{Convolutional Neural Network (CNN)\\
-    - A class of DNN\\
-    - CNN consist of: Convolutional Layers, Pooling layers \& fully connected layers.\\
-    - Convolutional Layers contain sets of filters/kernels\\
-    - Should emphesize the computation requirements in conv layers \& the memory access requirements in FC layers (see page 28~\autocite{qiuGoingDeeperEmbedded2016})}
-
-
 Much like traditional nerual networks the \Acrshort{cnn} architecture was inspired by human and animal brains, the concept of processing the input with local receptive fields is conceptually similar some functionality of the cat's visual cortex~\autocite{hubelReceptiveFieldsBinocular1962,lecunConvolutionalNetworksImages,pouyanfarSurveyDeepLearning2019}. 
-The influential paper by Hubel \& Weisel~\autocite{hubelReceptiveFieldsBinocular1962} ultimately had a significant influence on the design of \Acrshort{cnn}s via the Neocognitron, as proposed by Fukushima in~\autocite{fukushimaNeocognitronSelforganizingNeural1980} and again evaluated in~\autocite{fukushimaNeocognitronHierarchicalNeural1988}\textbf{(provide some comment on these papers)}. 
+The influential paper by Hubel \& Weisel~\autocite{hubelReceptiveFieldsBinocular1962} ultimately had a significant influence on the design of \Acrshort{cnn}s via the Neocognitron, as proposed by Fukushima in~\autocite{fukushimaNeocognitronSelforganizingNeural1980} and again evaluated in~\autocite{fukushimaNeocognitronHierarchicalNeural1988}, these papers paved the way for the modern CNN. 
 
 A critical aspect of image recognition is robustness to input shift and distortion, this robustness was indicated as one of the primary achivements of the Neocognitron in Fukushima's paper~\autocite{fukushimaNeocognitronSelforganizingNeural1980}. LeCunn and Bengio provide comprehensive explainations of how traditional \acrshort{dnn}s are so inefficient for these tasks 
 
@@ -59,8 +42,6 @@ The local receptive fields enable neurons to extract low level features such as 
 \Acrshort{cnn}s are robust to input shift or distortion by using receptive fields to identify these low level features across the entire input space, performing local averaging and downsampling in the layers following convolution layers means the absolute location of the features is less important than the position of the features relative to the position of other identified features~\autocite{lecunConvolutionalNetworksImages}. 
 Each layer produces higher degrees of abstraction from the input layer, in doing so these abstractions retain important information about the input, these abstractions are referred to as feature maps.
 The layers performing downsampling are known as pooling layers, they reduce the resolution or dimensions of the feature map which reduces overfitting and speeds up training by reducing the number of parameters in the network~\autocite{pouyanfarSurveyDeepLearning2019}.
-
-Convolutional Networks for Images, Speech, and Time-Series by LeCunn \& Bengio
 
 
 \acrshort{cnn}s have been found to be effective in many different AI domains, popular applications include: computer vision, \Acrshort{nlp}, and speech processing. 
