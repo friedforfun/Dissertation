@@ -1,21 +1,24 @@
 \documentclass[../D1.tex]{subfiles}
 
 \begin{document}
-\emph{\textbf{Summarising the context of the dissertation project, stating the aim and objectives of the project, 
-identifying the problems to be solved to achieve the objectives, and sketching the organisation of the dissertation.}}
-\emph{Good intro: hypothesis (assertion) one aim, set of objectives for meeting aim, try and quantify objectives (25\% better perf)}
 \subsection{Motivation}
 With the continued revolution of AI technologies a desire to perform inference at the edge is becoming ever more prevalent.
 The argument for localising inference is only becoming stronger with the ever increasing avaliablilty of computation resources alongside new and constatnly evolving AI applications, inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
-Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not always the case.
 
+
+Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not always the case.
+Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression.
+This alone can make compression a daunting task, even for experienced machine learning practicioners, however these compression algorithms often feature complex parameters that make compression even less accessible.
 
 \subsection{Hypothesis}
-\emph{Using a systematic model selection process combined with a bayesian optimisation algorithm we can imporve inference latency above an accuracy threshold in a typical edge computing environment.}
+\emph{Using a systematic model selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and imporve inference latency above an accuracy threshold in a typical edge computing environment.}
 
-\subsection{Research Aim}
-This dissertation will research methodologies for reducing inference latency with a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the internal structure of the neural network. 
-We will use this contextual information to apply a baysian optimisation strategy on the compression parameters.\\
+\newpage
+\subsection{Research Aims}
+\textbf{Aim 1}\label{Aim1} - This dissertation will research methodologies for reducing inference latency using a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the layer structure of the neural network.\\ 
+\noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select compression methodologies and apply a baysian optimisation strategy on the compression parameters.\\
+\noindent\textbf{Aim 3}\label{Aim3} - Maintain a valid testing environment by using an edge based ai accelerator to perform inference, while training and compression will be performed on a GPU.\\
+\noindent\textbf{Aim 4}\label{Aim4} - Develop a framework to optimise compression parameters according to a single metric.\\
 \textbf{\large~Objectives}
 \begin{itemize}
     \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
@@ -29,7 +32,7 @@ We will use this contextual information to apply a baysian optimisation strategy
     \item \textbf{O8:}\label{obj:TestOpt} Evaluate a model using a bayesian optimisation approach on compression parameters.
 \end{itemize}
 
-
+\subsection{Document structure}
 
 outline the document: We start with ..., then we cover x, y, and z ...
 
