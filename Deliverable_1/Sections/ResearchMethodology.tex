@@ -24,7 +24,7 @@ This versioning issue is one of the reasons we use Redis, it can act as a messag
 
 \subsubsection{Compression}
 The Distiller library was selected as the platform of choice to perform compression because it functions as a convienent toolbox to test a selection of compression methods under a common environment, and critically a larg collection of compression methods~~\autocite{zmoraNeuralNetworkDistiller2019}.
-The decision to use Distiller is reinforced by \hyperref[Aim1]{Aim 1}, there is a rich selection of already-implemented (off-the-shelf) algorithms to choose from, the parameters of these compression algorithms are all defined according to a ``scheduling recipe'' that can be defined programmaatically~\autocite{zmoraNeuralNetworkDistiller2019}.
+The decision to use Distiller is reinforced by \hyperref[Aim1]{Aim 1}, there is a rich selection of already-implemented (off-the-shelf) algorithms to choose from, the parameters of these compression algorithms are all defined according to a ``scheduling recipe'' that can be defined programmatically~\autocite{zmoraNeuralNetworkDistiller2019}.
 This project focuses specifically on the pruning methods within distiller, thus we refer to the parts of the scheduling recipe concerned with pruners as the compression parameters, depending on the compression method being used these can be lists of layers to apply the method, initial \& final sparsity, and groupings of the layer structure (channel vs filter).
 
 

@@ -46,6 +46,20 @@ The optimiser interface is a fairly simple program that is purely concerned with
 \end{table}
 
 
+\subsection{Non-functional Requirements}
+The following non-functional requirements apply to all 3 aspecst of the system.
+
+\begin{table}[H]
+    \begin{tabular}{l|p{10cm}|l}
+    \hline
+    Code & Description                                                                                                 & Importance \\ \hline
+    NFR1 & Queue implementation should not be a bottleneck by itself                                                   & high       \\
+    NFR2 & The system should be robust to the failure of a training agent                                              & medium     \\
+    NFR3 & The system should not introduce any changes to the model other than those enacted by Distiller and OpenVINO & high       \\
+    NFR4 & All benchmark metrics should have redundant storage                                                         & low        \\ \hline
+    \end{tabular}
+    \end{table}
+
 \subsection{Optimisation and Benchmarking suite}\label{sec:ERdiagram}
 %This section will display a high level design on the benchmarking and optimisation suite.
 
