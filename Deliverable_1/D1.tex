@@ -17,6 +17,7 @@
 \usepackage{url}
 \usepackage{mwe}
 \usepackage{caption}
+\usepackage{booktabs}
 
 \usepackage[backend=biber,style=ieee]{biblatex}
 \usepackage[toc]{appendix}
@@ -78,6 +79,12 @@ Date: .........................
 
 \textbf{Abstract:} a short description of the project and the main work to be carried out – probably
 between one and two hundred words
+
+State research question and aims
+Give a brief description of the methodology
+Summarise most significant body of work
+
+
 \thispagestyle{empty}
 \pagebreak
 
@@ -85,7 +92,10 @@ between one and two hundred words
 \thispagestyle{empty}
 \pagebreak
 
+\printnoidxglossary[type=acronym, nonumberlist]
+\thispagestyle{empty}
 
+\newpage
 \setcounter{page}{1}
 
 \section{Introduction}
@@ -135,7 +145,5 @@ Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Netwo
 \subsection{Appendices}
 to include additional material, consult with your supervisor.
 
-\printnoidxglossary[type=acronym]
-\printacronyms
 
 \end{document}
