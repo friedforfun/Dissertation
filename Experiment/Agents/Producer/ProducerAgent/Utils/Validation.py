@@ -1,7 +1,8 @@
 import errno
 import os
+import socket
 import sys
-import argparse
+from .Logging import logger
 
 # Sadly, Python fails to provide the following magic number for us.
 ERROR_INVALID_NAME = 123
@@ -17,11 +18,11 @@ https://docs.microsoft.com/en-us/windows/win32/debug/system-error-codes--0-499-
 def is_pathname_valid(pathname: str) -> bool:
     """Entertaining stack overflow post by Cecil Curry. Path validity checks use this. 
         https://stackoverflow.com/questions/9532499/check-whether-a-path-is-valid-in-python-without-creating-a-file-at-the-paths-ta
-    """
-    '''
+    
+    
     `True` if the passed pathname is a valid pathname for the current OS;
     `False` otherwise.
-    '''
+    """
     # If this pathname is either not a string or is but is empty, this pathname
     # is invalid.
     try:
@@ -86,5 +87,59 @@ def is_pathname_valid(pathname: str) -> bool:
     #
     # Did we mention this should be shipped with Python already?
 
-def validate_path(path):
-    return is_pathname_valid(path)
+def validate_path(path: str):
+    """Check if the path is valid and that it exists
+
+    :param path: Path to validate
+    :type path: str
+    :raises ValueError: Path is invalid or doesnt exist
+    :return: Validated path
+    :rtype: str
+    """
+    if is_pathname_valid(path):
+        if os.path.exists(path):
+            return path
+        else:
+            raise ValueError('Path doesnt exist')
+    else:
+        raise ValueError('Invalid path')
+
+
+def check_model(model: str):
+    """Verify model is expected
+
+    Args:
+        model (str): Model name
+
+    Raises:
+        ValueError: Unexpected model supplied
+
+    Returns:
+        str: Model name
+    """
+    model_name = model.lower().replace(' ', '')
+    valid_models = [
+        'resnet20_cifar',
+        'resnet50_cifar'
+    ]
+
+    if model_name in valid_models:
+        return model
+    else :
+        raise ValueError('Unexpected model')
+
+
+def validate_ipv4(addr: str):
+    """Validate IPv4 redis socket
+
+    Args:
+        addr (str): [description]
+
+    Returns:
+        bool: Is valid IPv4
+    """
+    try:
+        socket.inet_aton(addr)
+    except socket.error:
+        return False
+    return True
