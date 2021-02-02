@@ -140,6 +140,43 @@ def validate_ipv4(addr: str):
     """
     try:
         socket.inet_aton(addr)
-    except socket.error:
-        return False
-    return True
+    except socket.error as err:
+        raise ValueError("IP address failed validation check. Error: {}".format(err))
+    return addr
+
+def validate_port(port: str):
+    port_int = int(port)
+    if port_int < 65536:
+        return port_int
+    else:
+        raise ValueError('Redis port out of range')
+
+def get_check_path(env_key, arg_data):
+    if env_key is not None:
+        env_data = os.getenv(env_key)
+    if arg_data is not None:
+        #print("Checking arg value: {}".format(arg_data))
+        return validate_path(arg_data)
+    elif env_data is not None:
+        return validate_path(env_data)
+    else:
+        raise ValueError('Unspecified or invalid {} parameter'.format(env_key))
+
+
+def get_check_IPv4(env_key, arg_data):
+    env_data = os.getenv(env_key)
+    if arg_data is not None:
+        return validate_ipv4(arg_data)
+    elif env_data is not None:
+        return validate_ipv4(env_data)
+    else:
+        raise ValueError('Unspecified {}'.format(env_key))
+
+def get_check_port(env_key, arg_data):
+    env_data = os.getenv(env_key)
+    if env_key is not None:
+        pass
+    elif arg_data is not None:
+        pass
+    else:
+        raise ValueError('Unspecified redis port, add it to .env or CLI args')

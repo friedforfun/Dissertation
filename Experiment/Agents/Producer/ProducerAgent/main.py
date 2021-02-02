@@ -1,8 +1,9 @@
 import sys, argparse, os
 from pathlib import Path
 from dotenv import load_dotenv
-from .Utils.Validation import validate_path, check_model, validate_ipv4
-from .Utils.Logging import logger
+from ProducerAgent.Utils.Validation import check_model, get_check_path, get_check_IPv4, get_check_port
+from ProducerAgent.Utils.Logging import logger
+
 
 def main():
     run(parse_args())
@@ -17,15 +18,22 @@ def run(args):
         logger.info('Verbosity set to display info messages.')
         logger.debug('Verbosity set to display debug messages.')
         logger.todo('Verbosity set to display todo messages')
-        env_path = Path('..') / '.env'
+        env_path = Path('.env')
         load_dotenv(dotenv_path=env_path)
 
         model = check_model(args.model)
-        yaml_path = validate_path(args.yaml)
+        logger.info('Model Ok')
+
+        yaml_path = get_check_path(None, args.yaml)
+        logger.info('yaml file Ok')
 
         data_path = get_check_path('DATASET_ROOT', args.data)
+        logger.info('Data path OK')
         distiller_path = get_check_path('DISTILLER_ROOT', args.distiller)
+        logger.info('Distiller path OK')
         redis_host = get_check_IPv4('REDIS_HOST', args.redis)
+        logger.info('Redis host IP ok')
+        redis_port = get_check_port('REDIS_PORT', args.redis_port)
 
         # Add the compress_classifier.py parent folder to the path so we can import compress_classifier.py
         compress_path = distiller_path + '/examples/classifier_compression'
@@ -34,26 +42,10 @@ def run(args):
         #data_collector = DataCollector(path)
         #load = Thread(target=process_file, args=(data_collector,), daemon=True)
         #load.start()
-
-
-def get_check_path(env_key, arg_data):
-    env_data = os.getenv(env_key)
-    if arg_data:
-        return validate_path(arg_data)
-    elif env_data:
-        return validate_path(env_data)
-    else:
-        raise ValueError('Unspecified or invalid {}'.format(env_key))
-
-
-def get_check_IPv4(env_key, arg_data):
-    env_data = os.getenv(env_key)
-    if arg_data:
-        return validate_ipv4(arg_data)
-    elif env_data:
-        return validate_ipv4(env_data)
-    else:
-        raise ValueError('Unspecified or invalid {}'.format(env_key))
+    except ValueError as v:
+        logger.exception("Value error caught in run(args) with message: {}".format(v))
+    except Exception as e:
+        print("Caught exception: {}".format(e))
 
 
 def parse_args():
@@ -65,7 +57,8 @@ def parse_args():
     args.add_argument('-d', '--data', help='Specifies the data directory', required=True, type=str)
     args.add_argument('-y', '--yaml', help='Specifly the .yaml file to use', required=True, type=str)
     args.add_argument('-R', '--redis', help='Specifies the redis host ip', required=False, default=None, type=str)
-    args.add_argument('-D', '--distiller',help='Specifies the Distiller root directory', required=False, default=None, type=str)
+    args.add_argument('-rp', '--redis_port', help='Specifies the redis host port', required=False, default='6379', type=str)
+    args.add_argument('-i', '--distiller',help='Specifies the Distiller root directory', required=False, default=None, type=str)
     return parser.parse_args()
 
 
