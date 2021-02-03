@@ -51,9 +51,9 @@ def run(args):
 def parse_args():
     parser = argparse.ArgumentParser(description='CLI for Producer.')
     args = parser.add_argument_group('Core parameters')
-    args.add_argument('-v', '--verbose', type=int, required=False, default=30, nargs='?',
+    args.add_argument('--verbosity', type=int, required=False, default=30, nargs='?',
                                 const=20, help='Set the verbosity level, 20 for INFO, 10 for DEBUG. Default is 30: WARN')
-    args.add_argument('-m', '--model', help='Specifies the model to be used', required=True, type=str)
+    args.add_argument('-mo', '--model', help='Specifies the model to be used', required=True, type=str)
     args.add_argument('-d', '--data', help='Specifies the data directory', required=True, type=str)
     args.add_argument('-y', '--yaml', help='Specifly the .yaml file to use', required=True, type=str)
     args.add_argument('-R', '--redis', help='Specifies the redis host ip', required=False, default=None, type=str)
