@@ -5,21 +5,19 @@ class RedisConnectionManager:
         self.connection = redis.Redis(host=host, port=port, db=db)
         self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
         self.agent_id = agent_id
-        self.sub.subscribe('{}_result_channel'.format(self.agent_id))
+        self.sub.subscribe('model_channel')
 
 
-    def publish(self, message):
+    def publish(self, message, agent_id):
         """Publish the name of the model so the consumer agent can download and run the benchmark
 
         :param message: name of onnx model
         :type message: string
         """
-        # Message should contain: agent id, model path, model storage host, model UUID
         self.connection.publish('model_channel', message)
 
 
     def get_message(self):
-        # message should contain: model UUID, latency, accuracy, throughput
         self.newest_message = self.sub.get_message()
         return self.newest_message
 
