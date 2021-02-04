@@ -420,3 +420,8 @@ dmypy.json
 
 env_prod
 env_cons
+
+
+**/logs/**
+**/latest_log_dir/**
+**/wandb/**
