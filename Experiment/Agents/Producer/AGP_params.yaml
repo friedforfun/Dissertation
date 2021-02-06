@@ -1,0 +1,10 @@
+program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
+project: Test-Compression
+method: bayes
+metric:
+  goal: minimize
+  name: latency
+parameters:
+  learning_rate:
+    max: 1
+    min: 0.1
