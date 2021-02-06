@@ -421,7 +421,10 @@ dmypy.json
 env_prod
 env_cons
 
-
+# Ignore Log files
 **/logs/**
 **/latest_log_dir/**
 **/wandb/**
+
+# Vscode artifacts
+**/.vscode/**
