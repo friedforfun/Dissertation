@@ -3,6 +3,7 @@ import functools
 import sys
 
 TOIMPLEMENT_LEVEL = 1
+DISTILLER_OUTPUT_LEVEL = 5
 
 logging.basicConfig(format='[ %(levelname)s ] %(message)s', level=logging.INFO, stream=sys.stdout)
 logger = logging.getLogger('ProducerAgent')
@@ -77,3 +78,18 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
 
 
 addLoggingLevel('TODO', TOIMPLEMENT_LEVEL, methodName='todo')
+addLoggingLevel('DISTILLER', DISTILLER_OUTPUT_LEVEL, methodName='distiller')
+
+class DistillerLogger:
+    def __init__(self, name="root", level="DISTILLER"):
+        self.logger = logger
+        self.name = self.logger.name
+        self.level = getattr(logging, level)
+
+    def write(self, msg):
+        if msg and not msg.isspace():
+            self.logger.distiller(msg)
+
+    def flush(self):
+        pass
+

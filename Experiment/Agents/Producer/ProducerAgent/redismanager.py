@@ -1,8 +1,8 @@
 import redis
 
 class RedisConnectionManager:
-    def __init__(self, agent_id, host, port=6379, db=0):
-        self.connection = redis.Redis(host=host, port=port, db=db)
+    def __init__(self, agent_id, host, port=6379, db=0, password=None):
+        self.connection = redis.Redis(host=host, port=port, db=db, password=password)
         self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
         self.agent_id = agent_id
         self.sub.subscribe('{}_result_channel'.format(self.agent_id))
