@@ -2,8 +2,10 @@ import wandb
 import sys
 import argparse
 import json
+import socket
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
+from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path
 
 import random
 from dotenv import load_dotenv
@@ -11,9 +13,10 @@ from pathlib import Path
 from ProducerAgent.Utils.Validation import get_check_path
 
 
-model = 'resnet20_cifar'
-data_path = '/home/sam/Projects/distiller/datasets/cifar10'
-yaml_path = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
+MODEL = 'resnet20_cifar'
+DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
+YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
+
 
 
 def parse_args():
@@ -37,6 +40,8 @@ config = wandb.config
 
 
 def main():
+    
+
     env_path = Path('.env')
     load_dotenv(dotenv_path=env_path)
     distiller_path = get_check_path('DISTILLER_ROOT', None)
@@ -52,13 +57,21 @@ def log_wandb(data):
     metrics = {'Accuracy': metrics_dict.get('accuracy'), 'Loss': metrics_dict.get('loss'), 'Latency (ms)': metrics_dict.get('latency'), 'Throughput': metrics_dict.get('throughput')}
     wandb.log(metrics)
 
+def check_data(data):
+    metrics_dict = json.loads(data)
+
+
 
 def run(args):
     try:
-        learning_rate = args.learning_rate[0]
-        epochs = args.epochs[0]
+        model, yaml_path, data_path, distiller_path, redis_host, redis_port = load_and_check_params(args)
 
-        distiller_params = CompressionParams(model, data_path, yaml_path, epochs=epochs, lr=learning_rate, j=6, deterministic=True)
+        learning_rate = args.learning_rate[0]
+        epochs = 1
+        j = 6 # data loading worker threads
+        deterministic = True # make results deterministic with the same paramaters
+
+        distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic)
         compressor = Distiller(distiller_params)
         watcher = compressor.run()
 
@@ -66,7 +79,7 @@ def run(args):
             raise ValueError('No path for checkpoint!')
         print('Checkpoint path: {}'.format(watcher.path))
 
-        distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=epochs, lr=learning_rate, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path)
+        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path)
 
 
         compressor = Distiller(distiller_onnx_params)
@@ -78,7 +91,7 @@ def run(args):
         #! Send onnx model path to redis and block until results come back
 
         r_conn = RedisConnectionManager('Test_agent', '192.168.86.108', port=6379, db=0)
-        consumer_data = json.dumps({'Agent_name': 'Test_agent', 'Model-UUID': str(compressor.onnx_id), 'ONNX': watcher.onnx_path})
+        consumer_data = json.dumps({'Agent_name': 'Test_agent', 'Model-UUID': str(compressor.onnx_id), 'ONNX': watcher.onnx_path, 'Sender_IP': socket.gethostbyname(socket.gethostname())})
 
         r_conn.publish(consumer_data)
 

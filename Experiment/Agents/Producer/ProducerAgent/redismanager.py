@@ -8,8 +8,8 @@ class RedisConnectionManager:
         self.sub.subscribe('{}_result_channel'.format(self.agent_id))
 
 
-    def publish(self, message):
-        """Publish the name of the model so the consumer agent can download and run the benchmark
+    def publish_model(self, message):
+        """Publish the details of the model so the consumer agent can download and run the benchmark
 
         :param message: name of onnx model
         :type message: string
@@ -24,14 +24,20 @@ class RedisConnectionManager:
         return self.newest_message
 
 
-    def listen_blocking(self, message_fn):
+    def listen_blocking(self, message_fn, exit_fn):
         """Listens on agents result channel
 
         Args:
             message_fn (string -> Any): function to handle recived messages
+            exit_fn (string -> bool): function to set the exit loop condition
         """
-        for message in self.sub.listen():
-            message_type = message.get('type')
-            if message_type == 'message':
-                message_fn(message.get('data'))
+        exit_condition = False
+        while not exit_condition:
+            message = self.sub.get_message()
+            if message:
+                message_type = message.get('type')
+                if message_type == 'message':
+                    message_fn(message.get('data'))
+                    exit_condition = exit_fn(message.get('data'))
+                
         

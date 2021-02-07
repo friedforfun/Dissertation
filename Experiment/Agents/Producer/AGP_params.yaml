@@ -8,3 +8,10 @@ parameters:
   learning_rate:
     max: 1
     min: 0.1
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - "-model"
+  - 'resnet20_cifar'
+  - ${args}
