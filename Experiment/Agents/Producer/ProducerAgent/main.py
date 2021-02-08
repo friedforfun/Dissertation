@@ -80,8 +80,7 @@ def load_and_check_params(args):
         return model, yaml_path, data_path, distiller_path, redis_host, redis_port
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='CLI for Producer.')
+def setup_args(parser):
     args = parser.add_argument_group('Core parameters')
     args.add_argument('--verbose', type=int, required=False, default=30, nargs='?',
                                 const=20, help='Set the verbosity level, 20 for INFO, 10 for DEBUG. Default is 30: WARN')
@@ -91,7 +90,11 @@ def parse_args():
     args.add_argument('--redis', help='Specifies the redis host ip', required=False, default=None, type=str)
     args.add_argument('--redis_port', help='Specifies the redis host port', required=False, default='6379', type=str)
     args.add_argument('--distiller',help='Specifies the Distiller root directory', required=False, default=None, type=str)
-    return parser.parse_args()
+    return parser
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='CLI for Producer.')
+    return setup_args(parser).parse_args()
 
 
 if __name__ == "__main__":
