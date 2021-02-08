@@ -11,10 +11,11 @@ from ProducerAgent.filewatcher import FileCreationWatcher
 
 class Distiller:
 
-    def __init__(self, CLI_params):
+    def __init__(self, CLI_params, watcher):
         
         self.onnx_id = uuid.uuid1()
         self.CLI_params = CLI_params
+        self.watcher = watcher
 
          
 
@@ -32,17 +33,19 @@ class Distiller:
 
             self.CLI_params.clear_and_set_params()
 
-            watcher = FileCreationWatcher()
-            watcher_thread = Thread(target=watcher.run, daemon=True)
+            #watcher = FileCreationWatcher()
+            #self.watcher.add_redis_to_event_handler(self.conn)
+            watcher_thread = Thread(target=self.watcher.run, daemon=True)
             watcher_thread.start()
 
             compress_classifier.main()
 
-            watcher.terminate()
+            self.watcher.terminate()
             watcher_thread.join()
             #print('WATCHER TERMINATED')
             #checkpoint_path = watcher.path
-            return watcher
+            print('DISTILLER INTERACTION ONNX: {}'.format(self.watcher.onnx_path))
+            return self.watcher
 
         except KeyboardInterrupt:
             print("\n-- KeyboardInterrupt --")

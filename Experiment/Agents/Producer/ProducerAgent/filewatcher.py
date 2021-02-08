@@ -1,4 +1,6 @@
 import time
+import json
+import os
 
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
@@ -14,11 +16,16 @@ class FileCreationWatcher:
         self.path = None
         self.onnx_path = None
 
+    def add_redis_to_event_handler(self, connection_manager):
+        self.event_handler = FileCreationEvent(redis=connection_manager)
+        logger.info('ONNX path will be sent to redis on_created event')
+
     def terminate(self):
-        self._running = False
-        #print('TERMINATING WATCHER')
+        print('TERMINATING WATCHER')
         self.path = self.event_handler.checkpoint_path
         self.onnx_path = self.event_handler.onnx_path
+        print('WATCHER ONNX: {}'.format(self.onnx_path))
+        self._running = False
 
     def run(self):
         self.start()
@@ -50,12 +57,13 @@ class FileCreationWatcher:
 
 
 class FileCreationEvent(PatternMatchingEventHandler):
-    def __init__(self):
+    def __init__(self, redis=None):
         super(FileCreationEvent, self).__init__()
         self._ignore_directories = False
         #self._patterns = '*checkpoint.pth.tar'
         self.checkpoint_path = None
         self.onnx_path = None
+        self.redis = redis
 
 
     def on_created(self, event):
@@ -65,7 +73,14 @@ class FileCreationEvent(PatternMatchingEventHandler):
         if 'checkpoint.pth.tar' in path:
             #print('save this path: {}'.format(path))
             self.checkpoint_path = path
-        if '.onnx' in path:
+        if 'onnx' in path:
+            print('ONNX detected: {}'.format(path))
+            self.onnx_path = path
+            # Needed to get the path out when using wandb
+            if self.redis is not None:
+                self.redis.set_onnx(path)
+        elif path.endswith('onnx'):
+            print('endswith ONNX detected')
             self.onnx_path = path
 
 

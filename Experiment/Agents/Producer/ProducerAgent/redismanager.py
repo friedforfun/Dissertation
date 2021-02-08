@@ -6,7 +6,13 @@ class RedisConnectionManager:
         self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
         self.agent_id = agent_id
         self.sub.subscribe('{}_result_channel'.format(self.agent_id))
+        self.sub.subscribe('{}_onnx_path'.format(self.agent_id))
 
+    def set_onnx(self, onnx):
+        self.connection.set('{}_onnx_path'.format(self.agent_id), onnx)
+
+    def get_onnx(self):
+        return self.connection.get('{}_onnx_path'.format(self.agent_id))
 
     def publish_model(self, message):
         """Publish the details of the model so the consumer agent can download and run the benchmark
@@ -16,6 +22,10 @@ class RedisConnectionManager:
         """
         # Message should contain: agent id, model path, model storage host, model UUID
         self.connection.publish('model_channel', message)
+
+
+    def publish_message(self, channel, message):
+        self.connection.publish(channel, message)
 
 
     def get_message(self):

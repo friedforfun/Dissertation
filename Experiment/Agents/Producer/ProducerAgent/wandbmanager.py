@@ -1,17 +1,22 @@
+import redis
 import wandb
+import os
 import sys
 import argparse
 import json
 import socket
+import uuid
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
-from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path
+from ProducerAgent.filewatcher import FileCreationWatcher
+from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path, setup_args
 
 import random
 from dotenv import load_dotenv
 from pathlib import Path
 from ProducerAgent.Utils.Validation import get_check_path
 
+AGENT_ID = str(uuid.uuid4())
 
 MODEL = 'resnet20_cifar'
 DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
@@ -22,8 +27,9 @@ YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.
 def parse_args():
 
     parser = argparse.ArgumentParser()
-
-    parser.add_argument('-lr', '--learning_rate', nargs=1, type=float)
+    parser = setup_args(parser)
+    args = parser.add_argument_group('WandB args')
+    args.add_argument('-lr', '--learning_rate', nargs=1, type=float)
 
     return parser.parse_args()
 
@@ -59,43 +65,72 @@ def log_wandb(data):
 
 def check_data(data):
     metrics_dict = json.loads(data)
+    
+    if metrics_dict is None:
+        return False
+
+    # Sanity check make sure the data recived was sent by this agent.
+    if metrics_dict.get('Agent_ID') == AGENT_ID:
+        return True
+    else:
+        return False
+
 
 
 
 def run(args):
     try:
-        model, yaml_path, data_path, distiller_path, redis_host, redis_port = load_and_check_params(args)
+        MODEL, YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT = load_and_check_params(args)
+        add_compress_classifier_to_path(DISTILLER_PATH)
 
         learning_rate = args.learning_rate[0]
         epochs = 1
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
+        # Instantiate Redis Connection manager
+        r_conn = RedisConnectionManager('Test_agent', REDIS_HOST, port=REDIS_PORT, db=0)
+
+        # Instantiate File watcher & add reference to connection manager
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(r_conn)
+
+        # Set up distiller CLI params
         distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic)
-        compressor = Distiller(distiller_params)
-        watcher = compressor.run()
+        
+        # Start distiller & run
+        compressor = Distiller(distiller_params, watcher)
+        compressor.run()
 
-        if watcher.path is None:
+        # Check if checkpoint path is found
+        if compressor.watcher.path is None:
             raise ValueError('No path for checkpoint!')
-        print('Checkpoint path: {}'.format(watcher.path))
+        print('Checkpoint path: {}'.format(compressor.watcher.path))
+        checkpoint_abs_path = os.path.abspath(compressor.watcher.path)
 
+        # Run distiller again but start from checkpoint and export onnx
         distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path)
+        compressor = Distiller(distiller_onnx_params, watcher)
+        compressor.run()
 
-
-        compressor = Distiller(distiller_onnx_params)
-
-        watcher = compressor.run()
+        
+        redis_onnx = compressor.watcher.get_onnx()
+        print('REDIS ONNX: {}'.format(redis_onnx.decode('utf-8')))
+        
+        onnx_abs_path = os.path.abspath(compressor.watcher.onnx_path)
 
         print('ONNX path: {}'.format(watcher.onnx_path))
-
+        print('ABOLSUTE CHECKPOINT PATH: {}'.format(checkpoint_abs_path))
+        print('ABOLSUTE ONNC PATH: {}'.format(onnx_abs_path))
         #! Send onnx model path to redis and block until results come back
 
-        r_conn = RedisConnectionManager('Test_agent', '192.168.86.108', port=6379, db=0)
-        consumer_data = json.dumps({'Agent_name': 'Test_agent', 'Model-UUID': str(compressor.onnx_id), 'ONNX': watcher.onnx_path, 'Sender_IP': socket.gethostbyname(socket.gethostname())})
+        
 
-        r_conn.publish(consumer_data)
+        consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': watcher.onnx_path, 'Sender_IP': socket.gethostbyname(socket.gethostname())})
 
-        r_conn.listen_blocking(log_wandb)
+        r_conn.publish_model(consumer_data)
+
+        #r_conn.listen_blocking(log_wandb, check_data)
 
         metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
         wandb.log(metrics)
