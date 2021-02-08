@@ -12,6 +12,10 @@ command:
   - ${env}
   - ${interpreter}
   - ${program}
-  - "-model"
+  - '--model'
   - 'resnet20_cifar'
+  - '--data'
+  - '/home/sam/Projects/distiller/datasets/cifar10'
+  - '--yaml'
+  - '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
   - ${args}
