@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from ProducerAgent.Utils.Validation import check_model, get_check_path, get_check_IPv4, get_check_port
 from ProducerAgent.Utils.Logging import logger
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
+from ProducerAgent.filewatcher import FileCreationWatcher
+from ProducerAgent.redismanager import RedisConnectionManager
 
 
 
@@ -26,9 +28,14 @@ def run(args):
 
         add_compress_classifier_to_path(distiller_path)
 
+        redis_conn = RedisConnectionManager('MainTest', redis_host, port=redis_port, db=0)
+
+        watcher = FileCreationWatcher()
+
+        watcher.add_redis_to_event_handler(redis_conn)
 
         distiller_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True)
-        compressor = Distiller(distiller_params)
+        compressor = Distiller(distiller_params, watcher)
         watcher = compressor.run()
 
         if watcher.path is None:
@@ -38,7 +45,7 @@ def run(args):
         distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path)
 
 
-        compressor = Distiller(distiller_onnx_params)
+        compressor = Distiller(distiller_onnx_params, watcher)
 
         watcher = compressor.run()
 
