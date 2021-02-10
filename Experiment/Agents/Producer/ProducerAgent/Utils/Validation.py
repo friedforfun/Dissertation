@@ -144,8 +144,8 @@ def validate_ipv4(addr: str):
         raise ValueError("IP address failed validation check. Error: {}".format(err))
     return addr
 
-def validate_port(port: str):
-    port_int = int(port)
+def validate_port(port: int):
+    port_int = port
     if port_int < 65536:
         return port_int
     else:
@@ -176,14 +176,14 @@ def get_check_port(env_key, arg_data):
     env_data = os.getenv(env_key)
     # if CLI specifies different port use that
     if arg_data != 6379:
-        return arg_data
+        return validate_port(arg_data)
 
     # Otherwise check environment var
     elif env_data is not None and env_data != 6379:
-        return env_data
+        return validate_port(int(env_data))
 
     # return default
     elif env_data == 6379 or arg_data == 6379:
         return 6379
     else:
-        raise ValueError('Unspecified redis port, add it to .env or CLI args')
+        raise ValueError('Unspecified or invalid redis port, add it to .env or CLI args')
