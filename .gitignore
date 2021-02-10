@@ -428,3 +428,10 @@ env_cons
 
 # Vscode artifacts
 **/.vscode/**
+
+# openvino reports
+**/reports/**
+*.csv
+
+# onnx model
+*.onnx
