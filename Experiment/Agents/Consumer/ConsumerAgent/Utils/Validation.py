@@ -164,3 +164,13 @@ def get_check_port(env_key, arg_data):
         return 6379
     else:
         raise ValueError('Unspecified or invalid redis port, add it to .env or CLI args')
+
+def get_check_password(env_key, arg_data):
+    logger.todo('Ping redis to check password is valid here')
+    env_data = os.getenv(env_key)
+    if arg_data is not None:
+        return arg_data
+    elif env_data is not None:
+        return env_data
+    else:
+        return None

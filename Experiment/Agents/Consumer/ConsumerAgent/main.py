@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 from ConsumerAgent.Utils.Logging import logger
-from ConsumerAgent.Utils.Validation import get_check_path, get_check_IPv4, get_check_port
+from ConsumerAgent.Utils.Validation import get_check_path, get_check_IPv4, get_check_port, get_check_password
 
 def main():
     run(parse_args())
@@ -12,8 +12,8 @@ def main():
 
 def run(args):
     try:
-        data_path, openvino_path, redis_host, redis_port = load_and_check_params(args)
-        
+        data_path, openvino_path, redis_host, redis_port, redis_password = load_and_check_params(args)
+
 
     except Exception as e:
         print("Caught exception: {}".format(e))
@@ -46,8 +46,9 @@ def load_and_check_params(args):
     logger.info('Redis host IP ok')
     redis_port = get_check_port('REDIS_PORT', args.redis_port)
     logger.info('Redis port ok')
+    redis_password = get_check_password('REDIS_PASSWORD', args.redis_password)
 
-    return data_path, openvino_path, redis_host, redis_port
+    return data_path, openvino_path, redis_host, redis_port, redis_password
 
 
 if __name__ == "__main__":

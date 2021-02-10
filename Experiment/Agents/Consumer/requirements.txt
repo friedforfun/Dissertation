@@ -1,4 +1,4 @@
-ConsumerAgent==0.1
+-e git+https://github.com/friedforfun/Dissertation.git@2d44f3429f4da5725753333c17809c7836b33a18#egg=ConsumerAgent&subdirectory=Experiment/Agents/Consumer
 numpy==1.19.4
 opencv-python==4.4.0.46
 progress==1.5
