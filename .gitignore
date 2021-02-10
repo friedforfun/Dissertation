@@ -426,6 +426,9 @@ env_cons
 **/latest_log_dir/**
 **/wandb/**
 
+latest_log_file
+latest_log_dir
+
 # Vscode artifacts
 **/.vscode/**
 
