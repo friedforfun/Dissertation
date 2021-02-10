@@ -174,9 +174,16 @@ def get_check_IPv4(env_key, arg_data):
 
 def get_check_port(env_key, arg_data):
     env_data = os.getenv(env_key)
-    if env_key is not None:
-        pass
-    elif arg_data is not None:
-        pass
+    # if CLI specifies different port use that
+    if arg_data != 6379:
+        return arg_data
+
+    # Otherwise check environment var
+    elif env_data is not None and env_data != 6379:
+        return env_data
+
+    # return default
+    elif env_data == 6379 or arg_data == 6379:
+        return 6379
     else:
         raise ValueError('Unspecified redis port, add it to .env or CLI args')

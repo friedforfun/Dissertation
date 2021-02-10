@@ -95,7 +95,7 @@ def setup_args(parser):
     args.add_argument('-d', '--data', help='Specifies the data directory', required=True, type=str)
     args.add_argument('-y', '--yaml', help='Specifly the .yaml file to use', required=True, type=str)
     args.add_argument('--redis', help='Specifies the redis host ip', required=False, default=None, type=str)
-    args.add_argument('--redis_port', help='Specifies the redis host port', required=False, default='6379', type=str)
+    args.add_argument('--redis_port', help='Specifies the redis host port', required=False, default=6379, type=int)
     args.add_argument('--distiller',help='Specifies the Distiller root directory', required=False, default=None, type=str)
     return parser
 
