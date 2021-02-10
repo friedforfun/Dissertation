@@ -131,10 +131,12 @@ def validate_port(port: int):
 def get_check_path(env_key, arg_data):
     if env_key is not None:
         env_data = os.getenv(env_key)
+        #logger.debug('Got data from env: {}'.format(env_data))
     if arg_data is not None:
         #print("Checking arg value: {}".format(arg_data))
         return validate_path(arg_data)
     elif env_data is not None:
+        #logger.debug('Validating env path')
         return validate_path(env_data)
     else:
         raise ValueError('Unspecified or invalid {} parameter'.format(env_key))
