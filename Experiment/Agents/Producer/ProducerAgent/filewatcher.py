@@ -21,22 +21,24 @@ class FileCreationWatcher:
         logger.info('ONNX path will be sent to redis on_created event')
 
     def terminate(self):
-        print('TERMINATING WATCHER')
+        logger.debug('TERMINATING WATCHER CALL')
         self.path = self.event_handler.checkpoint_path
         self.onnx_path = self.event_handler.onnx_path
-        print('WATCHER ONNX: {}'.format(self.onnx_path))
+        logger.debug('WATCHER CHECKPOINT: {}'.format(self.path))
+        logger.debug('WATCHER ONNX: {}'.format(self.onnx_path))
         self._running = False
 
     def run(self):
         self.start()
         try:
             while self._running:
-                #print('Checking...')
+                #logger.debug('Checking...')
                 time.sleep(2)
         except KeyboardInterrupt:
-            print('Keyboard interrupted')
+            logger.debug('Keyboard interrupted')
 
         finally:
+            logger.debug('STOPPPING WATCHER')
             self.stop()
 
     def start(self):
@@ -76,7 +78,9 @@ class FileCreationEvent(PatternMatchingEventHandler):
         if 'onnx' in path:
             print('ONNX detected: {}'.format(path))
             self.onnx_path = path
+            
             # Needed to get the path out when using wandb
+            # if the event has a reference to the connection manager:
             if self.redis is not None:
                 self.redis.set_onnx(path)
         elif path.endswith('onnx'):
