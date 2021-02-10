@@ -1,4 +1,5 @@
 import redis
+import time
 
 class RedisConnectionManager:
     def __init__(self, agent_id, host, port=6379, db=0, password=None):
@@ -6,7 +7,7 @@ class RedisConnectionManager:
         self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
         self.agent_id = agent_id
         self.sub.subscribe('{}_result_channel'.format(self.agent_id))
-        self.sub.subscribe('{}_onnx_path'.format(self.agent_id))
+        #self.sub.subscribe('{}_onnx_path'.format(self.agent_id))
 
     def set_onnx(self, onnx):
         self.connection.set('{}_onnx_path'.format(self.agent_id), onnx)
@@ -45,9 +46,13 @@ class RedisConnectionManager:
         while not exit_condition:
             message = self.sub.get_message()
             if message:
+                print('Got message back')
                 message_type = message.get('type')
                 if message_type == 'message':
                     message_fn(message.get('data'))
                     exit_condition = exit_fn(message.get('data'))
+            time.sleep(2)
+
+
                 
         

@@ -1,8 +1,8 @@
-import redis
 import wandb
 import os
 import sys
 import argparse
+from threading import Thread
 import json
 import socket
 import uuid
@@ -56,14 +56,10 @@ def main():
     run(parse_args())
 
 
-def log_wandb(data):
-    metrics_dict = json.loads(data)
-    metrics_dict.accuracy = random.uniform(0.80, 0.99)
-    metrics_dict.latency = random.uniform(9.8, 11)
-    metrics = {'Accuracy': metrics_dict.get('accuracy'), 'Loss': metrics_dict.get('loss'), 'Latency (ms)': metrics_dict.get('latency'), 'Throughput': metrics_dict.get('throughput')}
-    wandb.log(metrics)
-
 def check_data(data):
+
+    data = data.decode('utf-8')
+
     metrics_dict = json.loads(data)
     
     if metrics_dict is None:
@@ -75,12 +71,19 @@ def check_data(data):
     else:
         return False
 
+def log_wandb(data):
+    if check_data(data):
+        data = data.decode('utf-8')
+        metrics_dict = json.loads(data)
+        metrics_dict.accuracy = random.uniform(0.80, 0.99)
 
+        metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': metrics_dict.get('Latency'), 'Throughput': metrics_dict.get('Throughput')}
+        wandb.log(metrics)
 
 
 def run(args):
     try:
-        MODEL, YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT = load_and_check_params(args)
+        MODEL, YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
         add_compress_classifier_to_path(DISTILLER_PATH)
 
         learning_rate = args.learning_rate[0]
@@ -89,48 +92,58 @@ def run(args):
         deterministic = True # make results deterministic with the same paramaters
 
         # Instantiate Redis Connection manager
-        r_conn = RedisConnectionManager('Test_agent', REDIS_HOST, port=REDIS_PORT, db=0)
+        r_conn = RedisConnectionManager('Test_agent', REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)
 
         # Instantiate File watcher & add reference to connection manager
         watcher = FileCreationWatcher()
         watcher.add_redis_to_event_handler(r_conn)
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
 
         # Set up distiller CLI params
         distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic)
         
         # Start distiller & run
-        compressor = Distiller(distiller_params, watcher)
+        compressor = Distiller(distiller_params)
         compressor.run()
 
+        watcher.terminate()
+        watcher_thread.join()
+
         # Check if checkpoint path is found
-        if compressor.watcher.path is None:
+        if watcher.path is None:
             raise ValueError('No path for checkpoint!')
-        print('Checkpoint path: {}'.format(compressor.watcher.path))
-        checkpoint_abs_path = os.path.abspath(compressor.watcher.path)
+        print('Checkpoint path: {}'.format(watcher.path))
+        checkpoint_abs_path = os.path.abspath(watcher.path)
+
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(r_conn)
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
 
         # Run distiller again but start from checkpoint and export onnx
         distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path)
-        compressor = Distiller(distiller_onnx_params, watcher)
+        compressor = Distiller(distiller_onnx_params)
         compressor.run()
 
-        
-        redis_onnx = compressor.watcher.get_onnx()
-        print('REDIS ONNX: {}'.format(redis_onnx.decode('utf-8')))
-        
-        onnx_abs_path = os.path.abspath(compressor.watcher.onnx_path)
+        watcher.terminate()
+        watcher_thread.join()
 
-        print('ONNX path: {}'.format(watcher.onnx_path))
-        print('ABOLSUTE CHECKPOINT PATH: {}'.format(checkpoint_abs_path))
-        print('ABOLSUTE ONNC PATH: {}'.format(onnx_abs_path))
+        redis_onnx = str(os.path.abspath(r_conn.get_onnx().decode('utf-8')))
+        print('REDIS ONNX: {}'.format(redis_onnx))
+        
+        #onnx_abs_path = os.path.abspath(compressor.watcher.onnx_path)
+
+        #print('ONNX path: {}'.format(watcher.onnx_path))
+        #print('ABOLSUTE CHECKPOINT PATH: {}'.format(checkpoint_abs_path))
+        #print('ABOLSUTE ONNC PATH: {}'.format(onnx_abs_path))
         #! Send onnx model path to redis and block until results come back
 
-        
-
-        consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': watcher.onnx_path, 'Sender_IP': socket.gethostbyname(socket.gethostname())})
+        consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX':redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
 
         r_conn.publish_model(consumer_data)
 
-        #r_conn.listen_blocking(log_wandb, check_data)
+        r_conn.listen_blocking(log_wandb, check_data)
 
         metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
         wandb.log(metrics)
@@ -160,6 +173,11 @@ def display_exception(e):
     message = template.format(type(e).__name__, e.args)
     print(message)
 
+def get_lan_ip():
+    return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] 
+    if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)), 
+    s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, 
+    socket.SOCK_DGRAM)]][0][1]]) if l][0][0]
 
 if __name__ == '__main__':
    sys.exit(main() or 0)
