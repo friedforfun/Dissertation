@@ -1,4 +1,7 @@
+ConsumerAgent==0.1
 numpy==1.19.4
 opencv-python==4.4.0.46
 progress==1.5
 py-cpuinfo==7.0.0
+python-dotenv==0.15.0
+redis==3.5.3
