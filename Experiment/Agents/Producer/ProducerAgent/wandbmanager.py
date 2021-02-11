@@ -14,7 +14,7 @@ from AgentBase.Utils.Logging import logger
 import random
 from dotenv import load_dotenv
 from pathlib import Path
-from ProducerAgent.Utils.Validation import get_check_path
+from AgentBase.Utils.Validation import get_check_path
 
 AGENT_ID = str(uuid.uuid4())
 #AGENT_ID = 'wandbTest'
@@ -82,7 +82,7 @@ def log_wandb(data):
     print('METRICS: {}'.format(metrics_dict))
     metrics_dict['accuracy'] = random.uniform(0.80, 0.99)
 
-    metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': metrics_dict.get('Latency'), 'Throughput': metrics_dict.get('Throughput')}
+    metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
     print('Logging wandb metrics')
     wandb.log(metrics)
 
