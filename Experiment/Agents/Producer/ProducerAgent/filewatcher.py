@@ -5,7 +5,7 @@ import os
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
-from ProducerAgent.Utils.Logging import logger
+from AgentBase.Utils.Logging import logger
 
 class FileCreationWatcher:
     def __init__(self):

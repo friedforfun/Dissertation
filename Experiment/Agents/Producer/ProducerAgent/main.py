@@ -5,16 +5,18 @@ import json
 import socket
 
 from dotenv import load_dotenv
-from ProducerAgent.Utils.Validation import check_model, get_check_path, get_check_IPv4, get_check_port, get_check_password
-from ProducerAgent.Utils.Logging import logger
+
+from AgentBase.Utils.Validation import check_model, get_check_path, get_check_IPv4, get_check_port, get_check_password
+from AgentBase.Utils.Logging import logger
+
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.filewatcher import FileCreationWatcher
 from ProducerAgent.redismanager import RedisConnectionManager
 
 
-
 def main():
     run(parse_args())
+
 
 def run(args):
     try:

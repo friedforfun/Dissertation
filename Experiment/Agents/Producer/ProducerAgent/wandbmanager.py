@@ -10,13 +10,14 @@ from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
 from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path, setup_args
-
+from AgentBase.Utils.Logging import logger
 import random
 from dotenv import load_dotenv
 from pathlib import Path
 from ProducerAgent.Utils.Validation import get_check_path
 
 AGENT_ID = str(uuid.uuid4())
+#AGENT_ID = 'wandbTest'
 
 MODEL = 'resnet20_cifar'
 DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
@@ -37,7 +38,7 @@ LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
 
 param_defaults = {
     'learning_rate': 0.3,
-    'epochs': 180
+    'epochs': 1
 }
 
 
@@ -78,7 +79,8 @@ def log_wandb(data):
     #if check_data(data):
     data = data.decode('utf-8')
     metrics_dict = json.loads(data)
-    metrics_dict.accuracy = random.uniform(0.80, 0.99)
+    print('METRICS: {}'.format(metrics_dict))
+    metrics_dict['accuracy'] = random.uniform(0.80, 0.99)
 
     metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': metrics_dict.get('Latency'), 'Throughput': metrics_dict.get('Throughput')}
     print('Logging wandb metrics')
@@ -87,6 +89,7 @@ def log_wandb(data):
 
 def run(args):
     try:
+        
         MODEL, YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
         add_compress_classifier_to_path(DISTILLER_PATH)
 
@@ -96,7 +99,7 @@ def run(args):
         deterministic = True # make results deterministic with the same paramaters
 
         # Instantiate Redis Connection manager
-        r_conn = RedisConnectionManager('Test_agent', REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)
+        r_conn = RedisConnectionManager(AGENT_ID, REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)
 
         # Instantiate File watcher & add reference to connection manager
         watcher = FileCreationWatcher()
@@ -147,10 +150,10 @@ def run(args):
 
         r_conn.publish_model(consumer_data)
         print('Model published.')
-        r_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
+        r_conn.listen_blocking(log_wandb, lambda _: True)
 
-        metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
-        wandb.log(metrics)
+        #metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
+        #wandb.log(metrics)
 
 
 

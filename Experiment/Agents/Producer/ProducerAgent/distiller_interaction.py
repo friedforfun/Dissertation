@@ -1,9 +1,6 @@
 import sys
-from threading import Thread
-import io
 import uuid
-from ProducerAgent.Utils.Logging import logger, DistillerLogger
-from ProducerAgent.filewatcher import FileCreationWatcher
+from AgentBase.Utils.Logging import logger
 
 """
     Sets compression params and starts compression
@@ -18,34 +15,15 @@ class Distiller:
         #self.watcher = watcher
 
          
-
     def run(self):
         """Begin pruning with the given parameters
         """
         
         try:
-            import compress_classifier #import main as compress_classifier
-            # For this to work must rename file examples/classifier_compression/parser.py -> mod_parser.py
-            # and change import parser -> import mod_parser in the compress_classifier.py script
-
-            #from compress_classifier import logdirectory
-
-
+            import compress_classifier
             self.CLI_params.clear_and_set_params()
-
-            #watcher = FileCreationWatcher()
-            #self.watcher.add_redis_to_event_handler(self.conn)
-            #watcher_thread = Thread(target=self.watcher.run, daemon=True)
-            #watcher_thread.start()
-
             compress_classifier.main()
 
-            #self.watcher.terminate()
-            #watcher_thread.join()
-            #print('WATCHER TERMINATED')
-            #checkpoint_path = watcher.path
-            #print('DISTILLER INTERACTION ONNX: {}'.format(self.watcher.onnx_path))
-            #return self.watcher
 
         except KeyboardInterrupt:
             print("\n-- KeyboardInterrupt --")
@@ -124,20 +102,10 @@ class CompressionParams:
 
     
     def clear_and_set_params(self):
-        # Clear parameters for argparse
-        sys.argv = [sys.argv[0]]   
+        """Clear argv parameters and set the new parameters defined by DistillerParams
+        """
 
-        # Args to add to sys.argv for compress classifier:
-        # --arch self.model_name
-        # data_path
-        # --compress=yaml file
-        # --epochs=180
-        # --lr=0.3
-        # -j=1
-        # --deterministic
-        # --export-onnx=self.onnx_name
-        # --out-dir
-        # --thinnify
+        sys.argv = [sys.argv[0]]
 
         for param in self.param_list:
             sys.argv.append(param)

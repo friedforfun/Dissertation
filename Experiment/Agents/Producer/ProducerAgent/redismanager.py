@@ -1,23 +1,27 @@
-import redis
 import time
 from AgentBase.redismanager import RedisConnectionManager as RCM
 
 class RedisConnectionManager(RCM):
     def __init__(self, agent_id, host, port=6379, db=0, password=None):
         super(RedisConnectionManager, self).__init__(agent_id, host, redis_port=port, db=db, password=password)
-        #self.connection = redis.Redis(host=host, port=port, db=db, password=password)
-        #self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
-        #self.agent_id = agent_id
-        #self.sub.subscribe('{}_result_channel'.format(self.agent_id))
-        #self.sub.subscribe('{}_onnx_path'.format(self.agent_id))
         self.subscribe('{}_result_channel'.format(self.agent_id))
 
 
     def set_onnx(self, onnx):
+        """Set the agents onnx path key
+
+        :param onnx: The absolute path of the onnx file
+        :type onnx: str
+        """
         self.connection.set('{}_onnx_path'.format(self.agent_id), onnx)
 
 
     def get_onnx(self):
+        """Get the onnx path
+
+        :return: Absolute path to the onnx file
+        :rtype: byte string
+        """
         return self.connection.get('{}_onnx_path'.format(self.agent_id))
 
 
