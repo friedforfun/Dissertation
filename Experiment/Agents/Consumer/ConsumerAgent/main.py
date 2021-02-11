@@ -10,8 +10,8 @@ from dotenv import load_dotenv
 
 from ConsumerAgent.openvino_interaction import BenchmarkQueue, OpenvinoParams, OpenvinoInteraction
 from ConsumerAgent.redismanager import RedisConnectionManager
-from ConsumerAgent.Utils.Logging import logger
-from ConsumerAgent.Utils.Validation import get_check_path, get_check_IPv4, get_check_port, get_check_password
+from AgentBase.Utils.Logging import logger
+from AgentBase.Utils.Validation import get_check_path, get_check_IPv4, get_check_port, get_check_password
 
 def main():
     run(parse_args())

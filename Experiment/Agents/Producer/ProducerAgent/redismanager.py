@@ -2,8 +2,8 @@ import time
 from AgentBase.redismanager import RedisConnectionManager as RCM
 
 class RedisConnectionManager(RCM):
-    def __init__(self, agent_id, host, port=6379, db=0, password=None):
-        super(RedisConnectionManager, self).__init__(agent_id, host, redis_port=port, db=db, password=password)
+    def __init__(self, agent_id, host, port=6379, db=0, password=None, message_fn=None):
+        super(RedisConnectionManager, self).__init__(agent_id, host, redis_port=port, db=db, password=password, message_fn=message_fn)
         self.subscribe('{}_result_channel'.format(self.agent_id))
 
 

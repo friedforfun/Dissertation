@@ -2,9 +2,7 @@ import sys
 import json
 from collections import deque
 
-from ConsumerAgent.Utils.Logging import logger
-
-
+from AgentBase.Utils.Logging import logger
 
 class OpenvinoInteraction:
     def __init__(self, params):

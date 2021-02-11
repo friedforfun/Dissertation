@@ -1,7 +1,12 @@
--e git+https://github.com/friedforfun/Dissertation.git@2d44f3429f4da5725753333c17809c7836b33a18#egg=ConsumerAgent&subdirectory=Experiment/Agents/Consumer
+-e git+https://github.com/friedforfun/Dissertation.git@4f281307641ec3d6da3383edb597591efeb619b4#egg=AgentBase&subdirectory=Experiment/CommonFunctionality
+-e git+https://github.com/friedforfun/Dissertation.git@4f281307641ec3d6da3383edb597591efeb619b4#egg=ConsumerAgent&subdirectory=Experiment/Agents/Consumer
 numpy==1.19.4
 opencv-python==4.4.0.46
+pandas==1.2.2
 progress==1.5
 py-cpuinfo==7.0.0
+python-dateutil==2.8.1
 python-dotenv==0.15.0
+pytz==2021.1
 redis==3.5.3
+six==1.15.0

@@ -22,6 +22,7 @@ class RedisConnectionManager:
         self.agent_id = agent_id
         self.message_fn = message_fn
 
+
     def subscribe(self, channel):
         """Subscribe to tha channel
 
@@ -30,6 +31,7 @@ class RedisConnectionManager:
         """
         self.sub.subscribe(channel)
 
+
     def add_message_fn(self, message_fn):
         """Pass a reference to a function to call when a message is recived
 
@@ -37,6 +39,7 @@ class RedisConnectionManager:
         :type message_fn: byte string -> Any
         """
         self.message_fn = message_fn
+
 
     def run(self):
         """Pass to a thread target to listen for messages
@@ -60,7 +63,7 @@ class RedisConnectionManager:
 
 
     def listen_blocking(self, message_fn):
-        """Listens on agents result channel
+        """Listens on agents subscribed channel
 
         Args:
             message_fn (string -> Any): function to handle recived messages
@@ -69,4 +72,5 @@ class RedisConnectionManager:
             message_type = message.get('type')
             if message_type == 'message':
                 message_fn(message.get('data'))
+        
         
