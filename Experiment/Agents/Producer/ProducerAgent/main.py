@@ -73,15 +73,8 @@ def run(args):
         data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
         redis_conn.publish_model(data_for_consumer)
 
-        data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
-        redis_conn.publish_model(data_for_consumer)
-
-        data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
-        redis_conn.publish_model(data_for_consumer)
-
-        data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
-        redis_conn.publish_model(data_for_consumer)
-
+        redis_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
+        print('Got response from Benchmarker')
         #watcher = FileCreationWatcher()
         #watcher.run()
         #print('LOG DIR: {}'.format(logdir))
