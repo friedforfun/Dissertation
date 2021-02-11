@@ -60,6 +60,8 @@ def check_data(data):
 
     data = data.decode('utf-8')
 
+    print('Checking data')
+
     metrics_dict = json.loads(data)
     
     if metrics_dict is None:
@@ -69,16 +71,18 @@ def check_data(data):
     if metrics_dict.get('Agent_ID') == AGENT_ID:
         return True
     else:
+        print('Got back bad data')
         return False
 
 def log_wandb(data):
-    if check_data(data):
-        data = data.decode('utf-8')
-        metrics_dict = json.loads(data)
-        metrics_dict.accuracy = random.uniform(0.80, 0.99)
+    #if check_data(data):
+    data = data.decode('utf-8')
+    metrics_dict = json.loads(data)
+    metrics_dict.accuracy = random.uniform(0.80, 0.99)
 
-        metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': metrics_dict.get('Latency'), 'Throughput': metrics_dict.get('Throughput')}
-        wandb.log(metrics)
+    metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': metrics_dict.get('Latency'), 'Throughput': metrics_dict.get('Throughput')}
+    print('Logging wandb metrics')
+    wandb.log(metrics)
 
 
 def run(args):
@@ -142,8 +146,8 @@ def run(args):
         consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX':redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
 
         r_conn.publish_model(consumer_data)
-
-        r_conn.listen_blocking(log_wandb, check_data)
+        print('Model published.')
+        r_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
 
         metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
         wandb.log(metrics)
