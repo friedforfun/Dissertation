@@ -1,0 +1,79 @@
+extensions:
+  net_thinner:
+    arch: resnet20_cifar
+    class: FilterRemover
+    dataset: cifar10
+    thinning_func_str: remove_filters
+lr_schedulers:
+  pruning_lr:
+    class: StepLR
+    gamma: 0.1
+    step_size: 50
+policies:
+- ending_epoch: 30
+  frequency: 2
+  pruner:
+    instance_name: low_pruner
+  starting_epoch: 0
+- ending_epoch: 50
+  frequency: 2
+  pruner:
+    instance_name: fine_pruner1
+  starting_epoch: 30
+- ending_epoch: 50
+  frequency: 2
+  pruner:
+    instance_name: fine_pruner2
+  starting_epoch: 30
+- ending_epoch: 50
+  frequency: 2
+  pruner:
+    instance_name: fc_pruner
+  starting_epoch: 30
+- epochs:
+  - 32
+  extension:
+    instance_name: net_thinner
+- ending_epoch: 400
+  frequency: 1
+  lr_scheduler:
+    instance_name: pruning_lr
+  starting_epoch: 0
+pruners:
+  fc_pruner:
+    class: L1RankedStructureParameterPruner_AGP
+    final_sparsity: 0.99
+    group_type: Rows
+    initial_sparsity: 0.05
+    weights:
+    - module.fc.weight
+  fine_pruner1:
+    class: AutomatedGradualPruner
+    final_sparsity: 0.5
+    initial_sparsity: 0.05
+    weights:
+    - module.layer3.0.conv1.weight
+    - module.layer3.0.conv2.weight
+  fine_pruner2:
+    class: AutomatedGradualPruner
+    final_sparsity: 0.7
+    initial_sparsity: 0.05
+    weights:
+    - module.layer3.1.conv1.weight
+    - module.layer3.1.conv2.weight
+    - module.layer3.2.conv1.weight
+    - module.layer3.2.conv2.weight
+  low_pruner:
+    class: L1RankedStructureParameterPruner_AGP
+    final_sparsity: 0.5
+    group_type: Filters
+    initial_sparsity: 0.1
+    weights:
+    - module.layer2.0.conv1.weight
+    - module.layer2.0.conv2.weight
+    - module.layer2.0.downsample.0.weight
+    - module.layer2.1.conv2.weight
+    - module.layer2.2.conv2.weight
+    - module.layer2.1.conv1.weight
+    - module.layer2.2.conv1.weight
+version: 1

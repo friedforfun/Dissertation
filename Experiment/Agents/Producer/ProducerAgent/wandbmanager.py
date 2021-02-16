@@ -9,6 +9,7 @@ import uuid
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
+from ProducerAgent.yamlEditor import YamlEditor
 from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path, setup_args
 from AgentBase.Utils.Logging import logger
 import random
@@ -21,8 +22,11 @@ AGENT_ID = str(uuid.uuid4())
 
 MODEL = 'resnet20_cifar'
 DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
-YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
+#ORIGINAL_YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
+ORIGINAL_YAML_PATH = 'example.yaml'
 
+FC_FINAL_SPARSITY_ID = 'fc_final_sparsity'
+FC_FINAL_SPARSITY_PATH = ['pruners', 'fc_pruner', 'final_sparsity']
 
 
 def parse_args():
@@ -31,6 +35,7 @@ def parse_args():
     parser = setup_args(parser)
     args = parser.add_argument_group('WandB args')
     args.add_argument('-lr', '--learning_rate', nargs=1, type=float)
+    args.add_argument('--fc_final_sparsity', type=float, default=0.5)
 
     return parser.parse_args()
 
@@ -90,13 +95,25 @@ def log_wandb(data):
 def run(args):
     try:
         
-        MODEL, YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
+        MODEL, ORIGINAL_YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
         add_compress_classifier_to_path(DISTILLER_PATH)
 
+        fc_final_sparsity = args.fc_final_sparsity
         learning_rate = args.learning_rate[0]
         epochs = 1
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
+
+
+        # Create a modified .yaml file from the base using wandb params:
+        yamlEditor = YamlEditor(ORIGINAL_YAML_PATH)
+
+        yamlEditor.add_modification_path(FC_FINAL_SPARSITY_ID, FC_FINAL_SPARSITY_PATH)
+
+        yamlEditor.set_value_by_id(FC_FINAL_SPARSITY_ID, fc_final_sparsity)
+
+        YAML_PATH = yamlEditor.write_yaml()
+
 
         # Instantiate Redis Connection manager
         r_conn = RedisConnectionManager(AGENT_ID, REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)

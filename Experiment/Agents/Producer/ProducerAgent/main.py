@@ -40,7 +40,6 @@ def run(args):
         yaml_test.print()
 
 
-        yaml_test.yaml_object['pruners']['fc_pruner']['final_sparsity'] = 0.99
 
         print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
 
@@ -50,52 +49,58 @@ def run(args):
         yaml_test.add_modification_path(modification_name, modification_path)
 
 
-        yaml_test.set_value_by_id('test', 0.5)
+        yaml_test.set_value_by_id('test', 0.99)
 
         print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
 
-        # redis_conn = RedisConnectionManager(AGENT_ID, redis_host, port=redis_port, db=0, password=redis_password)
+        test_path = yaml_test.write_yaml()
+        print(test_path)
 
-        # watcher = FileCreationWatcher()
-        # watcher.add_redis_to_event_handler(redis_conn)
+        yaml_path = test_path
 
-        # watcher_thread = Thread(target=watcher.run, daemon=True)
-        # watcher_thread.start()
+        redis_conn = RedisConnectionManager(AGENT_ID, redis_host, port=redis_port, db=0, password=redis_password)
 
-        # distiller_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True)
-        # compressor = Distiller(distiller_params)
-        # compressor.run()
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(redis_conn)
 
-        # watcher.terminate()
-        # watcher_thread.join()
-        # logger.setLevel(5)
-        # if watcher.path is None:
-        #     raise ValueError('No path for checkpoint!')
-        # logger.debug('!! ------------------------------------------------------ !!')
-        # logger.debug('Checkpoint path: {}'.format(watcher.path))
-        # logger.debug('!! ------------------------------------------------------ !!')
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
 
-        # watcher = FileCreationWatcher()
-        # watcher.add_redis_to_event_handler(redis_conn)
-        # watcher_thread = Thread(target=watcher.run, daemon=True)
-        # watcher_thread.start()
+        distiller_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True)
+        compressor = Distiller(distiller_params)
+        compressor.run()
 
-        # distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path)
-        # onnx_generator = Distiller(distiller_onnx_params)
-        # onnx_generator.run()
+        watcher.terminate()
+        watcher_thread.join()
+        logger.setLevel(5)
+        if watcher.path is None:
+            raise ValueError('No path for checkpoint!')
+        logger.debug('!! ------------------------------------------------------ !!')
+        logger.debug('Checkpoint path: {}'.format(watcher.path))
+        logger.debug('!! ------------------------------------------------------ !!')
 
-        # watcher.terminate()
-        # watcher_thread.join()
-        # logger.setLevel(0)
-        # redis_onnx = str(os.path.abspath(redis_conn.get_onnx().decode('utf-8')))
-        # print('ONNX path FROM REDIS: {}'.format(redis_onnx))
-        # logger.debug('ONNX path: {}'.format(watcher.onnx_path))
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(redis_conn)
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
 
-        # data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
-        # redis_conn.publish_model(data_for_consumer)
+        distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path)
+        onnx_generator = Distiller(distiller_onnx_params)
+        onnx_generator.run()
 
-        # redis_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
-        # print('Got response from Benchmarker')
+        watcher.terminate()
+        watcher_thread.join()
+        logger.setLevel(0)
+        redis_onnx = str(os.path.abspath(redis_conn.get_onnx().decode('utf-8')))
+        print('ONNX path FROM REDIS: {}'.format(redis_onnx))
+        logger.debug('ONNX path: {}'.format(watcher.onnx_path))
+
+        data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
+        redis_conn.publish_model(data_for_consumer)
+
+        redis_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
+        print('Got response from Benchmarker')
+        
         #watcher = FileCreationWatcher()
         #watcher.run()
         #print('LOG DIR: {}'.format(logdir))

@@ -1,3 +1,4 @@
+import os
 import yaml
 
 from AgentBase.Utils.Logging import logger
@@ -20,8 +21,24 @@ class YamlEditor:
     def print(self):
         print(self.yaml_object)
 
-    def add_modification_path(self, id, list_path_to_rule):
-        self.modification_dict[id] = list_path_to_rule
+    def add_modification_path(self, id, yaml_dict_path):
+        """Add an identifier for a path through the parsed yaml document. For e
+
+        Args:
+            id (str): [description]
+            yaml_dict_path (list[str]): [description]
+
+        Examples:
+            Given a yaml file of the format:
+            >>> pruner:
+            >>>     fc_pruner:
+            >>>         final_sparsity: 0.5
+
+            To create a path to modify the value of 'final_sparsity' we use the function like so:
+            >>> yamlEditor.add_modification_path('example', ['pruner', 'fc_pruner', 'final_sparsity'])
+
+        """
+        self.modification_dict[id] = yaml_dict_path
 
     def set_value_by_id(self, id, value):
         path = self.modification_dict.get(id)
@@ -32,4 +49,9 @@ class YamlEditor:
 
             yaml_seek[path[-1]] = value
         else:
-            raise ValueError('Rule ID is not valid')
+            raise ValueError('Path ID is not valid')
+
+    def write_yaml(self, file_name='schedule.yaml'):
+        with open(file_name, 'w') as f:
+            yaml.dump(self.yaml_object, f)
+        return os.path.abspath(file_name)
