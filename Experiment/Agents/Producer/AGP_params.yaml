@@ -11,14 +11,13 @@ parameters:
   fc_final_sparsity:
     max: 0.99
     min: 0.05
+  fc_class:
+    values: ['L1RankedStructureParameterPruner_AGP', 'AutomatedGradualPruner']
 command:
   - ${env}
   - ${interpreter}
   - ${program}
-  - '--model'
-  - 'resnet20_cifar'
-  - '--data'
-  - '/home/sam/Projects/distiller/datasets/cifar10'
-  - '--yaml'
-  - '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
+  - '--model=resnet20_cifar'
+  - '--data=/home/sam/Projects/distiller/datasets/cifar10'
+  - '--yaml=/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
   - ${args}

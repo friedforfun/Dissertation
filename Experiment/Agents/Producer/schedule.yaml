@@ -15,25 +15,20 @@ policies:
   pruner:
     instance_name: low_pruner
   starting_epoch: 0
+- epochs:
+  - 30
+  extension:
+    instance_name: net_thinner
 - ending_epoch: 50
   frequency: 2
   pruner:
-    instance_name: fine_pruner1
-  starting_epoch: 30
-- ending_epoch: 50
-  frequency: 2
-  pruner:
-    instance_name: fine_pruner2
+    instance_name: fine_pruner
   starting_epoch: 30
 - ending_epoch: 50
   frequency: 2
   pruner:
     instance_name: fc_pruner
   starting_epoch: 30
-- epochs:
-  - 32
-  extension:
-    instance_name: net_thinner
 - ending_epoch: 400
   frequency: 1
   lr_scheduler:
@@ -42,19 +37,12 @@ policies:
 pruners:
   fc_pruner:
     class: L1RankedStructureParameterPruner_AGP
-    final_sparsity: 0.99
+    final_sparsity: 0.30554152859052774
     group_type: Rows
     initial_sparsity: 0.05
     weights:
     - module.fc.weight
-  fine_pruner1:
-    class: AutomatedGradualPruner
-    final_sparsity: 0.5
-    initial_sparsity: 0.05
-    weights:
-    - module.layer3.0.conv1.weight
-    - module.layer3.0.conv2.weight
-  fine_pruner2:
+  fine_pruner:
     class: AutomatedGradualPruner
     final_sparsity: 0.7
     initial_sparsity: 0.05

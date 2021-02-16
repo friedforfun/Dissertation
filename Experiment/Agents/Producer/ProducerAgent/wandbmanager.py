@@ -28,22 +28,28 @@ ORIGINAL_YAML_PATH = 'example.yaml'
 FC_FINAL_SPARSITY_ID = 'fc_final_sparsity'
 FC_FINAL_SPARSITY_PATH = ['pruners', 'fc_pruner', 'final_sparsity']
 
+FC_CLASS_ID = 'fc_class'
+FC_CLASS_PATH = ['pruners', 'fc_pruner', 'class']
+
 
 def parse_args():
 
     parser = argparse.ArgumentParser()
     parser = setup_args(parser)
     args = parser.add_argument_group('WandB args')
-    args.add_argument('-lr', '--learning_rate', nargs=1, type=float)
+    args.add_argument('-lr', '--learning_rate', type=float)
     args.add_argument('--fc_final_sparsity', type=float, default=0.5)
+    args.add_argument('--fc_class', type=str)
 
     return parser.parse_args()
 
 LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
 
 param_defaults = {
+    'fc_final_sparsity': 0.5,
+    'fc_class': 'L1RankedStructureParameterPruner_AGP',
     'learning_rate': 0.3,
-    'epochs': 1
+    'epochs': 180
 }
 
 
@@ -96,22 +102,28 @@ def run(args):
     try:
         
         MODEL, ORIGINAL_YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
+        
+        
         add_compress_classifier_to_path(DISTILLER_PATH)
-
+        
+        fc_class = args.fc_class
         fc_final_sparsity = args.fc_final_sparsity
-        learning_rate = args.learning_rate[0]
-        epochs = 1
+        learning_rate = 0.4
+        epochs = 180
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
 
         # Create a modified .yaml file from the base using wandb params:
         yamlEditor = YamlEditor(ORIGINAL_YAML_PATH)
-
         yamlEditor.add_modification_path(FC_FINAL_SPARSITY_ID, FC_FINAL_SPARSITY_PATH)
+        yamlEditor.add_modification_path(FC_CLASS_ID, FC_CLASS_PATH)
 
+
+        # Set the value sent by wandb in the yaml file
         yamlEditor.set_value_by_id(FC_FINAL_SPARSITY_ID, fc_final_sparsity)
-
+        yamlEditor.set_value_by_id(FC_CLASS_ID, fc_class)
+        # write it out
         YAML_PATH = yamlEditor.write_yaml()
 
 
@@ -178,17 +190,17 @@ def run(args):
         display_exception(e)
         wandb.alert(title="Sweep exception raised",
                     text="Check the types of the parameters.\n {}".format(e))
-        sys.exit(1)
+        sys.exit(10)
     except AttributeError as e:
         display_exception(e)
         wandb.alert(title="Sweep exception raised",
                     text="Check the attributes being called in script (line 66?) \n {}".format(e))
-        sys.exit(1)
+        sys.exit(11)
     except Exception as e:
         display_exception(e)
         wandb.alert(title="Sweep exception raised",
                     text="An exception was raised during this sweep. \n {}".format(e))
-        sys.exit(1)
+        sys.exit(12)
 
 
 def display_exception(e):
