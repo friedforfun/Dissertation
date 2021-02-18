@@ -20,17 +20,44 @@ from AgentBase.Utils.Validation import get_check_path
 AGENT_ID = str(uuid.uuid4())
 #AGENT_ID = 'wandbTest'
 
-MODEL = 'resnet20_cifar'
+MODEL = 'resnet56_cifar'
 DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
 #ORIGINAL_YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
 ORIGINAL_YAML_PATH = 'example.yaml'
 
-FC_FINAL_SPARSITY_ID = 'fc_final_sparsity'
-FC_FINAL_SPARSITY_PATH = ['pruners', 'fc_pruner', 'final_sparsity']
+#FC_FINAL_SPARSITY_ID = 'fc_final_sparsity'
+#FC_FINAL_SPARSITY_PATH = ['pruners', 'fc_pruner', 'final_sparsity']
 
-FC_CLASS_ID = 'fc_class'
-FC_CLASS_PATH = ['pruners', 'fc_pruner', 'class']
+#FC_CLASS_ID = 'fc_class'
+#FC_CLASS_PATH = ['pruners', 'fc_pruner', 'class']
 
+FILTER_PRUNER_70_ID = 'filter_pruner_70'
+FILTER_PRUNER_70 = [
+  'pruners',
+  'filter_pruner_70',
+  'desired_sparsity'
+]
+
+FILTER_PRUNER_60_ID = 'filter_pruner_60'
+FILTER_PRUNER_60 = [
+  'pruners',
+  'filter_pruner_60',
+  'desired_sparsity'
+]
+
+FILTER_PRUNER_20_ID = 'filter_pruner_20'
+FILTER_PRUNER_20 = [
+  'pruners',
+  'filter_pruner_20',
+  'desired_sparsity'
+]
+
+FILTER_PRUNER_40_ID = 'filter_pruner_40'
+FILTER_PRUNER_40 = [
+  'pruners',
+  'filter_pruner_40',
+  'desired_sparsity'
+]
 
 def parse_args():
 
@@ -39,7 +66,11 @@ def parse_args():
     args = parser.add_argument_group('WandB args')
     args.add_argument('-lr', '--learning_rate', type=float)
     args.add_argument('--fc_final_sparsity', type=float, default=0.5)
-    args.add_argument('--fc_class', type=str)
+    args.add_argument('--fc_class', type=str, default=None)
+    args.add_argument('--filter_pruner_70', type=float)
+    args.add_argument('--filter_pruner_60', type=float)
+    args.add_argument('--filter_pruner_20', type=float)
+    args.add_argument('--filter_pruner_40', type=float)
 
     return parser.parse_args()
 
@@ -49,7 +80,11 @@ param_defaults = {
     'fc_final_sparsity': 0.5,
     'fc_class': 'L1RankedStructureParameterPruner_AGP',
     'learning_rate': 0.3,
-    'epochs': 180
+    'epochs': 70,
+    'filter_pruner_70' : 0.9,
+    'filter_pruner_60' : 0.9,
+    'filter_pruner_20' : 0.9,
+    'filter_pruner_40' : 0.9,
 }
 
 
@@ -108,21 +143,31 @@ def run(args):
         
         fc_class = args.fc_class
         fc_final_sparsity = args.fc_final_sparsity
-        learning_rate = 0.4
-        epochs = 180
+        filter_pruner_70 = args.filter_pruner_70
+        filter_pruner_60 = args.filter_pruner_60
+        filter_pruner_20 = args.filter_pruner_20
+        filter_pruner_40 = args.filter_pruner_40
+
+        learning_rate = 0.1
+        epochs = 70
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
 
         # Create a modified .yaml file from the base using wandb params:
         yamlEditor = YamlEditor(ORIGINAL_YAML_PATH)
-        yamlEditor.add_modification_path(FC_FINAL_SPARSITY_ID, FC_FINAL_SPARSITY_PATH)
-        yamlEditor.add_modification_path(FC_CLASS_ID, FC_CLASS_PATH)
+        yamlEditor.add_modification_path(FILTER_PRUNER_70_ID, FILTER_PRUNER_70)
+        yamlEditor.add_modification_path(FILTER_PRUNER_60_ID, FILTER_PRUNER_60)
+        yamlEditor.add_modification_path(FILTER_PRUNER_20_ID, FILTER_PRUNER_20)
+        yamlEditor.add_modification_path(FILTER_PRUNER_40_ID, FILTER_PRUNER_40)
 
 
         # Set the value sent by wandb in the yaml file
-        yamlEditor.set_value_by_id(FC_FINAL_SPARSITY_ID, fc_final_sparsity)
-        yamlEditor.set_value_by_id(FC_CLASS_ID, fc_class)
+        yamlEditor.set_value_by_id(FILTER_PRUNER_70_ID, filter_pruner_70)
+        yamlEditor.set_value_by_id(FILTER_PRUNER_60_ID, filter_pruner_60)
+        yamlEditor.set_value_by_id(FILTER_PRUNER_20_ID, filter_pruner_20)
+        yamlEditor.set_value_by_id(FILTER_PRUNER_40_ID, filter_pruner_40)
+
         # write it out
         YAML_PATH = yamlEditor.write_yaml()
 

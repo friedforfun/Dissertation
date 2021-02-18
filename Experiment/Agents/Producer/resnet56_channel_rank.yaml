@@ -1,0 +1,27 @@
+program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
+project: Test-Compression-Thinnify
+method: bayes
+metric:
+  goal: minimize
+  name: "latency"
+parameters:
+  filter_pruner_70:
+    min: 0.0
+    max: 0.99
+  filter_pruner_60:
+    min: 0.0
+    max: 0.99
+  filter_pruner_20:
+    min: 0.0
+    max: 0.99
+  filter_pruner_40:
+    min: 0.0
+    max: 0.99
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - '--model=resnet56_cifar'
+  - '--data=/home/sam/Projects/distiller/datasets/cifar10'
+  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/example.yaml'
+  - ${args}

@@ -120,7 +120,7 @@ def check_model(model: str):
     model_name = model.lower().replace(' ', '')
     valid_models = [
         'resnet20_cifar',
-        'resnet50_cifar'
+        'resnet56_cifar'
     ]
 
     if model_name in valid_models:
