@@ -2,24 +2,34 @@ import os
 import yaml
 
 from AgentBase.Utils.Logging import logger
+from AgentBase.Utils.MiscParsing import str_to_type
 # Read YAML file
 # Select params to modify
 # write copy with modified params
 
 # send message with location of modified yaml file
 
-class YamlEditor:
+class YamlBase:
     def __init__(self, yaml_path):
         self.yaml_path = yaml_path
         self.yaml_object = self.read_yaml()
-        self.modification_dict = {}
 
     def read_yaml(self):
         with open(self.yaml_path) as f:
             return yaml.load(f)
-    
+
     def print(self):
         print(self.yaml_object)
+
+    def write_yaml(self, file_name='schedule.yaml'):
+        with open(file_name, 'w') as f:
+            yaml.dump(self.yaml_object, f)
+        return os.path.abspath(file_name)
+
+class YamlEditor(YamlBase):
+    def __init__(self, yaml_path):
+        super().__init__(yaml_path)
+        self.modification_dict = {}
 
     def add_modification_path(self, id, yaml_dict_path):
         """Add an identifier for a path through the parsed yaml document. For e
@@ -51,7 +61,55 @@ class YamlEditor:
         else:
             raise ValueError('Path ID is not valid')
 
-    def write_yaml(self, file_name='schedule.yaml'):
-        with open(file_name, 'w') as f:
-            yaml.dump(self.yaml_object, f)
-        return os.path.abspath(file_name)
+
+
+
+class YamlEditorBuilder:
+    def __init__(self, yaml_spec):
+        """Used to build a YamlEditor using a yaml spec file, the spec file should contain keys that will represent the identifier for the yaml editor, and the values should be a list that represents a path through the schedule to the value.
+
+        Examples:
+            Given a schedule:
+            >>> pruner:
+            >>>     fc_pruner:
+            >>>         final_sparsity: 0.5
+
+            If we call the parameter in this schedule 'fc_pruner', and want to modify the float value of 'final_sparsity', add the following to the spec file:
+            >>> fc_pruner:
+            >>>     type: 'float' 
+            >>>     path: ['pruner', 'fc_pruner', 'final_sparsity']
+
+        Args:
+            yaml_spec (str): Path to Yaml spec file
+        """
+        super().__init__(yaml_spec)
+        self.editor = None
+
+    def get_editor(self, yaml_schedule):
+        self.editor = YamlEditor(yaml_schedule)
+        # ... add all modification paths
+        for k,v in self.yaml_object.items():
+            if k != 'version':
+                assert type(k) == str
+
+                path = v.get('path')
+                if path is not None:
+                    assert type(path) == list
+                    assert type(path[0]) == str
+                    self.editor.add_modification_path(k, path)
+                else:
+                    raise ValueError('YamlBuilder: missing path from yaml - Each Identifier should have a path')
+        return self.editor
+
+    def get_args(self, arg_parser):
+        args = arg_parser.add_argument_group('scheduler args')
+        for k,v in self.yaml_object.items():
+            if k != 'version':
+                assert type(k) == str
+                type_annotation = v.get('type')
+                if type_annotation is not None:
+                    args.add_argument('--{}'.format(k), type=str_to_type(type_annotation))
+
+        
+
+    
