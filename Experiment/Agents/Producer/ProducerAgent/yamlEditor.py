@@ -65,7 +65,7 @@ class YamlEditor(YamlBase):
 
 
 class YamlEditorBuilder:
-    def __init__(self, yaml_spec):
+    def __init__(self):
         """Used to build a YamlEditor using a yaml spec file, the spec file should contain keys that will represent the identifier for the yaml editor, and the values should be a list that represents a path through the schedule to the value.
 
         Examples:
@@ -79,16 +79,13 @@ class YamlEditorBuilder:
             >>>     type: 'float' 
             >>>     path: ['pruner', 'fc_pruner', 'final_sparsity']
 
-        Args:
-            yaml_spec (str): Path to Yaml spec file
         """
-        super().__init__(yaml_spec)
         self.editor = None
 
     def get_editor(self, yaml_schedule):
         self.editor = YamlEditor(yaml_schedule)
         # ... add all modification paths
-        for k,v in self.yaml_object.items():
+        for k,v in self.editor.yaml_object.items():
             if k != 'version':
                 assert type(k) == str
 
@@ -103,12 +100,14 @@ class YamlEditorBuilder:
 
     def get_args(self, arg_parser):
         args = arg_parser.add_argument_group('scheduler args')
-        for k,v in self.yaml_object.items():
+        assert self.editor is not None
+        for k,v in self.editor.yaml_object.items():
             if k != 'version':
                 assert type(k) == str
                 type_annotation = v.get('type')
                 if type_annotation is not None:
                     args.add_argument('--{}'.format(k), type=str_to_type(type_annotation))
+        return arg_parser
 
         
 

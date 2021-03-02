@@ -9,7 +9,7 @@ import uuid
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
-from ProducerAgent.yamlEditor import YamlEditor
+from ProducerAgent.yamlEditor import YamlEditor, YamlEditorBuilder
 from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path, setup_args
 from AgentBase.Utils.Logging import logger
 import random
@@ -25,81 +25,25 @@ DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
 #ORIGINAL_YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
 ORIGINAL_YAML_PATH = 'example.yaml'
 
-#FC_FINAL_SPARSITY_ID = 'fc_final_sparsity'
-#FC_FINAL_SPARSITY_PATH = ['pruners', 'fc_pruner', 'final_sparsity']
-
-#FC_CLASS_ID = 'fc_class'
-#FC_CLASS_PATH = ['pruners', 'fc_pruner', 'class']
-
-FILTER_PRUNER_70_ID = 'filter_pruner_70'
-FILTER_PRUNER_70 = [
-  'pruners',
-  'filter_pruner_70',
-  'desired_sparsity'
-]
-
-FILTER_PRUNER_60_ID = 'filter_pruner_60'
-FILTER_PRUNER_60 = [
-  'pruners',
-  'filter_pruner_60',
-  'desired_sparsity'
-]
-
-FILTER_PRUNER_20_ID = 'filter_pruner_20'
-FILTER_PRUNER_20 = [
-  'pruners',
-  'filter_pruner_20',
-  'desired_sparsity'
-]
-
-FILTER_PRUNER_40_ID = 'filter_pruner_40'
-FILTER_PRUNER_40 = [
-  'pruners',
-  'filter_pruner_40',
-  'desired_sparsity'
-]
-
 def parse_args():
+    """Parse human supplied args
 
+    Returns:
+        Namespace: Known args
+    """
     parser = argparse.ArgumentParser()
     parser = setup_args(parser)
-    args = parser.add_argument_group('WandB args')
-    args.add_argument('-lr', '--learning_rate', type=float)
-    args.add_argument('--fc_final_sparsity', type=float, default=0.5)
-    args.add_argument('--fc_class', type=str, default=None)
-    args.add_argument('--filter_pruner_70', type=float)
-    args.add_argument('--filter_pruner_60', type=float)
-    args.add_argument('--filter_pruner_20', type=float)
-    args.add_argument('--filter_pruner_40', type=float)
 
-    return parser.parse_args()
+    return parser.parse_known_args()[0]
 
 LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
 
-param_defaults = {
-    'fc_final_sparsity': 0.5,
-    'fc_class': 'L1RankedStructureParameterPruner_AGP',
-    'learning_rate': 0.3,
-    'epochs': 70,
-    'filter_pruner_70' : 0.9,
-    'filter_pruner_60' : 0.9,
-    'filter_pruner_20' : 0.9,
-    'filter_pruner_40' : 0.9,
-}
 
-
-wandb.init(config=param_defaults, project='Test-Compression')
+wandb.init(project='Test-Compression')
 config = wandb.config
 
 
 def main():
-    
-
-    env_path = Path('.env')
-    load_dotenv(dotenv_path=env_path)
-    distiller_path = get_check_path('DISTILLER_ROOT', None)
-    compress_path = distiller_path + '/examples/classifier_compression'
-    sys.path.append(compress_path)
     run(parse_args())
 
 
@@ -121,53 +65,33 @@ def check_data(data):
         print('Got back bad data')
         return False
 
-def log_wandb(data):
-    #if check_data(data):
-    data = data.decode('utf-8')
-    metrics_dict = json.loads(data)
-    print('METRICS: {}'.format(metrics_dict))
-    metrics_dict['accuracy'] = random.uniform(0.80, 0.99)
-
-    metrics = {'Accuracy': metrics_dict.get('accuracy'), 'latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
-    print('Logging wandb metrics')
-    wandb.log(metrics)
 
 
 def run(args):
     try:
         
         MODEL, ORIGINAL_YAML_PATH, DATA_PATH, DISTILLER_PATH, REDIS_HOST, REDIS_PORT, REDIS_PASSWORD = load_and_check_params(args)
-        
-        
         add_compress_classifier_to_path(DISTILLER_PATH)
-        
-        fc_class = args.fc_class
-        fc_final_sparsity = args.fc_final_sparsity
-        filter_pruner_70 = args.filter_pruner_70
-        filter_pruner_60 = args.filter_pruner_60
-        filter_pruner_20 = args.filter_pruner_20
-        filter_pruner_40 = args.filter_pruner_40
+
+        # Configure yaml editor and wandb specific args
+        yamlEditorBuilder = YamlEditorBuilder()
+        yamlEditor = yamlEditorBuilder.get_editor(ORIGINAL_YAML_PATH)
+
+        wandb_arg_parser = argparse.ArgumentParser()
+        args = wandb_arg_parser.add_argument_group('WandB args')
+        wandb_arg_parser = yamlEditorBuilder.get_args(wandb_arg_parser)
+        wandb_args = wandb_arg_parser.parse_known_args()[0]
+
 
         learning_rate = 0.1
         epochs = 70
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
-
-        # Create a modified .yaml file from the base using wandb params:
-        yamlEditor = YamlEditor(ORIGINAL_YAML_PATH)
-        yamlEditor.add_modification_path(FILTER_PRUNER_70_ID, FILTER_PRUNER_70)
-        yamlEditor.add_modification_path(FILTER_PRUNER_60_ID, FILTER_PRUNER_60)
-        yamlEditor.add_modification_path(FILTER_PRUNER_20_ID, FILTER_PRUNER_20)
-        yamlEditor.add_modification_path(FILTER_PRUNER_40_ID, FILTER_PRUNER_40)
-
-
         # Set the value sent by wandb in the yaml file
-        yamlEditor.set_value_by_id(FILTER_PRUNER_70_ID, filter_pruner_70)
-        yamlEditor.set_value_by_id(FILTER_PRUNER_60_ID, filter_pruner_60)
-        yamlEditor.set_value_by_id(FILTER_PRUNER_20_ID, filter_pruner_20)
-        yamlEditor.set_value_by_id(FILTER_PRUNER_40_ID, filter_pruner_40)
-
+        for k,v in vars(wandb_args):
+            yamlEditor.set_value_by_id(k, v)
+        
         # write it out
         YAML_PATH = yamlEditor.write_yaml()
 
@@ -213,21 +137,17 @@ def run(args):
         redis_onnx = str(os.path.abspath(r_conn.get_onnx().decode('utf-8')))
         print('REDIS ONNX: {}'.format(redis_onnx))
         
-        #onnx_abs_path = os.path.abspath(compressor.watcher.onnx_path)
-
-        #print('ONNX path: {}'.format(watcher.onnx_path))
-        #print('ABOLSUTE CHECKPOINT PATH: {}'.format(checkpoint_abs_path))
-        #print('ABOLSUTE ONNC PATH: {}'.format(onnx_abs_path))
-        #! Send onnx model path to redis and block until results come back
 
         consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX':redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
 
         r_conn.publish_model(consumer_data)
         print('Model published.')
-        r_conn.listen_blocking(log_wandb, lambda _: True)
+        
+        # parse accuracy here
+        upload_data = WandbLogger(88.5, 98.1)
 
-        #metrics = {'accuracy': random.uniform(0.80, 0.99), 'loss': None, 'latency (ms)': random.uniform(9.8, 11), 'Throughput': None}
-        #wandb.log(metrics)
+        # Blocks until a result is sent by the benchmarker
+        r_conn.listen_blocking(upload_data.log_wandb, lambda _: True)
 
 
 
@@ -247,6 +167,20 @@ def run(args):
                     text="An exception was raised during this sweep. \n {}".format(e))
         sys.exit(12)
 
+
+class WandbLogger:
+    def __init__(self, top1, top5):
+        self.top1 = float(top1)
+        self.top5 = float(top5)
+
+    def log_wandb(self, data):
+        #if check_data(data):
+        data = data.decode('utf-8')
+        metrics_dict = json.loads(data)
+
+        metrics = {'Top1': self.top1, 'Top5': self.top5, 'latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
+        print('Logging wandb metrics')
+        wandb.log(metrics)
 
 def display_exception(e):
     print('Exception encountered: ', e)
