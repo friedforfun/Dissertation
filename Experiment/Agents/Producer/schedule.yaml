@@ -1,67 +1,83 @@
 extensions:
   net_thinner:
-    arch: resnet20_cifar
-    class: FilterRemover
+    arch: resnet56_cifar
+    class: StructureRemover
     dataset: cifar10
-    thinning_func_str: remove_filters
+    thinning_func_str: remove_channels
 lr_schedulers:
-  pruning_lr:
-    class: StepLR
-    gamma: 0.1
-    step_size: 50
+  exp_finetuning_lr:
+    class: ExponentialLR
+    gamma: 0.95
 policies:
-- ending_epoch: 30
-  frequency: 2
-  pruner:
-    instance_name: low_pruner
-  starting_epoch: 0
 - epochs:
-  - 30
+  - 0
+  pruner:
+    instance_name: filter_pruner_70
+- epochs:
+  - 0
+  pruner:
+    instance_name: filter_pruner_60
+- epochs:
+  - 0
+  pruner:
+    instance_name: filter_pruner_40
+- epochs:
+  - 0
+  pruner:
+    instance_name: filter_pruner_20
+- epochs:
+  - 0
   extension:
     instance_name: net_thinner
-- ending_epoch: 50
-  frequency: 2
-  pruner:
-    instance_name: fine_pruner
-  starting_epoch: 30
-- ending_epoch: 50
-  frequency: 2
-  pruner:
-    instance_name: fc_pruner
-  starting_epoch: 30
-- ending_epoch: 400
+- ending_epoch: 300
   frequency: 1
   lr_scheduler:
-    instance_name: pruning_lr
-  starting_epoch: 0
+    instance_name: exp_finetuning_lr
+  starting_epoch: 10
 pruners:
-  fc_pruner:
-    class: L1RankedStructureParameterPruner_AGP
-    final_sparsity: 0.30554152859052774
-    group_type: Rows
-    initial_sparsity: 0.05
+  filter_pruner_20:
+    class: L1RankedStructureParameterPruner
+    desired_sparsity: 0.4424709166164181
+    group_type: Channels
     weights:
-    - module.fc.weight
-  fine_pruner:
-    class: AutomatedGradualPruner
-    final_sparsity: 0.7
-    initial_sparsity: 0.05
-    weights:
-    - module.layer3.1.conv1.weight
     - module.layer3.1.conv2.weight
-    - module.layer3.2.conv1.weight
-    - module.layer3.2.conv2.weight
-  low_pruner:
-    class: L1RankedStructureParameterPruner_AGP
-    final_sparsity: 0.5
-    group_type: Filters
-    initial_sparsity: 0.1
+  filter_pruner_40:
+    class: L1RankedStructureParameterPruner
+    desired_sparsity: 0.8225925477624857
+    group_type: Channels
     weights:
-    - module.layer2.0.conv1.weight
-    - module.layer2.0.conv2.weight
-    - module.layer2.0.downsample.0.weight
+    - module.layer3.2.conv2.weight
+    - module.layer3.3.conv2.weight
+    - module.layer3.5.conv2.weight
+    - module.layer3.6.conv2.weight
+    - module.layer3.7.conv2.weight
+    - module.layer3.8.conv2.weight
+  filter_pruner_60:
+    class: L1RankedStructureParameterPruner
+    desired_sparsity: 0.9133493892820683
+    group_type: Channels
+    weights:
     - module.layer2.1.conv2.weight
     - module.layer2.2.conv2.weight
-    - module.layer2.1.conv1.weight
-    - module.layer2.2.conv1.weight
+    - module.layer2.3.conv2.weight
+    - module.layer2.4.conv2.weight
+    - module.layer2.6.conv2.weight
+    - module.layer2.7.conv2.weight
+  filter_pruner_70:
+    class: L1RankedStructureParameterPruner
+    desired_sparsity: 0.3268221267627629
+    group_dependency: Leader
+    group_type: Channels
+    weights:
+    - module.layer1.1.conv1.weight
+    - module.layer1.0.conv1.weight
+    - module.layer1.2.conv1.weight
+    - module.layer1.3.conv1.weight
+    - module.layer1.4.conv1.weight
+    - module.layer1.5.conv1.weight
+    - module.layer1.6.conv1.weight
+    - module.layer1.7.conv1.weight
+    - module.layer1.8.conv1.weight
+    - module.layer2.0.conv1.weight
+    - module.layer2.0.downsample.0.weight
 version: 1

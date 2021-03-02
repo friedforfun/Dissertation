@@ -58,12 +58,12 @@ class RedisConnectionManager(RCM):
             exit_fn (string -> bool): function to set the exit loop condition
         """
         exit_condition = False
-        print('Listening for message...')
-        print('On: {}'.format(self.sub))
+        #print('Listening for message...')
+        #print('On: {}'.format(self.sub))
         while not exit_condition:
             message = self.sub.get_message()
             if message:
-                print('Got message back')
+                #print('Got message back')
                 message_type = message.get('type')
                 if message_type == 'message':
                     message_fn(message.get('data'))

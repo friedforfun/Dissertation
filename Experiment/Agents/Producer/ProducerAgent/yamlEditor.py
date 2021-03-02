@@ -64,8 +64,8 @@ class YamlEditor(YamlBase):
 
 
 
-class YamlEditorBuilder:
-    def __init__(self):
+class YamlEditorBuilder(YamlBase):
+    def __init__(self, yaml_spec):
         """Used to build a YamlEditor using a yaml spec file, the spec file should contain keys that will represent the identifier for the yaml editor, and the values should be a list that represents a path through the schedule to the value.
 
         Examples:
@@ -80,12 +80,24 @@ class YamlEditorBuilder:
             >>>     path: ['pruner', 'fc_pruner', 'final_sparsity']
 
         """
+        super().__init__(yaml_spec)
         self.editor = None
 
     def get_editor(self, yaml_schedule):
+        """Creates a YamlEditor and using the already stored yaml spec builds up all the modification paths.
+
+        Args:
+            yaml_schedule (str): Path to the schedule to pass into YamlEditor constructor
+
+        Raises:
+            ValueError: No path found for a key
+
+        Returns:
+            YamlEditor: The YamlEditor object with all paths added
+        """
         self.editor = YamlEditor(yaml_schedule)
         # ... add all modification paths
-        for k,v in self.editor.yaml_object.items():
+        for k,v in self.yaml_object.items():
             if k != 'version':
                 assert type(k) == str
 
@@ -99,9 +111,17 @@ class YamlEditorBuilder:
         return self.editor
 
     def get_args(self, arg_parser):
+        """Read the yaml spec file and build all the relevant arg parse args
+
+        Args:
+            arg_parser (ArgumentParser): An argparse.ArgumentParser
+
+        Returns:
+            ArgumentParser: The argument parser with all args added
+        """
         args = arg_parser.add_argument_group('scheduler args')
-        assert self.editor is not None
-        for k,v in self.editor.yaml_object.items():
+
+        for k,v in self.yaml_object.items():
             if k != 'version':
                 assert type(k) == str
                 type_annotation = v.get('type')

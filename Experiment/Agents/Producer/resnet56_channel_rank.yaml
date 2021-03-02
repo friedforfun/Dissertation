@@ -1,5 +1,5 @@
 program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
-project: Test-Compression-Thinnify
+project: Test-Compression-yaml-spec
 method: bayes
 metric:
   goal: minimize
@@ -23,5 +23,6 @@ command:
   - ${program}
   - '--model=resnet56_cifar'
   - '--data=/home/sam/Projects/distiller/datasets/cifar10'
+  - '--yaml_spec=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_channel_spec.yaml'
   - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/example.yaml'
   - ${args}

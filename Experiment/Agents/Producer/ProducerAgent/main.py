@@ -157,6 +157,7 @@ def setup_args(parser):
     args.add_argument('--redis_port', help='Specifies the redis host port', required=False, default=6379, type=int)
     args.add_argument('--redis_password', help='The password for the redis db', required=False, default=None, type=str)
     args.add_argument('--distiller',help='Specifies the Distiller root directory', required=False, default=None, type=str)
+    args.add_argument('--yaml_spec', help='A yaml file to specify the nodes in the schedule to modify', required=False, type=str)
     return parser
 
 def parse_args():

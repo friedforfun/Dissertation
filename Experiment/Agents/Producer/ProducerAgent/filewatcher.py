@@ -86,10 +86,6 @@ class FileCreationEvent(PatternMatchingEventHandler):
             if self.redis is not None:
                 self.redis.set_onnx(path)
 
-        if 'output.log' in path:
-            print('WANDB output log file: {}'.format(path))
-            self.redis.set_output(path)
-
 
         elif path.endswith('onnx'):
             print('endswith ONNX detected')
@@ -97,7 +93,11 @@ class FileCreationEvent(PatternMatchingEventHandler):
 
 
     def on_any_event(self, event):
-        return super().on_any_event(event)
+        path = event.src_path
+        if 'output.log' in path:
+            print('WANDB output log file: {}'.format(path))
+            if self.redis is not None:
+                self.redis.set_output(path)
 
     def on_moved(self, event):
         return super().on_moved(event)

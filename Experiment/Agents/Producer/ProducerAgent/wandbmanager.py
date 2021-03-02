@@ -9,21 +9,19 @@ import uuid
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
-from ProducerAgent.yamlEditor import YamlEditor, YamlEditorBuilder
+from ProducerAgent.yamlEditor import YamlEditorBuilder
 from ProducerAgent.main import load_and_check_params, add_compress_classifier_to_path, setup_args
 from AgentBase.Utils.Logging import logger
-import random
-from dotenv import load_dotenv
-from pathlib import Path
-from AgentBase.Utils.Validation import get_check_path
+
+
 
 AGENT_ID = str(uuid.uuid4())
 #AGENT_ID = 'wandbTest'
 
-MODEL = 'resnet56_cifar'
-DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
+#MODEL = 'resnet56_cifar'
+#DATA_PATH = '/home/sam/Projects/distiller/datasets/cifar10'
 #ORIGINAL_YAML_PATH = '/home/sam/Projects/distiller/examples/agp-pruning/resnet20_filters.schedule_agp.yaml'
-ORIGINAL_YAML_PATH = 'example.yaml'
+#ORIGINAL_YAML_PATH = 'example.yaml'
 
 def parse_args():
     """Parse human supplied args
@@ -33,10 +31,9 @@ def parse_args():
     """
     parser = argparse.ArgumentParser()
     parser = setup_args(parser)
-
     return parser.parse_known_args()[0]
 
-LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
+#LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
 
 
 wandb.init(project='Test-Compression')
@@ -74,22 +71,24 @@ def run(args):
         add_compress_classifier_to_path(DISTILLER_PATH)
 
         # Configure yaml editor and wandb specific args
-        yamlEditorBuilder = YamlEditorBuilder()
+        yamlEditorBuilder = YamlEditorBuilder(args.yaml_spec)
         yamlEditor = yamlEditorBuilder.get_editor(ORIGINAL_YAML_PATH)
 
         wandb_arg_parser = argparse.ArgumentParser()
         args = wandb_arg_parser.add_argument_group('WandB args')
         wandb_arg_parser = yamlEditorBuilder.get_args(wandb_arg_parser)
+        print('Parsing known wandb args')
         wandb_args = wandb_arg_parser.parse_known_args()[0]
 
 
         learning_rate = 0.1
-        epochs = 70
+        epochs = 1
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
         # Set the value sent by wandb in the yaml file
-        for k,v in vars(wandb_args):
+        print('Setting yaml values')
+        for k,v in vars(wandb_args).items():
             yamlEditor.set_value_by_id(k, v)
         
         # write it out
@@ -143,8 +142,26 @@ def run(args):
         r_conn.publish_model(consumer_data)
         print('Model published.')
         
-        # parse accuracy here
-        upload_data = WandbLogger(88.5, 98.1)
+        output_log = str(os.path.abspath(r_conn.get_output().decode('utf-8')))
+        if output_log is None:
+            raise ValueError("No output.log found")
+
+        # find testing data accuracy from output.log 
+        test_accuracy = None
+        with open(output_log, "r") as fp:
+            for line in line_contains("==>", fp):
+                read_accuracy = line
+
+        # Record the final top1, top5 and loss
+        test_accuracy = read_accuracy.rstrip().split()
+
+        # Use dummy values incase output.log parse fails
+        upload_data = WandbLogger(-1.0, -1.0, -1.0)
+        if test_accuracy is not None:
+            top1 = float(test_accuracy[2])
+            top5 = float(test_accuracy[4])
+            loss = float(test_accuracy[6])
+            upload_data = WandbLogger(top1, top5, loss)
 
         # Blocks until a result is sent by the benchmarker
         r_conn.listen_blocking(upload_data.log_wandb, lambda _: True)
@@ -168,17 +185,24 @@ def run(args):
         sys.exit(12)
 
 
+def line_contains(string, fp):
+    for line in fp:
+        if string in line:
+            yield line
+
+
 class WandbLogger:
-    def __init__(self, top1, top5):
+    def __init__(self, top1, top5, loss):
         self.top1 = float(top1)
         self.top5 = float(top5)
+        self.loss = float(loss)
 
     def log_wandb(self, data):
         #if check_data(data):
         data = data.decode('utf-8')
         metrics_dict = json.loads(data)
 
-        metrics = {'Top1': self.top1, 'Top5': self.top5, 'latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
+        metrics = {'Top1': self.top1, 'Top5': self.top5, 'Loss': self.loss, 'Latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
         print('Logging wandb metrics')
         wandb.log(metrics)
 
