@@ -15,8 +15,12 @@ class FileCreationWatcher:
         self.onnx_path = None
 
     def add_redis_to_event_handler(self, connection_manager):
+        assert callable(getattr(connection_manager, 'set_onnx', None))
+        assert callable(getattr(connection_manager, 'set_output', None))
+
         self.event_handler = FileCreationEvent(redis=connection_manager)
         logger.info('ONNX path will be sent to redis on_created event')
+
 
     def terminate(self):
         logger.debug('TERMINATING WATCHER CALL')
@@ -81,6 +85,12 @@ class FileCreationEvent(PatternMatchingEventHandler):
             # if the event has a reference to the connection manager:
             if self.redis is not None:
                 self.redis.set_onnx(path)
+
+        if 'output.log' in path:
+            print('WANDB output log file: {}'.format(path))
+            self.redis.set_output(path)
+
+
         elif path.endswith('onnx'):
             print('endswith ONNX detected')
             self.onnx_path = path

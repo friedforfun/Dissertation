@@ -6,12 +6,27 @@ class RedisConnectionManager(RCM):
         super(RedisConnectionManager, self).__init__(agent_id, host, redis_port=port, db=db, password=password, message_fn=message_fn)
         self.subscribe('{}_result_channel'.format(self.agent_id))
 
+    def set_output(self, output):
+        """Set the output path key for the agent
+
+        Args:
+            output (str): path to output log file
+        """
+        self.connection.set('{}_output_log_path'.format(self.agent_id), output)
+
+    def get_output(self):
+        """Gets the log file output path
+
+        Returns:
+            str: Path to the output log
+        """
+        return self.connection.get('{}_output_log_path'.format(self.agent_id))
 
     def set_onnx(self, onnx):
         """Set the agents onnx path key
 
-        :param onnx: The absolute path of the onnx file
-        :type onnx: str
+        Args:
+            onnx (str): The path of the onnx file
         """
         self.connection.set('{}_onnx_path'.format(self.agent_id), onnx)
 
@@ -19,8 +34,8 @@ class RedisConnectionManager(RCM):
     def get_onnx(self):
         """Get the onnx path
 
-        :return: Absolute path to the onnx file
-        :rtype: byte string
+        Returns:
+            str: The path to the onnx file
         """
         return self.connection.get('{}_onnx_path'.format(self.agent_id))
 
