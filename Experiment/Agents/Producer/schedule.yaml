@@ -37,13 +37,13 @@ policies:
 pruners:
   filter_pruner_20:
     class: L1RankedStructureParameterPruner
-    desired_sparsity: 0.4424709166164181
+    desired_sparsity: 0.6917680816760892
     group_type: Channels
     weights:
     - module.layer3.1.conv2.weight
   filter_pruner_40:
     class: L1RankedStructureParameterPruner
-    desired_sparsity: 0.8225925477624857
+    desired_sparsity: 0.38089556444773015
     group_type: Channels
     weights:
     - module.layer3.2.conv2.weight
@@ -54,7 +54,7 @@ pruners:
     - module.layer3.8.conv2.weight
   filter_pruner_60:
     class: L1RankedStructureParameterPruner
-    desired_sparsity: 0.9133493892820683
+    desired_sparsity: 0.5160987350254002
     group_type: Channels
     weights:
     - module.layer2.1.conv2.weight
@@ -65,7 +65,7 @@ pruners:
     - module.layer2.7.conv2.weight
   filter_pruner_70:
     class: L1RankedStructureParameterPruner
-    desired_sparsity: 0.3268221267627629
+    desired_sparsity: 0.8740659262306779
     group_dependency: Leader
     group_type: Channels
     weights:
