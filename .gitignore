@@ -438,3 +438,6 @@ latest_log_dir
 
 # onnx model
 *.onnx
+
+# Auto generated schedule file
+schedule.yaml
