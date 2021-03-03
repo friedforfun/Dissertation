@@ -23,6 +23,6 @@ command:
   - ${program}
   - '--model=resnet56_cifar'
   - '--data=/home/sam/Projects/distiller/datasets/cifar10'
-  - '--yaml_spec=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_filters_spec.yaml'
-  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_filter_rank_v2.yaml'
+  - '--yaml_spec=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_channel_spec.yaml'
+  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_filter_rank_v2.yaml'
   - ${args}
