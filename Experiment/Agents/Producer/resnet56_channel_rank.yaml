@@ -1,5 +1,5 @@
 program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
-project: Test-Compression-yaml-spec
+project: Resnet56-Channels-A
 method: bayes
 metric:
   goal: minimize

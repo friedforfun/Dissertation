@@ -1,11 +1,13 @@
 import wandb
 import os
 import sys
+import io
 import argparse
 from threading import Thread
 import json
 import socket
 import uuid
+import logging
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
@@ -82,7 +84,7 @@ def run(args):
 
 
         learning_rate = 0.1
-        epochs = 1
+        epochs = 70
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
@@ -93,7 +95,6 @@ def run(args):
         
         # write it out
         YAML_PATH = yamlEditor.write_yaml()
-
 
         # Instantiate Redis Connection manager
         r_conn = RedisConnectionManager(AGENT_ID, REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)
@@ -126,16 +127,18 @@ def run(args):
         watcher_thread.start()
 
         # Run distiller again but start from checkpoint and export onnx
-        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path)
+        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path, thinnify=True)
         compressor = Distiller(distiller_onnx_params)
         compressor.run()
 
         watcher.terminate()
         watcher_thread.join()
+        
 
         redis_onnx = str(os.path.abspath(r_conn.get_onnx().decode('utf-8')))
         print('REDIS ONNX: {}'.format(redis_onnx))
         
+
 
         consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX':redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
 
@@ -148,12 +151,15 @@ def run(args):
 
         # find testing data accuracy from output.log 
         test_accuracy = None
-        with open(output_log, "r") as fp:
-            for line in line_contains("==>", fp):
+
+        with open(output_log, 'r') as fh:
+            for line in line_contains("==>", fh):
+                print('Found accuracy line')
                 read_accuracy = line
 
         # Record the final top1, top5 and loss
         test_accuracy = read_accuracy.rstrip().split()
+        print(test_accuracy)
 
         # Use dummy values incase output.log parse fails
         upload_data = WandbLogger(-1.0, -1.0, -1.0)
@@ -185,11 +191,19 @@ def run(args):
         sys.exit(12)
 
 
-def line_contains(string, fp):
-    for line in fp:
+
+def line_contains(string, fh):
+    for line in fh:
         if string in line:
             yield line
 
+
+class OutCapture:
+    def __init__(self):
+        self.st = ''
+
+    def write(self, o):
+        self.st += str(o)
 
 class WandbLogger:
     def __init__(self, top1, top5, loss):

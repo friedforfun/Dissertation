@@ -1,13 +1,13 @@
 import time
 
 from watchdog.observers import Observer
-from watchdog.events import PatternMatchingEventHandler
+from watchdog.events import FileSystemEventHandler 
 
 from AgentBase.Utils.Logging import logger
 
 class FileCreationWatcher:
     def __init__(self):
-        self.src_path = './logs'
+        self.src_path = '.'
         self.event_handler = FileCreationEvent()
         self.event_observer = Observer()
         self._running = True
@@ -60,7 +60,7 @@ class FileCreationWatcher:
   )
 
 
-class FileCreationEvent(PatternMatchingEventHandler):
+class FileCreationEvent(FileSystemEventHandler):
     def __init__(self, redis=None):
         super(FileCreationEvent, self).__init__()
         self._ignore_directories = False
@@ -93,9 +93,10 @@ class FileCreationEvent(PatternMatchingEventHandler):
 
 
     def on_any_event(self, event):
+        #print('On any event fired (watchdog). Path : {}'.format(event.src_path))
         path = event.src_path
         if 'output.log' in path:
-            print('WANDB output log file: {}'.format(path))
+            #print('WANDB output log file: {}'.format(path))
             if self.redis is not None:
                 self.redis.set_output(path)
 
