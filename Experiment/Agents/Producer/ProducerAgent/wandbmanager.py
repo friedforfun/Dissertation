@@ -154,7 +154,6 @@ def run(args):
 
         with open(output_log, 'r') as fh:
             for line in line_contains("==>", fh):
-                print('Found accuracy line')
                 read_accuracy = line
 
         # Record the final top1, top5 and loss
