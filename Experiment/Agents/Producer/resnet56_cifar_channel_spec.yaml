@@ -1,0 +1,29 @@
+version: 1
+filter_pruner_70: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_70',
+    'desired_sparsity'
+  ]
+filter_pruner_60: 
+  type: 'float' 
+  path: [
+    'pruners',
+    'filter_pruner_60',
+    'desired_sparsity'
+  ]
+filter_pruner_20: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_20',
+    'desired_sparsity'
+  ]
+filter_pruner_40: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_40',
+    'desired_sparsity'
+  ]
