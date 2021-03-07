@@ -52,7 +52,7 @@ def run(args):
                         logger.debug('Latency: {}'.format(latency))
                         logger.debug('Throughput: {}'.format(throughput))
                         benchmark_results = json.dumps({'Model_UUID': model_data.get('Model-UUID'), 'Latency': latency, 'Throughput': throughput, 'Agent_ID': model_data.get('Agent_ID')})
-                        redis_conn.publish_model_result(benchmark_results, model_data.get('Agent_ID'))
+                        redis_conn.conn.publish_model_result(benchmark_results, model_data.get('Agent_ID'))
                     bar()
                     time.sleep(0.25)
 
