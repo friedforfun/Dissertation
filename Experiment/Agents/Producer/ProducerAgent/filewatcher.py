@@ -77,6 +77,9 @@ class FileCreationEvent(FileSystemEventHandler):
         if 'checkpoint.pth.tar' in path:
             #print('save this path: {}'.format(path))
             self.checkpoint_path = path
+            if self.redis is not None:
+                self.redis.set_checkpoint(path)
+                
         if 'onnx' in path:
             print('ONNX detected: {}'.format(path))
             self.onnx_path = path

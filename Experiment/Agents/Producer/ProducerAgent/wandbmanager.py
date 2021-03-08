@@ -117,9 +117,16 @@ def run(args):
 
         # Check if checkpoint path is found
         if watcher.path is None:
+            checkpoint = r_conn.get_checkpoint()
+
+        else:
+            checkpoint = watcher.path
+        
+        if checkpoint is None:
             raise ValueError('No path for checkpoint!')
-        print('Checkpoint path: {}'.format(watcher.path))
-        checkpoint_abs_path = os.path.abspath(watcher.path)
+
+        print('Checkpoint path: {}'.format(checkpoint))
+        checkpoint_abs_path = os.path.abspath(checkpoint)
 
         watcher = FileCreationWatcher()
         watcher.add_redis_to_event_handler(r_conn)
@@ -127,7 +134,7 @@ def run(args):
         watcher_thread.start()
 
         # Run distiller again but start from checkpoint and export onnx
-        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=watcher.path, thinnify=True)
+        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', resume_from=checkpoint_abs_path, thinnify=True)
         compressor = Distiller(distiller_onnx_params)
         compressor.run()
 

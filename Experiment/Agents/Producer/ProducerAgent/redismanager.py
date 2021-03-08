@@ -40,6 +40,12 @@ class RedisConnectionManager(RCM):
         return self.connection.get('{}_onnx_path'.format(self.agent_id))
 
 
+    def set_checkpoint(self, checkpoint):
+        self.connection.set('{}_checkpoint'.format(self.agent_id), checkpoint)
+
+    def get_checkpoint(self):
+        return self.connection.get('{}_checkpoint'.format(self.agent_id))
+
     def publish_model(self, message):
         """Publish the details of the model so the consumer agent can download and run the benchmark
 
