@@ -1,7 +1,7 @@
 import redis
 
 class RedisConnectionManager:
-    def __init__(self, agent_id, redis_host, redis_port=6379, db=0, password=None, message_fn=None):
+    def __init__(self, agent_id, redis_host, redis_port=6379, db=0, password=None, message_fn=None, socket_timeout=None):
         """Redis connection manager for experiment agents
 
         :param agent_id: A unique identifier for this agent
@@ -17,7 +17,7 @@ class RedisConnectionManager:
         :param message_fn: Function to call on message recived by listener, defaults to None
         :type message_fn: byte str -> Any, optional
         """
-        self.connection = redis.Redis(host=redis_host, port=redis_port, db=db, password=password)
+        self.connection = redis.Redis(host=redis_host, port=redis_port, db=db, password=password, socket_timeout=socket_timeout)
         self.sub = self.connection.pubsub(ignore_subscribe_messages=True)
         self.agent_id = agent_id
         self.message_fn = message_fn
@@ -42,7 +42,7 @@ class RedisConnectionManager:
 
 
     def run(self):
-        """Pass to a thread target to listen for messages
+        """ Check for message handler and begin listening for messages
 
         :raises ValueError: No behaviour is defined when a message is recived
         """

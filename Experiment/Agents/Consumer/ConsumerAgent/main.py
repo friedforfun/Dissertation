@@ -7,9 +7,9 @@ import json
 from threading import Thread
 from pathlib import Path
 from dotenv import load_dotenv
-
+from alive_progress import alive_bar
 from ConsumerAgent.openvino_interaction import BenchmarkQueue, OpenvinoParams, OpenvinoInteraction
-from ConsumerAgent.redismanager import RedisConnectionManager
+from ConsumerAgent.redismanager import ConnectionController
 from AgentBase.Utils.Logging import logger
 from AgentBase.Utils.Validation import get_check_path, get_check_IPv4, get_check_port, get_check_password
 
@@ -24,40 +24,37 @@ def run(args):
         logger.setLevel(5)
         data_path, openvino_path, redis_host, redis_port, redis_password = load_and_check_params(args)
 
-        # Connect to redis
-        redis_conn = RedisConnectionManager('Benchmarker', redis_host, port=redis_port, db=0, password=redis_password)
-
         # Create queue
         bench_queue = BenchmarkQueue()        
 
-        # Tell listener what to do with message
-        redis_conn.add_message_fn(bench_queue.queue_message)
+        redis_conn = ConnectionController('Benchmarker', redis_host, port=redis_port, db=0, password=redis_password, message_fn=bench_queue.queue_message)
 
         # create and start listener thread
-        listener_thread = Thread(target=redis_conn.run, daemon=True)
+        listener_thread = Thread(target=redis_conn.start, daemon=True)
         listener_thread.start()
 
         try:
-            while True:
-                if not bench_queue.is_empty():
-                    logger.debug('Start ONNX copy')
-                    model_data = bench_queue.pop()
-                    copy_to_local_machine(model_data)
-                    model_path = ONNX_FILE
-                    ov_params = OpenvinoParams(model_path, data_path, perf_count=True, niter=100, report_folder=RESULTS_DIR)
-                    benchmark = OpenvinoInteraction(ov_params)
-                    logger.debug('Starting benchmark')
-                    benchmark.run()
-                    logger.debug('Benchmark finished')
-                    results_df = read_results()
-                    latency = results_df.loc['latency (ms)', :].values[0]
-                    throughput = results_df.loc['throughput', :].values[0]
-                    logger.debug('Latency: {}'.format(latency))
-                    logger.debug('Throughput: {}'.format(throughput))
-                    benchmark_results = json.dumps({'Model_UUID': model_data.get('Model-UUID'), 'Latency': latency, 'Throughput': throughput, 'Agent_ID': model_data.get('Agent_ID')})
-                    redis_conn.publish_model_result(benchmark_results, model_data.get('Agent_ID'))
-
-                time.sleep(2)
+            with alive_bar(title='Waiting for requests...', total=None) as bar:
+                while True:
+                    if not bench_queue.is_empty():
+                        logger.debug('Start ONNX copy')
+                        model_data = bench_queue.pop()
+                        copy_to_local_machine(model_data)
+                        model_path = ONNX_FILE
+                        ov_params = OpenvinoParams(model_path, data_path, perf_count=True, niter=100, report_folder=RESULTS_DIR)
+                        benchmark = OpenvinoInteraction(ov_params)
+                        logger.debug('Starting benchmark')
+                        benchmark.run()
+                        logger.debug('Benchmark finished')
+                        results_df = read_results()
+                        latency = results_df.loc['latency (ms)', :].values[0]
+                        throughput = results_df.loc['throughput', :].values[0]
+                        logger.debug('Latency: {}'.format(latency))
+                        logger.debug('Throughput: {}'.format(throughput))
+                        benchmark_results = json.dumps({'Model_UUID': model_data.get('Model-UUID'), 'Latency': latency, 'Throughput': throughput, 'Agent_ID': model_data.get('Agent_ID')})
+                        redis_conn.conn.publish_model_result(benchmark_results, model_data.get('Agent_ID'))
+                    bar()
+                    time.sleep(0.25)
 
         except KeyboardInterrupt:
             logger.debug('Stopping...')            
