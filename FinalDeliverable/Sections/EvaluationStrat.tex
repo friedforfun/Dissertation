@@ -1,0 +1,54 @@
+\documentclass[../D1.tex]{subfiles}
+
+\begin{document}
+This section presents practical details of the evaluation process and how analysis will be conducted. 
+
+\subsection{Preliminary considerations}
+\textbf{Environment} - To simulate an edge compute environment we will use the Intel Neural Compute stick for inference, training and compression will be performed on a consumer grade GPU, these environment choices satisfy \hyperref[Aim3]{Aim 3}.
+
+\textbf{Determine models, and test datasets} - In accordance with objectives \hyperref[obj:ModelSel]{O1} \& \hyperref[obj:DataSel]{O2}, at least 1 popular model will be selected, the models layer structure should be considered during selection: depth, number of parameters, and number of convolutional\/FC layers will be taken into account. 
+Two datasets will be used with these models, one with a small number of classes such as CIFAR-10 and also a dataset with a much larger number of classes such as Imagenet. Ideally the selected model should have pretrained weights for both datasets, if necessary we will train and store the models ourselves.
+
+\textbf{Select compression algorithms} - Select at least 4 algorithms that utilise different pruning methods. If feasable these algorithms should explore a spectrum of sub-domains of Pruning (such as fine-grained pruning vs filter or channel pruning). Any selected algorithms should have the capability to be applied to a specific layer (for this reason knowledge distillation techniques would not be suitable here).
+For compatibility reasons with the ONNX intermediate representation quantisation may not be exporeted from Distiller (as of Oct 2019)~\autocite{zmoraNeuralNetworkDistiller2019}, \emph{Experiment stage 0} (Section~\ref{sec:Experiment0}) will present a good opportunity to test if this is still the case.
+The selection of compression algorithms will also depend on how they are implemented within the Intel Distiller library, for example \href{https://github.com/IntelLabs/distiller/blob/master/distiller/pruning/automated_gradual_pruner.py}{Automated Gradual Pruner} works on a diverse set of neural network architectures so it would be a suitable choice~\autocite{zhuPruneNotPrune2017}.
+
+\newpage
+\subsection{Experiment tasks}\label{sec:ExperimentTasks}
+\subsubsection{Experiment stage 0: Verify preliminary results}\label{sec:Experiment0}
+This experimental stage is necessary due to the preliminary evaluation reported in Section~\ref{sec:prelimEval}.
+
+\noindent~The following steps will be taken to complete objective \hyperref[obj:VerifyComp]{O0}:
+\begin{enumerate}
+    \item \textbf{Evaluate Compression Scheduler}: We will begin by closely assessing the compression scheduler behaviour, there are extensive tools for evaluating the sparsity metrics of pruned models. This will give us insight into how the compression algorithm is affecting the model 
+    \item \textbf{Evaluate Intermediate Representation}: We used the ONNX format (an open standard format for represnting machinea learning models), to transfer our model from distiller to OpenVINO. We will take a closer look at this representation for issues with compatibility of sparse tensors\/quantisation and the conversion process. One quick verification strategy is to convert the ONNX represtation back to distiller and re-evaluate the models sparsity properties   
+    \item \textbf{Evaluate OpenVINO Representations}: Models converted from ONNX format by OpenVINO are then translated into a format consumable by OpenVINO's Inference Engine, this conversion process uses an OpenVINO tool called the Model Optimser. Transformations on the model during these stages will need to be investigated to confirm they do not interfere with the compressed model. 
+\end{enumerate}
+
+\subsubsection{Experiment stage 1: Initial data gathering}\label{sec:Experiment1}
+Completion of the following stages will satisfy objectives \hyperref[obj:EvalE2E]{O3}, \hyperref[obj:EvalLayer]{O4}, and \hyperref[obj:EvalComp]{O5}
+\begin{enumerate}
+    \item \textbf{Aqcuire suite of baseline data}: Using a fixed test set from each dataset we will run inference on all the models with no compression techniques applied, to acquire a \emph{baseline}. The end to end latency, individual layer latency and also the Top1/Top5 accuracy will be recored for each model/dataset pairing.
+    \item \textbf{Apply compression and gather full compression data}: For each compression algorithm and preselected parameters compress the models used in the \emph{baseline} tests by selectively applying the compression technique to a subset of relevant layers (i.e. layers which the algorithm can be applied). Next using the same testing data from \emph{baseline}, perform inference with the compressed models. The same metrics will be logged as in the \emph{baseline}. We will refer to this test as \emph{full compression}.
+    \item \textbf{Evaluate full compression}: We will make observations about the resulting data, the key metric we are interested in is latency at this stage. First we will make general comparisons with the end-to-end latency and accuracy against the \emph{baseline}. Next we will take a close look at the layer by layer latency against the \emph{baseline}, to try and identify patterns with respect to the size and type of each layer, its location in the neural network, and varience in latency. 
+    \item \textbf{Apply combinations of compression techniques}: Based on the results in the previous step we will cherry pick the best agorithm/parameter pairings, with respect to latency reduction for each domain represented in the selected algorithms. We will then apply a composition of these sucessful compression techinques to the models, using the same compression application strategies from \emph{full compression}.
+    \item \textbf{Evaluate combined compression}: We will evaluate latency changes from \emph{full compression} and \emph{baseline}. Of particular interest will be any changes in the individual layer latencies.
+\end{enumerate}
+
+\subsubsection{Experiment stage 2: Develop optimisation interface}\label{sec:Experiment2}
+These stages concern objectives \hyperref[obj:ParaSel]{O6} and \hyperref[obj:CompPara]{O7}
+\begin{enumerate}
+    \item \textbf{Parameterise compression algorithms}: Develop an interface to define the compression algorithm and its (distiller) scheduler settings. This will be a thin layer on top of distillers pre-existing scheduler api, the purpose of which will be to facilitate communication between an external parameter optimisation tool and distiller.
+    \item \textbf{Implement interface}: We will select the most performant aglorithms from Experiment stage 1 and include select parameters in the aforementioned interface. The parameters selection criteria will be based on observed layerwise latency improvement from Experiment stage 1.
+    \item \textbf{Define optimisation metric}: We will define an optimisation metric using an accuracy threshold as a user defined parameter. This will be the optimisation target.
+    \item \textbf{Integrate interface with benchmark suite}: link optimised distiller model generated via the interface with OpenVINO to run benchmarks
+\end{enumerate}
+
+\subsubsection{Experiment stage 3: Testing Compression optimisation}\label{sec:Experiment3}
+This stage of research will complete objective \hyperref[obj:TestOpt]{O8}
+\begin{enumerate}
+    \item \textbf{Run the optimiser}: Using the interface developed in stage 2 we will utilise a bayseian optimisation strategy (a sweep) that shows how a each parameter correlates with the target metric, this strategy will also reveal parameter importance metrics.
+    \item \textbf{Collect data}: We will gather the data aqcuired in the final experiment and draw conclusions based on the improvement (or lack of it) over the baseline and manual parameter selection. At this point we should be able to answer our hypothesis one way or another.
+    \item Extended evaulation of the data may be worthwhile, observations of the parameter importance and correlation metrics may shed some light on a direction of future research.
+\end{enumerate}
+\end{document}

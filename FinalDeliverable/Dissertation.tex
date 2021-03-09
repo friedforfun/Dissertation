@@ -1,0 +1,190 @@
+\documentclass[11pt]{article}
+\usepackage[table]{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\usepackage{setspace}
+\doublespacing
+
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{inputenc}
+
+\usepackage{dashrule}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{mwe}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{enumitem}
+
+\usepackage[backend=biber,style=ieee]{biblatex}
+\usepackage[toc]{appendix}
+\usepackage[acronym]{glossaries}
+
+\addbibresource{Dissertation.bib}
+
+\hypersetup{ linktoc=all}
+\graphicspath{ {./images/}{../images/}{../../images} }
+
+\makenoidxglossaries
+
+\newacronym{ai}{AI}{artifical intelligence}
+\newacronym{fc}{FC}{fully connected}
+\newacronym{dnn}{DNN}{deep neural network}
+\newacronym{cnn}{CNN}{convolutional neural network}
+\newacronym{rnn}{RNN}{recurrent neural network}
+\newacronym{lstm}{LSTM}{long term short term memory network}
+\newacronym{nlp}{NLP}{natural language processing}
+
+\newacronym{ncs}{NCS}{neural compute stick}
+\newacronym{tpu}{TPU}{tensor processing unit}
+\newacronym{vpu}{VPU}{video processing unit}
+\newacronym{gpu}{GPU}{graphics processing unit}
+\newacronym{apu}{APU}{associative processing unit}
+\newacronym{fpga}{FPGA}{field programmable gate array}
+\newacronym{asic}{ASIC}{application specific integrated circuit}
+
+\newacronym{blas}{BLAS}{basic linear algebra subprograms}
+\newacronym{csc}{CSC}{compressed sparse column}
+\newacronym{tops}{TOPS}{trillion operations per second}
+\newacronym{soc}{SoC}{system on a chip}
+
+
+\usepackage{subfiles}
+
+\begin{document}
+\title{%
+	\bf Inference at the edge: tuning compression parameters for performance\\ 
+	\large Deliverable 1: Final year Dissertation \\
+	Bsc Computer Science: Artificial Intelligence}
+
+\author{
+	Sam Fay-Hunt | \texttt{sf52@hw.ac.uk}\\
+	Supervisor: Rob Stewart | \texttt{R.Stewart@hw.ac.uk}
+}
+
+\maketitle
+\thispagestyle{empty}
+\pagebreak
+
+\textbf{DECLARATION}\\
+I, Sam Fay-Hunt confirm that this work submitted for assessment is my own and is expressed in
+my own words. Any uses made within it of the works of other authors in any form (e.g., ideas,
+equations, figures, text, tables, programs) are properly acknowledged at any point of their
+use. A list of the references employed is included.\\
+Signed: .....Sam Fay-Hunt...........\\
+Date: .....10/12/2020...............
+\thispagestyle{empty}
+\pagebreak
+
+\textbf{Abstract:} 
+\emph{Abstract here}
+
+
+
+\thispagestyle{empty}
+\pagebreak
+
+\tableofcontents
+\thispagestyle{empty}
+\pagebreak
+
+\printnoidxglossary[type=acronym, nonumberlist]
+\thispagestyle{empty}
+
+\newpage
+\setcounter{page}{1}
+
+\section{Introduction}
+%\subfile{Sections/introduction}
+
+
+
+\pagebreak
+\section{Background}
+\emph{
+\begin{itemize}
+	\item Adapt from D1
+	\item rewrite with more of a focus on the concrete channel and pruning methodology used
+	\item Would be good to include wandb bayse hyperparam optimisation details
+\end{itemize}
+}
+%This Section will be split into 4 subsections:\\
+%Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a deep neural network and the \acrshort{cnn} model.\\
+%Section~\ref{subsec:compressionTypes} - \textbf{Neural Network Compression}: Discusses neural network compression techniques and on how they change the underlying representations of DNNs.\\
+%Section~\ref{subsec:AIaccelerators} - \textbf{AI accelerators} Covers a few popular AI accelerators architectures, their strengths, weaknesses and specialisms.\\
+%Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Networks}: Describes the how DNNs interact with memory, and discusses some of the implications of this.
+
+%\subsection{Deep Neural Networks}\label{subsec:deepLearning}
+%\subfile{Sections/Background/DeepNeuralNetworks}
+
+%\newpage
+%\subsection{Neural Network Compression}\label{subsec:compressionTypes}
+%\subfile{Sections/Background/Compression}
+
+%\newpage
+%\subsection{AI accelerators}\label{subsec:AIaccelerators}
+%\subfile{Sections/Background/AIaccelerators}
+
+%\newpage
+%\subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
+%\subfile{Sections/Background/HardwareMemArch}
+
+%\newpage
+\section{Methodology}
+\subsection{Conceptual Process}
+\emph{
+\begin{itemize}
+	\item Sensitivity analysis - filter/channel selection
+	\item Filter pruning implementation - Theory
+	\item Channel pruning implementation - Theory
+\end{itemize}
+}
+
+\subsection{Engineering steps}
+\emph{
+\begin{itemize}
+	\item High level overview of physical system - justify need for multiple training agents
+	\item Benchmarking setup - openvino + benchmark (getting latency/throughput)
+	\item Pruning \& retraining setup - Distiller (Pruning \& training)
+	\item Data processing - wandb + data visualisation steps
+\end{itemize}
+}
+
+\section{Experiment Discussion}
+\subsection{Filter and channel selection}
+\emph{
+Link back to selected model
+\begin{itemize}
+	\item Filter selection (visual representation of filters)
+	\item Channel selection (visual representation of channels)
+\end{itemize}
+}
+
+\section{Conclusion}
+\subsection{Further work}
+\emph{
+\begin{itemize}
+	\item Suggested improvements for methodology
+	\item Next steps
+\end{itemize}
+}
+\subsection{Discussion}
+\emph{
+\begin{itemize}
+	\item Discuss results
+	\item Criticism of methodology
+\end{itemize}
+}
+
+\appendix
+\section{Back matter}
+\subsection{References}
+\printbibliography
+
+
+\end{document}
