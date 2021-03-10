@@ -101,7 +101,16 @@ Date: .....10/12/2020...............
 
 \section{Introduction}
 %\subfile{Sections/introduction}
-
+\emph{
+\begin{itemize}
+	\item Introduce terminology  - Inference, neural network model, pruning, layers, channels, filters
+	\item Introduce models to be used - high level conceptual representation of the models
+	\item Introduce hypothesis
+	\item Describe research aims
+	\item Define project objectives
+	\item Describe how this work contributes to further research
+\end{itemize}
+}
 
 
 \pagebreak
@@ -135,17 +144,38 @@ Date: .....10/12/2020...............
 %\subfile{Sections/Background/HardwareMemArch}
 
 %\newpage
+
+
+
 \section{Methodology}
+\subsection{Overview}
+\emph{
+\begin{itemize}
+	\item Questions to be addressed
+	\item Metrics to be measured - why
+\end{itemize}
+}
 \subsection{Conceptual Process}
 \emph{
 \begin{itemize}
-	\item Sensitivity analysis - filter/channel selection
+	\item Sensitivity analysis - filter/channel selection and layer interdependencies
 	\item Filter pruning implementation - Theory
 	\item Channel pruning implementation - Theory
+	\item Retraining pruned model
 \end{itemize}
 }
 
-\subsection{Engineering steps}
+\subsection{Filter and channel selection}
+\emph{
+Link back to selected model - concrete examples of process described in previous section
+\begin{itemize}
+	\item Filter selection (visual representation of filters)
+	\item Channel selection (visual representation of channels)
+	\item Discussion of pruning consequences (and recovery) -> top1/top5 before retraining and after
+\end{itemize}
+}
+
+\subsection{Engineering/implementation details}
 \emph{
 \begin{itemize}
 	\item High level overview of physical system - justify need for multiple training agents
@@ -155,13 +185,25 @@ Date: .....10/12/2020...............
 \end{itemize}
 }
 
-\section{Experiment Discussion}
-\subsection{Filter and channel selection}
+
+\section{Evaluation}
+\subsection{Evaluation of experimental design}
 \emph{
-Link back to selected model
 \begin{itemize}
-	\item Filter selection (visual representation of filters)
-	\item Channel selection (visual representation of channels)
+	\item Duration of training
+	\item volume of data gathered
+	\item (im)practicalities - power consumption? 
+	\item limitations - single optimisation metric
+	\item Criticism of methodology
+\end{itemize}
+}
+
+\subsection{Evaluation of results}
+\emph{
+\begin{itemize}
+	\item Summary of results per model/dataset
+	\item Deep dive into results, detailed visualisations of accuracy \& latency tradeoffs (maybe example with poor quality sensitivity analysis vs higher quality layer selection)
+	\item 
 \end{itemize}
 }
 
@@ -177,7 +219,6 @@ Link back to selected model
 \emph{
 \begin{itemize}
 	\item Discuss results
-	\item Criticism of methodology
 \end{itemize}
 }
 
