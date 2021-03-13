@@ -46,11 +46,13 @@ def run(args):
                         logger.debug('Starting benchmark')
                         benchmark.run()
                         logger.debug('Benchmark finished')
-                        benchmark_df = read_benchmark_report()
+                        benchmark_df = read_benchmark_report().drop_duplicates(keep='first')
                         total_latency = benchmark_df.loc['latency (ms)', :].values[0]
                         throughput = benchmark_df.loc['throughput', :].values[0]
-                        detailed_counters_df = read_detailed_counters().drop_duplicates(keep='first')
-                        latency = detailed_counters_df.loc['Total'].values[3]
+                        detailed_counters_df = read_detailed_counters()
+                        
+                        latency = detailed_counters_df[detailed_counters_df['layerName'] == 'Total'].iloc[0].values[4]
+
                         logger.debug('Latency: {}'.format(latency))
                         logger.debug('Total_Latency: {}'.format(total_latency))
                         logger.debug('Throughput: {}'.format(throughput))
