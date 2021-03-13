@@ -222,7 +222,7 @@ class WandbLogger:
         data = data.decode('utf-8')
         metrics_dict = json.loads(data)
 
-        metrics = {'Top1': self.top1, 'Top5': self.top5, 'Loss': self.loss, 'Latency': float(metrics_dict.get('Latency')), 'Throughput': float(metrics_dict.get('Throughput'))}
+        metrics = {'Top1': self.top1, 'Top5': self.top5, 'Loss': self.loss, 'Total_Latency': float(metrics_dict.get('Total_Latency')), 'Throughput': float(metrics_dict.get('Throughput')), 'Latency': float(metrics_dict.get('Latency'))}
         print('Logging wandb metrics')
         wandb.log(metrics)
 

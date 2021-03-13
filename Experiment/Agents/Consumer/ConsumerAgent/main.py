@@ -46,12 +46,15 @@ def run(args):
                         logger.debug('Starting benchmark')
                         benchmark.run()
                         logger.debug('Benchmark finished')
-                        results_df = read_results()
-                        latency = results_df.loc['latency (ms)', :].values[0]
-                        throughput = results_df.loc['throughput', :].values[0]
+                        benchmark_df = read_benchmark_report()
+                        total_latency = benchmark_df.loc['latency (ms)', :].values[0]
+                        throughput = benchmark_df.loc['throughput', :].values[0]
+                        detailed_counters_df = read_detailed_counters().drop_duplicates(keep='first')
+                        latency = detailed_counters_df.loc['Total'].values[3]
                         logger.debug('Latency: {}'.format(latency))
+                        logger.debug('Total_Latency: {}'.format(total_latency))
                         logger.debug('Throughput: {}'.format(throughput))
-                        benchmark_results = json.dumps({'Model_UUID': model_data.get('Model-UUID'), 'Latency': latency, 'Throughput': throughput, 'Agent_ID': model_data.get('Agent_ID')})
+                        benchmark_results = json.dumps({'Model_UUID': model_data.get('Model-UUID'), 'Total_Latency': total_latency, 'Throughput': throughput, 'Latency': latency, 'Agent_ID': model_data.get('Agent_ID')})
                         redis_conn.conn.publish_model_result(benchmark_results, model_data.get('Agent_ID'))
                     bar()
                     time.sleep(0.25)
@@ -71,12 +74,16 @@ def copy_to_local_machine(json_message):
     logger.debug('ONNX copied to local FS')
   
 
-def read_results():
+def read_benchmark_report():
     report_path = '{}/benchmark_report.csv'.format(RESULTS_DIR)
     df = pd.read_csv(report_path, delimiter=';')
     #print(df)
     return df
 
+def read_detailed_counters():
+    report_path = '{}/benchmark_detailed_counters_report.csv'.format(RESULTS_DIR)
+    df = pd.read_csv(report_path, delimiter=';')
+    return df
 
 def setup_args(parser):
     args = parser.add_argument_group('Core parameters')
