@@ -1,13 +1,11 @@
 import wandb
 import os
 import sys
-import io
 import argparse
 from threading import Thread
 import json
 import socket
 import uuid
-import logging
 from ProducerAgent.distiller_interaction import Distiller, CompressionParams
 from ProducerAgent.redismanager import RedisConnectionManager
 from ProducerAgent.filewatcher import FileCreationWatcher
@@ -142,7 +140,10 @@ def run(args):
         watcher_thread.join()
         
 
-        redis_onnx = str(os.path.abspath(r_conn.get_onnx().decode('utf-8')))
+        redis_onnx = r_conn.get_onnx()
+        if redis_onnx is None:
+            raise ValueError("Missing onnx field from redis, check filewater")
+        redis_onnx = str(os.path.abspath(redis_onnx.decode('utf-8')))
         print('REDIS ONNX: {}'.format(redis_onnx))
         
 
@@ -152,9 +153,10 @@ def run(args):
         r_conn.publish_model(consumer_data)
         print('Model published.')
         
-        output_log = str(os.path.abspath(r_conn.get_output().decode('utf-8')))
+        output_log = r_conn.get_output()
         if output_log is None:
             raise ValueError("No output.log found")
+        output_log = str(os.path.abspath(output_log.decode('utf-8')))
 
         # find testing data accuracy from output.log 
         test_accuracy = None
@@ -219,6 +221,8 @@ class WandbLogger:
 
     def log_wandb(self, data):
         #if check_data(data):
+        if data is None:
+            raise ValueError('Missing data from consumer')
         data = data.decode('utf-8')
         metrics_dict = json.loads(data)
 
