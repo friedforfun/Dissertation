@@ -76,19 +76,31 @@ def run(args):
 
         wandb_arg_parser = argparse.ArgumentParser()
         args = wandb_arg_parser.add_argument_group('WandB args')
-        wandb_arg_parser = yamlEditorBuilder.get_args(wandb_arg_parser)
-        print('Parsing known wandb args')
+        args.add_argument('--epochs', type=int, required=False, default=None)
+        args.add_argument('--learning_rate', type=float, required=False, default=None)
+        print('Parsing known wandb args...')
         wandb_args = wandb_arg_parser.parse_known_args()[0]
 
+        yaml_arg_parser = argparse.ArgumentParser()
+        yaml_arg_parser = yamlEditorBuilder.get_args(yaml_arg_parser)
+        print('Parsing known yaml args')
+        yaml_args = yaml_arg_parser.parse_known_args()[0]
 
-        learning_rate = 0.1
-        epochs = 70
+
+        learning_rate = wandb_args.learning_rate
+        if learning_rate is None:
+            learning_rate = 0.1
+
+        epochs = wandb_args.epochs
+        if epochs is None:
+            epochs = 70
+            
         j = 6 # data loading worker threads
         deterministic = True # make results deterministic with the same paramaters
 
         # Set the value sent by wandb in the yaml file
         print('Setting yaml values')
-        for k,v in vars(wandb_args).items():
+        for k,v in vars(yaml_args).items():
             yamlEditor.set_value_by_id(k, v)
         
         # write it out
@@ -142,7 +154,7 @@ def run(args):
 
         redis_onnx = r_conn.get_onnx()
         if redis_onnx is None:
-            raise ValueError("Missing onnx field from redis, check filewater")
+            raise ValueError("Missing onnx field from redis, check filewatcher")
         redis_onnx = str(os.path.abspath(redis_onnx.decode('utf-8')))
         print('REDIS ONNX: {}'.format(redis_onnx))
         
@@ -178,7 +190,7 @@ def run(args):
             upload_data = WandbLogger(top1, top5, loss)
 
         # Blocks until a result is sent by the benchmarker
-        r_conn.listen_blocking(upload_data.log_wandb, lambda _: True)
+        r_conn.listen_blocking(upload_data.log_wandb, lambda x: check_data(x))
 
 
 
@@ -190,7 +202,7 @@ def run(args):
     except AttributeError as e:
         display_exception(e)
         wandb.alert(title="Sweep exception raised",
-                    text="Check the attributes being called in script (line 66?) \n {}".format(e))
+                    text="Check the attributes being called in script \n {}".format(e))
         sys.exit(11)
     except Exception as e:
         display_exception(e)

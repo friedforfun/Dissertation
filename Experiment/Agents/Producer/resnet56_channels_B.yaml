@@ -2,20 +2,26 @@ program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgen
 project: Resnet56-Filters-Test
 method: bayes
 metric:
-  goal: minimize
-  name: "Latency"
+  goal: maximise
+  name: "Top1"
 parameters:
+  epochs:
+    min: 70
+    max: 300
+  learning_rate:
+    min: 0.1
+    max: 0.5
   filter_pruner_70:
-    min: 0.0
+    min: 0.88
     max: 0.99
   filter_pruner_60:
-    min: 0.0
+    min: 0.36
     max: 0.99
   filter_pruner_20:
     min: 0.0
     max: 0.99
   filter_pruner_40:
-    min: 0.0
+    min: 0.57
     max: 0.99
 command:
   - ${env}
@@ -24,5 +30,5 @@ command:
   - '--model=resnet56_cifar'
   - '--data=/home/sam/Projects/distiller/datasets/cifar10'
   - '--yaml_spec=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_channel_spec.yaml'
-  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_cifar_filter_rank_v2.yaml'
+  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_channels_base.yaml'
   - ${args}
