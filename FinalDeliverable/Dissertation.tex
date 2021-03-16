@@ -30,7 +30,7 @@
 \hypersetup{ linktoc=all}
 \graphicspath{ {./images/}{../images/}{../../images} }
 
-\makenoidxglossaries
+%\makenoidxglossaries
 
 \newacronym{ai}{AI}{artifical intelligence}
 \newacronym{fc}{FC}{fully connected}
@@ -93,8 +93,8 @@ Date: .....10/12/2020...............
 \thispagestyle{empty}
 \pagebreak
 
-\printnoidxglossary[type=acronym, nonumberlist]
-\thispagestyle{empty}
+%\printnoidxglossary[type=acronym, nonumberlist]
+%\thispagestyle{empty}
 
 \newpage
 \setcounter{page}{1}
@@ -148,42 +148,7 @@ Date: .....10/12/2020...............
 
 
 \section{Methodology}
-\subsection{Overview}
-\emph{
-\begin{itemize}
-	\item Questions to be addressed
-	\item Metrics to be measured - why
-\end{itemize}
-}
-\subsection{Conceptual Process}
-\emph{
-\begin{itemize}
-	\item Sensitivity analysis - filter/channel selection and layer interdependencies
-	\item Filter pruning implementation - Theory
-	\item Channel pruning implementation - Theory
-	\item Retraining pruned model
-\end{itemize}
-}
-
-\subsection{Filter and channel selection}
-\emph{
-Link back to selected model - concrete examples of process described in previous section
-\begin{itemize}
-	\item Filter selection (visual representation of filters)
-	\item Channel selection (visual representation of channels)
-	\item Discussion of pruning consequences (and recovery) -> top1/top5 before retraining and after
-\end{itemize}
-}
-
-\subsection{Engineering/implementation details}
-\emph{
-\begin{itemize}
-	\item High level overview of physical system - justify need for multiple training agents
-	\item Benchmarking setup - openvino + benchmark (getting latency/throughput)
-	\item Pruning \& retraining setup - Distiller (Pruning \& training)
-	\item Data processing - wandb + data visualisation steps
-\end{itemize}
-}
+\subfile{Sections/Methodology}
 
 
 \section{Evaluation}
