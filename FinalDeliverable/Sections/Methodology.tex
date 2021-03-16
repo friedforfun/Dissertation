@@ -52,8 +52,14 @@ While the process of pruning is relatively fast, retraining the network to regai
 
 When pruning begins, the producer agent requests the (initially random) pruning parameters from the Weights and Biases Project server, the producer then applies the pruning algorithm and begins retraining the model. Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
 
-\subsubsection{Pruning parameter selection}
+\subsubsection{defining parameters to prune}
 
+Distiller uses a compression schedule yaml document to define the filters and channels to prune.
+
+The pruning schedule is composed of lists of sections that define Pruners, LR-schedulers, and policies. A Pruner defines a pruning algorithm and the layers on which that pruning algorithm will be applied, LR-schedulers define the \textbf{learning-rate decay(Definition required)} algorithm. 
+Finally each policy defines the instance of the pruner or LR-scheduler it is managing, define when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
+
+Each layer in the network is labelled internally by Pytorch, distiller uses these labels to identify the layers being referenced by the compression schedule, 
 
 \subsubsection{Benchmarking}
 
