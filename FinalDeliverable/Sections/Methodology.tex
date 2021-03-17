@@ -9,6 +9,7 @@
 	\item Metrics to be measured - why
 \end{itemize}
 }
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Conceptual Process}
 \emph{
 \begin{itemize}
@@ -18,7 +19,7 @@
 	\item Retraining pruned model
 \end{itemize}
 }
-
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Filter and channel selection}
 \emph{
 Link back to selected model - concrete examples of process described in previous section
@@ -28,7 +29,7 @@ Link back to selected model - concrete examples of process described in previous
 	\item Discussion of pruning consequences (and recovery) -> top1/top5 before retraining and after
 \end{itemize}
 }
-
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Engineering/implementation details}
 \emph{
 \begin{itemize}
@@ -39,7 +40,11 @@ Link back to selected model - concrete examples of process described in previous
 \end{itemize}
 }
 
+\newpage
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{High level overview of system}
+
+Figure~\ref{fig:agentCommunication} shows how each system interacts in the workflow, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent
 
 \begin{figure}[H]
     \centering
@@ -48,19 +53,104 @@ Link back to selected model - concrete examples of process described in previous
     \label{fig:agentCommunication}
 \end{figure}
 
+When pruning begins, the producer agent requests the (initially random) pruning parameters from the Weights and Biases Project server, the producer then applies the pruning algorithm and begins retraining the model. Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
+As described in \textbf{(TBD)} the parameter importance and correlation with the target metric is re-computed each time results are logged this can help determine in what direction to tune the paramater settings to minimise (or maximise) the target metric.
+
 While the process of pruning is relatively fast, retraining the network to regain lost accuracy can very demanding. To handle this problem we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add new pruning and benchmarking agents to a single experiment or run multiple experiments in parallel.
 
-When pruning begins, the producer agent requests the (initially random) pruning parameters from the Weights and Biases Project server, the producer then applies the pruning algorithm and begins retraining the model. Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Defining parameters to prune}
 
-\subsubsection{defining parameters to prune}
+\singlespacing
+\begin{figure}[H]
+    \begin{minted}[breaklines]{yaml}
+        pruners: 
+            layer_1_conv_pruner:
+                class: 'L1RankedStructureParameterPruner'
+                group_type: Filters
+                desired_sparsity: 0.9
+                weights: [
+                    module.layer1.0.conv1.weight,
+                    module.layer1.1.conv1.weight
+                ]
+        lr_schedulers:
+            exp_finetuning_lr:
+                class: ExponentialLR
+            gamma: 0.95
 
-Distiller uses a compression schedule yaml document to define the filters and channels to prune.
+        policies:
+            - pruner:
+                instance_name: layer_1_conv_pruner
+                epochs: [0]
+            
+            - lr_scheduler:
+                    instance_name: exp_finetuning_lr
+                starting_epoch: 10
+                ending_epoch: 300
+                frequency: 1
+    \end{minted}
+    \caption{Example distiller schedule file, showing the pruning algorithm selected, and that algorithms parameters}
+    \label{fig:CompressionSchedule}
+\end{figure}
+\doublespacing
+
+Figure~\ref{fig:CompressionSchedule} shows a compression schedule document in .yaml format which will provide instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (section \textbf{TBD}) to prune the weights in each of the convolutions visible inside the `weights' array, specifying filter pruning and a target sparsity.
 
 The pruning schedule is composed of lists of sections that define Pruners, LR-schedulers, and policies. A Pruner defines a pruning algorithm and the layers on which that pruning algorithm will be applied, LR-schedulers define the \textbf{learning-rate decay(Definition required)} algorithm. 
 Finally each policy defines the instance of the pruner or LR-scheduler it is managing, define when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
 
-Each layer in the network is labelled internally by Pytorch, distiller uses these labels to identify the layers being referenced by the compression schedule, 
+\begin{figure}[H]
+    \includegraphics[width=\textwidth]{temp_pruning_layers.png}
+    \caption{Resnet56 example showing wieght labels. \textbf{(TODO: rescale and redraw to highlight pertinent information)}}
+    \label{fig:resnet56weightlabels}
+\end{figure}
 
+Each layer in the network is labelled either manually or automatically (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers being referenced by the compression schedule. 
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{WandB API}
+
+\begin{table}[H]
+    \begin{tabular}{@{}|l|l|l|@{}}
+    \toprule
+    Key        & Description                    & Value                                    \\ \midrule
+    program    & Script to be run               & Path to script                           \\ \midrule
+    method     & Search strategy                & grid, random, or bayse                   \\ \midrule
+    metric     & The metric to optimise         & Name and direction of metric to optimise \\ \midrule
+    parameters & The parameter bounds to search & Name + min/max or array of fixed values  \\ \bottomrule
+    \end{tabular}
+    \caption{Configuration setting keys, descriptions and values}
+    \label{tab:WandBConfig}
+\end{table}
+
+To explore the space of possible models the hyperparameter optimisation tool within WandB called Sweeps was leveraged. 
+This involves writing a python script that can run the entire workflow (pruning, training \& benchmarking) and record the results, each sweep needs a configuration file (see figure~\ref{fig:sweepConfig}).
+
+% which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
+
+\singlespacing
+\begin{figure}[H]
+    \begin{minted}[breaklines]{yaml}
+        program: workflow.py
+        method: bayes
+        metric:
+            goal: minimize
+            name: Latency
+        parameters:
+            layer_1_conv_pruner_sparsity:
+                min: 0.01
+                max: 0.99
+            layer_1_conv_pruner_group_type:
+                values: [Channels, Filters]
+    \end{minted}
+    \caption{WandB sweep configuration file}
+    \label{fig:sweepConfig}
+\end{figure}
+\doublespacing
+
+
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Benchmarking}
 
 \begin{figure}[H]
@@ -71,8 +161,16 @@ Each layer in the network is labelled internally by Pytorch, distiller uses thes
 \end{figure}
 
 
-To pass the pruned and trained model to the Neural Compute stick we used OpenVino; a toolkit providing a high level \textbf{inference engine(Ensure this is defined)} API, this facilitates the process of optimizing the model for specialised hardware (in this case the NCS). 
+To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the NCS. 
 OpenVino itself has a Benchmarking tool that we leverage to access to detailed latency and throughput metrics. A predefined set of images are selected and loaded into the NCS, the benchmarking application then runs 100 iterations by passing the same 4 images through the network and returns the mean end-to-end latency (including loading images into the NCS memory), VPU processing latency (Inference latency), and throughput in FPS.
 
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Fitting it all together}
+\begin{itemize}
+    \item Wrapper on Distiller, reading schedule \& paramaterise elements
+    \item WandB implementation, defining parameters to optimise
+    \item communication between producer \& consumer (redis - pub/sub)
+    \item running benchmark and logging results
+\end{itemize}
 
 \end{document}
