@@ -21,6 +21,10 @@
 \usepackage{multirow}
 \usepackage{enumitem}
 \usepackage{minted}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{ragged2e}
+\usepackage{xcolor}
 
 \usepackage[backend=biber,style=ieee]{biblatex}
 \usepackage[toc]{appendix}
@@ -30,6 +34,10 @@
 
 \hypersetup{ linktoc=all}
 \graphicspath{ {./images/}{../images/}{../../images} }
+
+\makeatletter
+\newcommand*{\compress}{\@minipagetrue}
+\makeatother
 
 %\makenoidxglossaries
 
