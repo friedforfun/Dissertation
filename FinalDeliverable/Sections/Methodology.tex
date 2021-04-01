@@ -26,13 +26,18 @@ This section will discusss the methodology used to search for lower latency mode
 
 \subsubsection{Sensitivity Analysis}
 
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Filter Pruning}
-This methodology selected the algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the implementation described by Li et al in  Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. This algorithm ranks filters
+This methodology selected the algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the implementation described by Li et al in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
+This algorithm removes the filters that have the smallest impact on accuracy drop, the effect of filter pruning on network feature maps~\textbf{Definition needed} is described in section \textbf{TBD}.
+
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{FilterPruning.jpg}
     \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
 \end{figure}
+
+
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
@@ -130,7 +135,7 @@ Finally each policy references the instance of the pruner or LR-scheduler it is 
     \label{fig:resnet56weightlabels}
 \end{figure}
 
-Each layer in the network is labelled either manually or automatically (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers being referenced by the compression schedule. 
+Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers being referenced by the compression schedule. 
 
 
 
@@ -184,7 +189,7 @@ This involves writing a python script that can run the entire workflow (pruning,
 \begin{figure}[H]
 	\centering
 	\includegraphics{./OpenVinoModelOptimizer}
-	\caption{Workflow for deploying trained model onto NCS \autocite{ModelOptimizerDeveloper}}
+	\caption{Workflow for deploying trained model onto NCS~\autocite{ModelOptimizerDeveloper}}
 	\label{fig:OpenVinoWorkflow}
 \end{figure}
 
@@ -209,6 +214,7 @@ For the purpose of this experiment we chose to use the L1RankedStructureParamete
 We conducted three experiments using the Resnet56 model trained on the CIFAR10 dataset. 
 These three experiemnts each used a different target metric: Latency, Top1, and a hybrid metric (see section (TBD)).
 
+\newpage
 \subsubsection{Schedules}
 The following groups of weights were selected for Filter pruning in the resnet56 model:
 
@@ -216,7 +222,7 @@ The following groups of weights were selected for Filter pruning in the resnet56
 \begin{table}[H]
     \centering
     \setlist[itemize]{font= \color{black}, wide, leftmargin=*, noitemsep, after=\vspace*{-\topsep}}
-    \setlength{\extrarowheight}{3pt}
+    \setlength{\extrarowheight}{1pt}
     \setlength{\tabcolsep}{3pt}
     \label{my-label}
     \begin{tabularx}{0.6\textwidth}{|p{40mm}|*{1}{>{\compress\RaggedRight\arraybackslash} X |}}
