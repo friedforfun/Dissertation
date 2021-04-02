@@ -33,7 +33,7 @@
 \addbibresource{Dissertation.bib}
 
 \hypersetup{ linktoc=all}
-\graphicspath{ {./images/}{../images/}{../../images} }
+\graphicspath{ {./images/}{../images/}{../../images}{../Deliverable_1/images}{../../Deliverable_1/images} }
 
 \makeatletter
 \newcommand*{\compress}{\@minipagetrue}
@@ -102,14 +102,15 @@ Date: .....10/12/2020...............
 \thispagestyle{empty}
 \pagebreak
 
-%\printnoidxglossary[type=acronym, nonumberlist]
-%\thispagestyle{empty}
+\printnoidxglossary[type=acronym, nonumberlist]
+\thispagestyle{empty}
 
 \newpage
 \setcounter{page}{1}
 
 \section{Introduction}
-%\subfile{Sections/introduction}
+\subfile{Sections/introduction}
+
 \emph{
 \begin{itemize}
 	\item Introduce terminology  - Inference, neural network model, pruning, layers, channels, filters
@@ -131,28 +132,28 @@ Date: .....10/12/2020...............
 	\item Would be good to include wandb bayse hyperparam optimisation details
 \end{itemize}
 }
-%This Section will be split into 4 subsections:\\
-%Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a deep neural network and the \acrshort{cnn} model.\\
-%Section~\ref{subsec:compressionTypes} - \textbf{Neural Network Compression}: Discusses neural network compression techniques and on how they change the underlying representations of DNNs.\\
-%Section~\ref{subsec:AIaccelerators} - \textbf{AI accelerators} Covers a few popular AI accelerators architectures, their strengths, weaknesses and specialisms.\\
-%Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Networks}: Describes the how DNNs interact with memory, and discusses some of the implications of this.
+This Section will be split into 4 subsections:\\
+Section~\ref{subsec:deepLearning} - \textbf{Deep Learning}: An overview of the basic components of a deep neural network and the \acrshort{cnn} model.\\
+Section~\ref{subsec:compressionTypes} - \textbf{Neural Network Compression}: Discusses neural network compression techniques and on how they change the underlying representations of DNNs.\\
+Section~\ref{subsec:AIaccelerators} - \textbf{AI accelerators} Covers a few popular AI accelerators architectures, their strengths, weaknesses and specialisms.\\
+Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Networks}: Describes how DNNs interact with memory, and discusses some of the implications of this.
 
-%\subsection{Deep Neural Networks}\label{subsec:deepLearning}
-%\subfile{Sections/Background/DeepNeuralNetworks}
+\subsection{Deep Neural Networks}\label{subsec:deepLearning}
+\subfile{Sections/Background/DeepNeuralNetworks}
 
-%\newpage
-%\subsection{Neural Network Compression}\label{subsec:compressionTypes}
-%\subfile{Sections/Background/Compression}
+\newpage
+\subsection{Neural Network Compression}\label{subsec:compressionTypes}
+\subfile{Sections/Background/Compression}
 
-%\newpage
-%\subsection{AI accelerators}\label{subsec:AIaccelerators}
-%\subfile{Sections/Background/AIaccelerators}
+\newpage
+\subsection{AI accelerators}\label{subsec:AIaccelerators}
+\subfile{Sections/Background/AIaccelerators}
 
-%\newpage
-%\subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
-%\subfile{Sections/Background/HardwareMemArch}
+\newpage
+\subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
+\subfile{Sections/Background/HardwareMemArch}
 
-%\newpage
+\newpage
 
 
 

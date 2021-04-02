@@ -1,26 +1,35 @@
-\documentclass[../D1.tex]{subfiles}
+\documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
 \subsection{Motivation}
-With the continued revolution of AI technologies a desire to perform inference at the edge is becoming ever more prevalent.
+With the continued revolution of AI technologies a desire to \textbf{perform inference at the edge (rephrase)} is becoming ever more prevalent.
 The argument for localising inference is only becoming stronger with the ever increasing avaliablilty of computation resources alongside new and constantly evolving AI applications, inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
 
 
-Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not always the case.
+Neural network compression is one avenue for bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency but this is often not the case.
 Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression because compression techniques such as pruning can have cascading effects througout a neural network.
 This alone can make compression a daunting task, even for experienced machine learning practicioners, it gets worse however, these compression algorithms often feature complex parameters with implications that may not be revealed until a substantial amount of time has already been invested in retraining a compressed model.
 
+\subsection{Terminology}
+\emph{Introduce common terminology}
 
+
+\begin{itemize}
+    \item Inference
+    \item Edge
+    \item Channels
+    \item Filters
+\end{itemize}
 
 \subsection{Hypothesis}
 \emph{Using a systematic compression method selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and imporve inference latency based on an accuracy threshold in a typical edge computing environment.}
 
-\newpage
 \subsection{Research Aims}
+%! --------------------------------------------- NEED REVISION ----------------------------------------------
 \textbf{Aim 1}\label{Aim1} - This dissertation will research methodologies for reducing inference latency using a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the layer structure of the neural network.\\ 
-\noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select approriate compression methodologies and reduce the search space down to a single pruning algorithm per sub domain.\\
+\noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select approriate compression methodologies and reduce the search space down to a single pruning algorithm.\\
 \noindent\textbf{Aim 3}\label{Aim3} - Maintain a valid testing environment by using an edge based ai accelerator to perform inference, while training and compression will be performed on a GPU.\\
-\noindent\textbf{Aim 4}\label{Aim4} - Develop a interface to optimise compression parameters according to a metric representing the union of accuracy and latency.\\
+\noindent\textbf{Aim 4}\label{Aim4} - Develop a platform to optimise compression parameters according to a metric representing the union of accuracy and latency.\\
 \textbf{\large~Objectives}
 \begin{itemize}
     \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
@@ -33,6 +42,6 @@ This alone can make compression a daunting task, even for experienced machine le
     \item \textbf{O7:}\label{obj:CompPara} Develop a interface to parameterise select compression methods.
     \item \textbf{O8:}\label{obj:TestOpt} Evaluate a model using a bayesian optimisation approach on compression parameters.
 \end{itemize}
-
+%! -------------------------------------------------------------------------------------------------------------
 
 \end{document}

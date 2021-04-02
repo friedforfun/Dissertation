@@ -216,7 +216,8 @@ These three experiemnts each used a different target metric: Latency, Top1, and 
 
 \newpage
 \subsubsection{Schedules}
-The following groups of weights were selected for Filter pruning in the resnet56 model:
+Table~\ref{tab:scheduleWeights} shows the labels and groupings of weights used for Filter pruning in the selected Resnet56 model.
+Note that only the first 
 
 
 \begin{table}[H]
@@ -224,7 +225,6 @@ The following groups of weights were selected for Filter pruning in the resnet56
     \setlist[itemize]{font= \color{black}, wide, leftmargin=*, noitemsep, after=\vspace*{-\topsep}}
     \setlength{\extrarowheight}{1pt}
     \setlength{\tabcolsep}{3pt}
-    \label{my-label}
     \begin{tabularx}{0.6\textwidth}{|p{40mm}|*{1}{>{\compress\RaggedRight\arraybackslash} X |}}
     \hline
     Label & Weights  \\
@@ -268,6 +268,7 @@ The following groups of weights were selected for Filter pruning in the resnet56
     \end{itemize}\\ \hline
     \end{tabularx}
     \caption{Mapping of pruners to filter weights}
+    \label{tab:scheduleWeights}
 \end{table}
 
 \subsubsection{Latency Target Metric}
