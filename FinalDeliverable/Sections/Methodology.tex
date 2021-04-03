@@ -72,7 +72,7 @@ Link back to selected model - concrete examples of process described in previous
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{High level overview of system}
 
-Figure~\ref{fig:agentCommunication} shows how each system interacts in the workflow, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the wandb system serves the next set of sweep parameters to each of the `Producer' agents.
+Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the wandb system serves the next set of sweep parameters to each of the `Producer' agents.
 
 \begin{figure}[H]
     \centering
@@ -138,9 +138,35 @@ Finally each policy references the instance of the pruner or LR-scheduler it is 
 Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers being referenced by the compression schedule. 
 
 
-
+\newpage
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{WandB API}
+
+\singlespacing
+\begin{figure}[H]
+    \begin{minted}[breaklines]{yaml}
+        program: pipeline.py
+        method: bayes
+        metric:
+            goal: minimize
+            name: Latency
+        parameters:
+            layer_1_conv_pruner_desired_sparsity:
+                min: 0.01
+                max: 0.99
+            layer_1_conv_pruner_group_type:
+                values: [Channels, Filters]
+    \end{minted}
+    \caption{WandB sweep configuration file}
+    \label{fig:sweepConfig}
+\end{figure}
+\doublespacing
+
+To explore the space of pruning paramater values the hyperparameter optimisation framework exposed by WandB called `Sweeps' was leveraged. 
+This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a desciption of each key in the wandb configuration file with a summary of appropriate arguments. 
+
+
+% which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
 
 \begin{table}[H]
     \begin{tabular}{@{}|l|l|l|@{}}
@@ -155,33 +181,12 @@ Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}
     \label{tab:WandBConfig}
 \end{table}
 
-To explore the space of possible models the hyperparameter optimisation tool within WandB called Sweeps was leveraged. 
-This involves writing a python script that can run the entire workflow (pruning, training \& benchmarking) and record the results, each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a desciption of each key in the wandb configuration file and their appropriate arguments. 
+
+%Each set of pruning parameters in this experiment used a bayesian optimisation technique~\autocite{snoekPracticalBayesianOptimization2012}
 
 
-% which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
-
-\singlespacing
-\begin{figure}[H]
-    \begin{minted}[breaklines]{yaml}
-        program: workflow.py
-        method: bayes
-        metric:
-            goal: minimize
-            name: Latency
-        parameters:
-            layer_1_conv_pruner_sparsity:
-                min: 0.01
-                max: 0.99
-            layer_1_conv_pruner_group_type:
-                values: [Channels, Filters]
-    \end{minted}
-    \caption{WandB sweep configuration file}
-    \label{fig:sweepConfig}
-\end{figure}
-\doublespacing
-
-
+This configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max float/integer. 
+The pipeline script that recieves the arguments from wandb then uses a mapping from these args to settings in the distiller compression schedule, and using the values provided by wandb writes out a new schedule to be fed into distiller. 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Benchmarking}
