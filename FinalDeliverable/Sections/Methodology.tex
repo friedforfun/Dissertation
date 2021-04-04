@@ -93,7 +93,7 @@ To imporve the efficiency of the training we separated the benchmarking system (
 
 \singlespacing
 \begin{figure}[H]
-    \begin{minted}[breaklines]{yaml}
+    \begin{minted}[breaklines, linenos]{yaml}
         pruners: 
             layer_1_conv_pruner:
                 class: 'L1RankedStructureParameterPruner'
@@ -124,10 +124,13 @@ To imporve the efficiency of the training we separated the benchmarking system (
 \end{figure}
 \doublespacing
 
-Figure~\ref{fig:CompressionSchedule} shows a example compression schedule document in .yaml format which will provide instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (section \textbf{TBD}) to prune the weights in each of the convolutions visible inside the `weights' array, specifying filter pruning and a target sparsity.
+Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance(line 2 - layer\_1\_conv\_pruner), a single `lr\_scheduler' instance (line 11 - exp\_fine\_tuning\_lr), and their respecitve policies (explained below).
+
 
 The pruning schedule is composed of lists of sections that define `Pruners', `LR-schedulers', and `policies'. A `Pruner' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(Definition required)} algorithm. 
 Finally each policy references the instance of the pruner or LR-scheduler it is managing (instance\_name), and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
+
+Figure~\ref{fig:CompressionSchedule} shows a example compression schedule document in .yaml format which will provide instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (section \textbf{TBD}) to prune the weights in each of the convolutions visible inside the `weights' array, specifying filter pruning and a target sparsity.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{temp_pruning_layers.png}
@@ -186,7 +189,8 @@ This involves writing a python script that can run the entire pipeline (pruning,
 
 
 This configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max float/integer. 
-The pipeline script that recieves the arguments from wandb then uses a mapping from these args to settings in the distiller compression schedule, and using the values provided by wandb writes out a new schedule to be fed into distiller. 
+The pipeline script that recieves the arguments from wandb contains a mapping from the wandb arguments to the corresponding value in the distiller compression schedule.
+The pipeline then uses the values provided by wandb and writes out a new schedule that will be fed into distiller. 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Benchmarking}
