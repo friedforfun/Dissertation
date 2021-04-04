@@ -124,13 +124,13 @@ To imporve the efficiency of the training we separated the benchmarking system (
 \end{figure}
 \doublespacing
 
-Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance(line 2 - layer\_1\_conv\_pruner), a single `lr\_scheduler' instance (line 11 - exp\_fine\_tuning\_lr), and their respecitve policies (explained below).
+Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance (line 2 - \texttt{\color{mintedgreen}layer\_1\_conv\_pruner}), a single `lr\_scheduler' instance (line 11 - \texttt{\color{mintedgreen}exp\_fine\_tuning\_lr}), and their respecitve policies (explained below).
 
 
-The pruning schedule is composed of lists of sections that define `Pruners', `LR-schedulers', and `policies'. A `Pruner' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(Definition required)} algorithm. 
-Finally each policy references the instance of the pruner or LR-scheduler it is managing (instance\_name), and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
+The pruning schedule is composed of lists of sections that define `{\color{mintedgreen}pruners}', `{\color{mintedgreen}lr-schedulers}', and `{\color{mintedgreen}policies}'. A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(Definition required)} algorithm. 
+Finally each policy references an instance of a pruner or LR-scheduler, and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
 
-Figure~\ref{fig:CompressionSchedule} shows a example compression schedule document in .yaml format which will provide instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (section \textbf{TBD}) to prune the weights in each of the convolutions visible inside the `weights' array, specifying filter pruning and a target sparsity.
+The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (section \textbf{TBD}) to prune the weights in each of the convolutions visible inside the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}target\_sparsity}' indicates how many tensors will try to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), note that target sparsity should not be confused with an actual change in sparsity - it should be noted that filter and channel pruning will always result in a dense layer with an actual sparsity of 0.
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{temp_pruning_layers.png}
@@ -138,7 +138,7 @@ Figure~\ref{fig:CompressionSchedule} shows a example compression schedule docume
     \label{fig:resnet56weightlabels}
 \end{figure}
 
-Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers being referenced by the compression schedule. 
+Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers are being referenced by the compression schedule. 
 
 
 \newpage
@@ -204,10 +204,10 @@ The pipeline then uses the values provided by wandb and writes out a new schedul
 
 
 To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
-OpenVino itself has a benchmarking tool that we leverage to access detailed latency and throughput metrics. 
-Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running to through the model optimizer, the IR can then be processed by the Inference Engine.
-Once the model is loaded to the VPU we load the images that will be used for benchmarking into the VPU memory.
-We observe three measurements for every model, the mean end-to-end latency (from loading an image into the model until getting a result), the actual inference latency or the latency to pass the data through the neural network excluding loading images into memory, and finally we also measure the throughput (the number of images(frames) that can be processed per second or FPS).
+OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{link to table of operations and latency in appendix}. 
+Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimizer, the IR can then be read by the Inference Engine and loaded into VPU memory.
+Once the model is loaded into VPU we load the images that will be used for benchmarking into the VPU memory.
+We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result), the sum of latency for each instruction executed by the VPU once the image is loaded into memory, and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Experiment setup}
@@ -215,7 +215,7 @@ We observe three measurements for every model, the mean end-to-end latency (from
     \item Wrapper on Distiller, reading schedule \& paramaterise elements
     \item WandB implementation, defining parameters to optimise
     \item communication between producer \& consumer (redis - pub/sub)
-    \item running benchmark and logging results
+    \item running benchmark and logging results.
 \end{itemize}
 
 For the purpose of this experiment we chose to use the L1RankedStructureParameterPruner algorithm with filter pruning, .
