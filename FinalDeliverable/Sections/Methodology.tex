@@ -28,10 +28,10 @@ This section will discusss the methodology used to search for lower latency mode
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \newpage
-\subsubsection{Filter Pruning}
-We selected the algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
-We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting at the smallest sum values, with their corresponding feature maps.
-For each removed filter its corresponding kernel in the next convolutional layer is removed with its feature map also. \\
+\subsubsection{Filter Pruning algorithm}
+We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
+We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
+Each filter that gets removed results in the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
 
 
 \begin{singlespace}
@@ -44,16 +44,18 @@ For each removed filter its corresponding kernel in the next convolutional layer
         \item Prune $m$ filters with the smallest sum values and their corresponding feature maps. The kernels in the next convolutional layer corresponding to the pruned feature maps are also removed.
         \item A new kernel matrix is created for both the $i$th and $i + 1$th layers, and the remaining kernel weights are copied to the new model.
     \end{enumerate}
+\end{singlespace}
 
-
-  %  the effect of filter pruning on network feature maps~\textbf{Definition needed} is described in section \textbf{TBD}.
-
+Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilitent layers once and retraining can result in much of the lost accuracy to be regained~.
+Once pruning is completed we compensate for the performance degredation by retraining the network, 
 
     \begin{figure}[H]
         \includegraphics[width=\textwidth]{FilterPruning.jpg}
         \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
+        \label{fig:FeaturemapAndKernel}
     \end{figure}
-\end{singlespace}
+
+
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
@@ -242,11 +244,11 @@ These three experiemnts each used a different target metric: Latency, Top1, and 
 
 \newpage
 \subsubsection{Schedules}
-Table~\ref{tab:scheduleWeights} shows the labels and groupings of weights used for Filter pruning in the selected Resnet56 model, the 3 labelled pruners and their corresponding weights were used in all experiments.
+Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labeled for Filter pruning in the selected Resnet56 model, the 3 labelled pruners and their corresponding weights were used in all experiments.
 Layers with a similar degree of sensitivity to pruning are grouped together, layers that are omitted from the table have a much higher sensitivity to pruning and are not pruned at all, pruning more sensitive layers can result in a significantly higher rate of pruned neural networks that lose all predictive ability.
-Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer) and significantly reduces the complexity of the parameter search.\\
+Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.\\
 
-Note that only the first convolution in each residual block (\textbf{Explanation needed}) is being pruned.
+Note that only the first convolution in each residual block (\textbf{Explanation needed}) is being pruned, because the convolutions following this will also have the kernels removed following the removed feature maps.
 
 
 \begin{table}[H]
