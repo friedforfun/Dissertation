@@ -59,7 +59,7 @@ Once pruning is completed we compensate for the performance degredation by retra
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Filter and channel selection}
+\subsection{Model}
 \emph{
 Link back to selected model - concrete examples of process described in previous section
 \begin{itemize}
@@ -69,7 +69,12 @@ Link back to selected model - concrete examples of process described in previous
 \end{itemize}
 }
 
+Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' which, from the perspective of pruning, adds additional interdependencies between layers.
 
+ResNets were origninally proposed to help address a training accuracy degredation problem that can occur in very deep networks, where accuracy saturation occurs a phenomenon where adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+Today ResNets are commonly used for computer vision tasks, we selected a resnet network for this experiment because adding 
+
+The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks as standard today.
 
 
 
@@ -153,11 +158,11 @@ The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} p
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{temp_pruning_layers.png}
-    \caption{Resnet56 example showing first 4 convolutional layers with labels for the weights. \textbf{(TODO: rescale and redraw to highlight pertinent information)}}
+    \caption{Resnet56 fragment showing first 2 residual block with the corresponding weights matrices labelled. \textbf{(TODO: rescale and redraw to highlight pertinent information)}}
     \label{fig:resnet56weightlabels}
 \end{figure}
 
-Each layer in the network is labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which layers are being referenced by the compression schedule. 
+Each layer in the network is implicitly labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which weight matricies are being referenced by the compression schedule. 
 
 
 \newpage
@@ -250,11 +255,11 @@ Grouping layers in this way helps us avoid having to use 56 pruning parameters (
 
 Note that only the first convolution in each residual block (\textbf{Explanation needed}) is being pruned, because the convolutions following this will also have the kernels removed following the removed feature maps.
 
-
+\singlespacing
 \begin{table}[H]
     \centering
     \setlist[itemize]{font= \color{black}, wide, leftmargin=*, noitemsep, after=\vspace*{-\topsep}}
-    \setlength{\extrarowheight}{1pt}
+    \setlength{\extrarowheight}{0.5pt}
     \setlength{\tabcolsep}{3pt}
     \begin{tabularx}{0.6\textwidth}{|p{40mm}|*{1}{>{\compress\RaggedRight\arraybackslash} X |}}
     \hline
@@ -301,6 +306,7 @@ Note that only the first convolution in each residual block (\textbf{Explanation
     \caption{Mapping of pruners to filter weights}
     \label{tab:scheduleWeights}
 \end{table}
+\doublespacing
 
 \subsubsection{Latency Target Metric}
 This experiment targeted pure inference latency, no information regarding accuracy was encoded in the optimisation metric. 

@@ -12,6 +12,9 @@
 \end{itemize}
 }
 
+
+
+
 \subsection{Evaluation of results}
 \emph{
 \begin{itemize}
@@ -20,5 +23,13 @@
 	\item 
 \end{itemize}
 }
+
+\textbf{Interesting observations}
+\begin{itemize}
+    \item The models that lost all predictive power due to overpruning were not the fastest, even when targeting only latency.
+    \item The relationship between more pruning and lower latency is not as simple as you get a faster model with fewer tensors
+    \item When targeting accuracy we found models with as low latency when targeting latency directly.
+    \item When targeting latency we found models with as high accuracy as when targeting accuracy directly.
+\end{itemize}
 
 \end{document}
