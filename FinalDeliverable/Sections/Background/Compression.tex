@@ -21,8 +21,8 @@ There has been a substantial amount of research into how pruning can be used to 
 \end{figure}
 
 This process of pruning the weight matrix within a DNN results in a sparse matrix representation of weights, where the degree of sparsity is determined by the pruning algorithm being used and hyperparameters that can be tuned for the situation, such as how much accuracy loss is considered acceptable, and to what degree the neural network needs to be compressed. 
-The pattern of sparsity in a weight matrix is a fundamental factor when considering how to accelerate a pruned neural network~\autocite{maoExploringRegularitySparse2017}, this is known as the \textbf{granularity of sparsity}.
-Figure~\ref{fig:SparsityRegularity} provides a visual representation of granularity of sparsity, the spectrum of granularity usually falls between either \textbf{fine-grained (unstructured)} or \textbf{course-grained (structured)}, pruning techniques are also categorised by the aformentioned granularities.
+The pattern of sparsity in a weight matrix is a fundamental factor when considering how to accelerate a pruned neural network~\autocite{maoExploringRegularitySparse2017}, this is known as the \emph{granularity of sparsity}.
+Figure~\ref{fig:SparsityRegularity} provides a visual representation of granularity of sparsity, the spectrum of granularity usually falls between either \emph{fine-grained (unstructured)} or \emph{coarse-grained (structured)}, pruning techniques are also categorised by the aformentioned granularities.
 
 
 The influential paper Optimal Brain Damage by LeCun et al~\autocite{lecunOptimalBrainDamage} was the first to propose a very fine-grained pruning technique by identifying and zeroing individual weights within a network.
@@ -31,7 +31,7 @@ Fine-grained pruning results in a network that can be challenging to accelerate 
 
 Coarse-grained pruning techniques such as channel and filter pruning preserve the density of the network by altering the dimensionality of the input/output vectors, channel pruning involves removing an entire channel in a feature map, filter level pruning likewise removes an entire convolutional filter. 
 
-This style of pruning however can have a significant impact on the accuracy of the network, but as demonstrated by Wen et al~\autocite{wenLearningStructuredSparsity2016}~accelerating networks with very course-grained pruning is straightforward because the model smaller but still dense, so libraries such as~\acrshort{blas} are able to take full advantage of the structure. 
+This style of pruning however can have a significant impact on the accuracy of the network, but as demonstrated by Wen et al~\autocite{wenLearningStructuredSparsity2016}~accelerating networks with very coarse-grained pruning is straightforward because the model smaller but still dense, so libraries such as~\acrshort{blas} are able to take full advantage of the structure. 
 
 
 
