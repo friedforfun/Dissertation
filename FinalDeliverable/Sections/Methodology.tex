@@ -71,12 +71,17 @@ Link back to selected model - concrete examples of process described in previous
 
 Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' which, from the perspective of pruning, adds additional interdependencies between layers.
 
-ResNets were origninally proposed to help address a training accuracy degredation problem that can occur in very deep networks, where accuracy saturation occurs a phenomenon where adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
-Today ResNets are commonly used for computer vision tasks, we selected a resnet network for this experiment because adding 
+ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, degredation (accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+Today ResNets are commonly used for computer vision tasks, we selected a resnet neural network for this experiment because networks that are shallow enough not to benefit from residual blocks will have far fewer pruning paramaters to manage, the practicality of automating these parameters increases with the size of a network. 
 
-The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks as standard today.
+The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks today.
 
-
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
+    \caption{A residual block}
+    \label{fig:ResidualBlock}
+\end{figure}
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Engineering/implementation details}
