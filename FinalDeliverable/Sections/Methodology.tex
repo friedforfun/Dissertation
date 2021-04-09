@@ -74,12 +74,16 @@ Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune fil
 ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, degredation (accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
 Today ResNets are commonly used for computer vision tasks, we selected a resnet neural network for this experiment because networks that are shallow enough not to benefit from residual blocks will have far fewer pruning paramaters to manage, the practicality of automating these parameters increases with the size of a network. 
 
-The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks today.
+The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks today.\\
+
+We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks, performing this experiemnt on networks using residual blocks is important because in general the necessity of using compression techniques such as pruning increases as networks get larger, residual blocks are important for larger networks for the reasons described above. 
+The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, so it provides a good point of comparison.
+It is not a trivial task to improve on the preexisting hand built schedules manually without extensive understanding of layer sensitivities.  
 
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
-    \caption{A residual block}
+    \caption{A residual block, note the identity feature map skips the weight layers, these are also known as `skip connections'.}
     \label{fig:ResidualBlock}
 \end{figure}
 
@@ -312,6 +316,10 @@ Note that only the first convolution in each residual block (\textbf{Explanation
     \label{tab:scheduleWeights}
 \end{table}
 \doublespacing
+
+\subsubsection{Baseline data}
+For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10, and second an `off-the-shelf' version of ResNet56 with parameters hand picked by an expert in the field (\textbf{qualify this})~\autocite{liPruningFiltersEfficient2017}.
+
 
 \subsubsection{Latency Target Metric}
 This experiment targeted pure inference latency, no information regarding accuracy was encoded in the optimisation metric. 

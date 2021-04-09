@@ -25,6 +25,14 @@ The size of the pruned networks is not measured.
 \end{itemize}
 }
 
+We gathered data in 3 phases; a fast pruning phase targeting latency only with no retraining, targeting latency only with retraining, and targeting accuracy only with retraining.
+
+\subsubsection{Fast pruning phase}
+During this phase of the experiment we gathered data to observe how pruning would effect latency, this was useful as an initial proof of concept.
+This phase of the experiment was very time efficient, we were able to perform 1631 runs with around 18 hours of compute time, each run would usually take between 24-55 seconds. 
+As discussed in section (\textbf{TBD}) for this experiment we set the training epochs to 0 and set the target metric to minimize latency. 
+
+
 \textbf{Interesting observations}
 \begin{itemize}
     \item The models that lost all predictive power due to overpruning were not the fastest, even when targeting only latency.
