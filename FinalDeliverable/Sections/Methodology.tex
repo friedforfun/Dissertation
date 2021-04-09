@@ -46,7 +46,7 @@ Each filter that gets removed results in the corresponding feature map to be rem
     \end{enumerate}
 \end{singlespace}
 
-Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilitent layers once and retraining can result in much of the lost accuracy to be regained~.
+\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.
 Once pruning is completed we compensate for the performance degredation by retraining the network, 
 
     \begin{figure}[H]
@@ -255,6 +255,17 @@ For the purpose of this experiment we chose to use the L1RankedStructureParamete
 
 We conducted three experiments using the Resnet56 model trained on the CIFAR10 dataset. 
 These three experiemnts each used a different target metric: Latency, Top1, and a hybrid metric (see section (TBD)).
+
+\singlespacing
+\noindent\textbf{Observed metrics:}
+\begin{itemize}
+    \item \textbf{Latency} | Computed by calculating the sum of CPU time for hardware operations inside the NCS after the model and images have been loaded into memory.
+    \item \textbf{Total\_Latency} | Measures the full latency to perform inference on an image once a model is optimised and loaded into the NCS, inlcuding loading the image into the stick memory.
+    \item \textbf{Throughput} | Shows the number of images per second that can be processed by the NCS.
+    \item \textbf{Top1} | The \% accuracy of the most likely class the model predicts.
+    \item \textbf{Top5} | The \% accuracy of the top 5 predicted classes.
+\end{itemize}
+\doublespacing
 
 \newpage
 \subsubsection{Schedules}

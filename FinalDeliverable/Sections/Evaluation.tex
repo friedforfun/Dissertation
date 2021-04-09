@@ -28,10 +28,33 @@ The size of the pruned networks is not measured.
 We gathered data in 3 phases; a fast pruning phase targeting latency only with no retraining, targeting latency only with retraining, and targeting accuracy only with retraining.
 
 \subsubsection{Fast pruning phase}
-During this phase of the experiment we gathered data to observe how pruning would effect latency, this was useful as an initial proof of concept.
-This phase of the experiment was very time efficient, we were able to perform 1631 runs with around 18 hours of compute time, each run would usually take between 24-55 seconds. 
-As discussed in section (\textbf{TBD}) for this experiment we set the training epochs to 0 and set the target metric to minimize latency. 
 
+\begin{figure}[H]
+    \includegraphics[width=1\textwidth]{TargetSparsityVsLatency_No_Retrain.jpg}
+    \caption{Each pruner target sparisity plotted against mean Latency.}
+    \label{fig:fastPruneParamVSLatency}
+\end{figure}
+
+During this phase of the experiment we gathered data to observe how pruning would effect latency, this was useful as an initial proof of concept.
+This phase of the experiment was very time efficient, we were able to perform 1631 runs with around 18 hours of compute time, each run usually lasted between 24-55 seconds. 
+As discussed in section (\textbf{TBD}) for this experiment we set the training epochs to 0 and set the target metric to minimize latency. 
+Figure~\ref{fig:fastPruneParamVSLatency} shows the mean Latency computed by using equal width binning, where each bin represents parameter values inside each discretized 0.02 range between 0.0 and 1.0.
+This chart does obfuscate any relationship between the parameters, however we can see how pruning the filter pruner on Layer 3.2 (red) has a much greater impact on latency than Pruning on Layer 1 (blue), this is also supported by computing the correlation between these values.
+Table~\ref{tab:fastPruneCorrelations} shows the correlations between each pruning parameter and Latency and Top1
+
+\singlespacing
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}cp{26mm}p{26mm}p{26mm}p{26mm}@{}}
+    \toprule
+    \textbf{Metric}  & \textbf{Filter Pruner  Layer 1} & \textbf{Filter Pruner Layer 2} & \textbf{Filter Pruner Layer 3.1} & \textbf{Filter Pruner Layer 3.2} \\ \midrule
+    \textbf{Latency} & $-0.11259$                        & $-0.552583$                      & $-0.40775$                         & $-0.80726$                         \\
+    \textbf{Top1}    & $0.004462$                        & $-0.071923$                      & $-0.104505$                        & $-0.152767$                        \\ \bottomrule
+    \end{tabular}
+    \caption{Correlations between each target sparsity parameter and the metric being measured.}
+    \label{tab:fastPruneCorrelations}
+\end{table}
+\doublespacing
 
 \textbf{Interesting observations}
 \begin{itemize}
