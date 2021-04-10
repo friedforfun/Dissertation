@@ -3,7 +3,7 @@
 \begin{document}
 
 \subsection{Overview}
-\emph{
+\emph{\color{red}
 \begin{itemize}
 	\item Questions to be addressed
 	\item Metrics to be measured - why
@@ -13,21 +13,8 @@
 This section will discusss the methodology used to search for lower latency models by tweaking pruning parameters.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Conceptual Process}
-\emph{
-\begin{itemize}
-	\item Sensitivity analysis - filter/channel selection and layer interdependencies
-	\item Filter pruning implementation - Theory
-	\item Channel pruning implementation - Theory
-	\item Retraining pruned model
-\end{itemize}
-}
- 
+\subsection{Experiment descisions {\color{red}(section to be renamed)}}
 
-\subsubsection{Sensitivity Analysis}
-
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\newpage
 \subsubsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
 We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
 We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
@@ -59,49 +46,36 @@ Once pruning is completed we compensate for the performance degredation by retra
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Model}
-\emph{
-Link back to selected model - concrete examples of process described in previous section
-\begin{itemize}
-	\item Filter selection (visual representation of filters)
-	\item Channel selection (visual representation of channels)
-	\item Discussion of pruning consequences (and recovery) -> top1/top5 before retraining and after
-\end{itemize}
-}
+\subsubsection{Model Selection}\label{sec:ModelSelection}
 
-Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' which, from the perspective of pruning, adds additional interdependencies between layers.
+Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
 
-ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, degredation (accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
-Today ResNets are commonly used for computer vision tasks, we selected a resnet neural network for this experiment because networks that are shallow enough not to benefit from residual blocks will have far fewer pruning paramaters to manage, the practicality of automating these parameters increases with the size of a network. 
+We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
+Performing this experiemnt on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
 
-The accuracy degredation problem with very deep CNNs is common enough that many new networks in research and production make use of what are known as residual blocks today.\\
+The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
+It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
 
-We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks, performing this experiemnt on networks using residual blocks is important because in general the necessity of using compression techniques such as pruning increases as networks get larger, residual blocks are important for larger networks for the reasons described above. 
-The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, so it provides a good point of comparison.
-It is not a trivial task to improve on the preexisting hand built schedules manually without extensive understanding of layer sensitivities.  
-
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
-    \caption{A residual block, note the identity feature map skips the weight layers, these are also known as `skip connections'.}
+    \caption{A residual block, note the identity feature map skips the weight layers, this is also known as a `skip connection'.}
     \label{fig:ResidualBlock}
 \end{figure}
 
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Engineering/implementation details}
-\emph{
-\begin{itemize}
-	\item High level overview of physical system - justify need for multiple training agents
-    \item Pruning \& retraining setup - Distiller (Pruning \& training)
-	\item Benchmarking setup - openvino + benchmark (getting latency/throughput)
-	\item Data processing - wandb + data visualisation steps
-\end{itemize}
-}
+\textbf{\color{red}Discuss further how residual blocks effect pruning.}
+ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, Degredation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+The accuracy degredation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Model Retraining}
+\textbf{TBD}
 
 
 \newpage
 %! ---------------------------------------------------------------------------------------------------------------------------------
+\subsection{Engineering/implementation details}
+This section will discuss the specifics of the system engineered to perform the experiments.{\color{red}Rephase needed}
 \subsubsection{High level overview of system}
 
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the wandb system serves the next set of sweep parameters to each of the `Producer' agents.
@@ -115,7 +89,7 @@ Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipel
 
 When pruning begins, the producer agent requests the (initially random) pruning parameters from the Weights and Biases Project server, the producer then applies the pruning algorithm and begins retraining the model.
 Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
-As described in \textbf{(TBD)} the parameter importance and correlation with the target metric is re-computed each time results are logged this can help determine in what direction to tune the paramater settings to minimise (or maximise) the target metric.
+As described in Section~\textbf{(TBD)} the parameter importance and correlation with the target metric is re-computed each time results are logged this can help determine in what direction to tune the paramater settings to minimise (or maximise) the target metric.
 
 The runtime of a full benchmark for one model on the NCS is usually at most 5 seconds, pruning and retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs. 
 To imporve the efficiency of the training we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
@@ -236,25 +210,18 @@ The pipeline then uses the values provided by wandb and writes out a new schedul
 \end{figure}
 
 
-To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
-OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{link to table of operations and latency in appendix}. 
+To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(\color{red}Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
+OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{\color{red}link to example table of HW operations and latency in appendix}. 
 Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimizer, the IR can then be read by the Inference Engine and loaded into VPU memory.
 Once the model is loaded into VPU we load the images that will be used for benchmarking into the VPU memory.
 We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result), the sum of latency for each instruction executed by the VPU once the image is loaded into memory, and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Experiment setup}
-\begin{itemize}
-    \item Wrapper on Distiller, reading schedule \& paramaterise elements
-    \item WandB implementation, defining parameters to optimise
-    \item communication between producer \& consumer (redis - pub/sub)
-    \item running benchmark and logging results.
-\end{itemize}
-
-For the purpose of this experiment we chose to use the L1RankedStructureParameterPruner algorithm with filter pruning, .
-
 We conducted three experiments using the Resnet56 model trained on the CIFAR10 dataset. 
-These three experiemnts each used a different target metric: Latency, Top1, and a hybrid metric (see section (TBD)).
+The first experiment set the retraining epochs to 0 so we could prune and benchmark rapidly, we set minimisation of latency to be the target.
+For the second experiment we set the target to minimise latency, but this time allowed retraining up to 300 epochs.
+The final (third) experiment was the same as the second but we set the target metric to maximise Top1 accuracy. 
 
 \singlespacing
 \noindent\textbf{Observed metrics:}
@@ -273,7 +240,7 @@ Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labeled fo
 Layers with a similar degree of sensitivity to pruning are grouped together, layers that are omitted from the table have a much higher sensitivity to pruning and are not pruned at all, pruning more sensitive layers can result in a significantly higher rate of pruned neural networks that lose all predictive ability.
 Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.\\
 
-Note that only the first convolution in each residual block (\textbf{Explanation needed}) is being pruned, because the convolutions following this will also have the kernels removed following the removed feature maps.
+Note that only the first convolution in each residual block is being pruned, because the convolutions following this will also have the kernels removed following the removed feature maps (See Section~\ref{sec:ModelSelection}).
 
 \singlespacing
 \begin{table}[H]
@@ -328,13 +295,18 @@ Note that only the first convolution in each residual block (\textbf{Explanation
 \end{table}
 \doublespacing
 
+\subsubsection{Passing pruned/trained networks to benchmarker}
+\emph{Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
+
 \subsubsection{Baseline data}
-For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10, and second an `off-the-shelf' version of ResNet56 with parameters hand picked by an expert in the field (\textbf{qualify this})~\autocite{liPruningFiltersEfficient2017}.
+For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10, and second an `off-the-shelf' version of ResNet56 with parameters hand picked by an expert in the field (\textbf{\color{red}qualify this?})~\autocite{liPruningFiltersEfficient2017}.
+
+\subsubsection{Experiment 1: Rapid pruning, no retraining}
 
 
-\subsubsection{Latency Target Metric}
+\subsubsection{Experiment 2: Target latency, with retraining}
 This experiment targeted pure inference latency, no information regarding accuracy was encoded in the optimisation metric. 
 
-
+\subsubsection{Experiment 3: Target Top1, with retraining}
 
 \end{document}

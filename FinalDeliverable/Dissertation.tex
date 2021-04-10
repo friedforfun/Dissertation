@@ -26,6 +26,7 @@
 \usepackage{enumitem}
 \usepackage{ragged2e}
 \usepackage{xcolor}
+\usepackage{subfig}
 
 \usepackage[backend=biber,style=ieee]{biblatex}
 \usepackage[toc]{appendix}
@@ -170,8 +171,61 @@ Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Netwo
 \section{Conclusion}
 \subfile{Sections/Conclusion}
 
+\newpage
 \appendix
 \section{Back matter}
+\subsection{Model Listing}
+The following section is a listing of cherry-picked models, with a hyperlink to further details for each model, and a description of the Pruning parameters and observed metrics.
+
+All networks in this section have links to the original data as it was gathered, the pruning schedule labels used in this data are different to those described throughout the dissertation. 
+The label names were changed to improve the readability of this dissertation, Table~\ref{tab:labelMapping} shows how the labels in this dissertation map to the labels in the original data. 
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lll@{}}
+    \toprule
+    \textbf{Dissertation Label} &                & \textbf{Label in Dataset} \\ \hline
+    Filter Pruner Layer 1       & $\rightarrow$ & filter\_pruner\_20        \\
+    Filter Pruner Layer 2       & $\rightarrow$ & filter\_pruner\_40        \\
+    Filter Pruner Layer 3.1     & $\rightarrow$ & filter\_pruner\_60        \\
+    Filter Pruner Layer 3.2     & $\rightarrow$ & filter\_pruner\_70        \\ \hline
+    \end{tabular}
+    \caption{Mapping of labels from dissertation to dataset}
+    \label{tab:labelMapping}
+\end{table}
+
+
+\subsubsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
+This model was created during the `no-retraining' experiment, very low pruning parameters with a low Top1, and fairly low Latency.\\
+Referenced by: [\ref{sec:FastPruningPhase}]
+\begin{table}[H]
+    \centering
+    \subfloat[Pruning parameters]{
+        \begin{tabular}{@{}ll@{}}
+            \toprule
+            \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+            filter\_pruner\_20      & 0.153          \\
+            filter\_pruner\_40      & 0.2536         \\
+            filter\_pruner\_60      & 0.09001        \\
+            filter\_pruner\_70      & 0.09955        \\ \bottomrule
+        \end{tabular}
+    }
+    \hspace{2em}
+    \subfloat[Recorded Metrics]{
+        \begin{tabular}{@{}ll@{}}
+            \toprule
+            \textbf{Metric}    & \textbf{Value} \\ \midrule
+            Latency(ms)        & 4.397          \\
+            Loss               & 1.924          \\
+            Throughput(FPS)    & 302.36         \\
+            Top1               & 27.02          \\
+            Top5               & 83.26          \\
+            Total\_latency(ms) & 13.06          \\ \bottomrule
+        \end{tabular}
+    }
+\end{table}
+
 \subsection{References}
 \printbibliography
 
