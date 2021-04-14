@@ -102,7 +102,7 @@ pruners:
   filter_pruner_70:
     class: 'L1RankedStructureParameterPruner'
     group_type: Channels
-    desired_sparsity: 0.9
+    desired_sparsity: 0.7
     group_dependency: Leader
     weights: [
       module.layer1.1.conv1.weight,
@@ -121,7 +121,7 @@ pruners:
   filter_pruner_60:
     class: 'L1RankedStructureParameterPruner'
     group_type: Channels
-    desired_sparsity: 0.9
+    desired_sparsity: 0.6
     weights: [
       module.layer2.1.conv2.weight,
       module.layer2.2.conv2.weight,
@@ -133,13 +133,13 @@ pruners:
   filter_pruner_20:
     class: 'L1RankedStructureParameterPruner'
     group_type: Channels
-    desired_sparsity: 0.9
+    desired_sparsity: 0.2
     weights: [module.layer3.1.conv2.weight]
 
   filter_pruner_40:
     class: 'L1RankedStructureParameterPruner'
     group_type: Channels
-    desired_sparsity: 0.9
+    desired_sparsity: 0.4
     weights: [
       module.layer3.2.conv2.weight,
       module.layer3.3.conv2.weight,

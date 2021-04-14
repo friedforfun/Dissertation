@@ -76,8 +76,11 @@ The accuracy degredation problem with very deep CNNs is common enough that many 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Engineering/implementation details}
 This section will discuss the specifics of the system engineered to perform the experiments.{\color{red}Rephase needed}
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{High level overview of system}
 
+We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the wandb system serves the next set of sweep parameters to each of the `Producer' agents.
 
 \begin{figure}[H]
@@ -91,7 +94,7 @@ When pruning begins, the producer agent requests the (initially random) pruning 
 Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
 As described in Section~\textbf{(TBD)} the parameter importance and correlation with the target metric is re-computed each time results are logged this can help determine in what direction to tune the paramater settings to minimise (or maximise) the target metric.
 
-The runtime of a full benchmark for one model on the NCS is usually at most 5 seconds, pruning and retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs. 
+The runtime of a full benchmark for one model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
 To imporve the efficiency of the training we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
@@ -130,14 +133,14 @@ To imporve the efficiency of the training we separated the benchmarking system (
 \end{figure}
 \doublespacing
 
-Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance (line 2 - \texttt{\color{mintedgreen}layer\_1\_conv\_pruner}), a single `\texttt{\color{mintedgreen}lr\_scheduler}' instance (line 11 - \texttt{\color{mintedgreen}exp\_fine\_tuning\_lr}), and their respecitve policies (explained below).
+Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance (line 2 - `'\texttt{\color{mintedgreen}layer\_1\_conv\_pruner}'), a single `\texttt{\color{mintedgreen}lr\_scheduler}' instance (line 11 - `\texttt{\color{mintedgreen}exp\_fine\_tuning\_lr}'), and their respecitve policies (explained below).
 
 
 The pruning schedule is composed of lists of sections that describe `{\color{mintedgreen}pruners}', `{\color{mintedgreen}lr-schedulers}', and `{\color{mintedgreen}policies}'. 
 A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(Definition required)} algorithm. 
 Finally each policy references an instance of a pruner or LR-scheduler, and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
 
-The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (as described in Section~\ref{sec:FilterPruningAlgo}) to prune the weights in each of the convolutions described by the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}desired\_sparsity}' indicates how many tensors it will aim to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), desired sparsity should not be confused with an actual change in sparsity - note that filter and channel pruning will always result in a dense layer with an actual sparsity of 0 because this is a form of coarse-grained pruning (see section~\ref{sec:Pruning}).
+The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (as described in Section~\ref{sec:FilterPruningAlgo}) to prune the weights in each of the convolutions described by the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}desired\_sparsity}' indicates how many tensors it will aim to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), desired sparsity should not be confused with an actual change in sparsity | note that filter and channel pruning will always result in a dense layer with an actual sparsity of 0 because this is a form of coarse-grained pruning (see section~\ref{sec:Pruning}).
 
 \begin{figure}[H]
     \includegraphics[width=\textwidth]{temp_pruning_layers.png}
@@ -145,7 +148,8 @@ The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} p
     \label{fig:resnet56weightlabels}
 \end{figure}
 
-Each layer in the network is implicitly labelled (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which weight matricies are being referenced by the compression schedule. 
+Each grouping of weights in the network has labels (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which weight matricies are being referenced by the compression schedule. 
+Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference the weights we wish to prune from the model in Figure~\ref{fig:resnet56weightlabels} 
 
 
 \newpage
@@ -195,9 +199,11 @@ This involves writing a python script that can run the entire pipeline (pruning,
 %Each set of pruning parameters in this experiment used a bayesian optimisation technique~\autocite{snoekPracticalBayesianOptimization2012}
 
 
-This configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max float/integer. 
-The pipeline script that recieves the arguments from wandb contains a mapping from the wandb arguments to the corresponding value in the distiller compression schedule.
-The pipeline then uses the values provided by wandb and writes out a new schedule that will be fed into distiller. 
+The sweep configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
+The pipeline script that recieves the arguments from wandb contains a mapping from the wandb arguments to a corresponding value in a distiller compression schedule.
+This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the paramaters from wandb, this new schedule is then provided to Distiller as the compression schedule to use.
+
+
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Benchmarking}
@@ -212,8 +218,8 @@ The pipeline then uses the values provided by wandb and writes out a new schedul
 
 To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(\color{red}Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
 OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{\color{red}link to example table of HW operations and latency in appendix}. 
-Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimizer, the IR can then be read by the Inference Engine and loaded into VPU memory.
-Once the model is loaded into VPU we load the images that will be used for benchmarking into the VPU memory.
+Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimizer, the IR is then read by the Inference Engine and loaded into VPU memory.
+Once the model is ready we load the images that will be used for benchmarking into the VPU memory.
 We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result), the sum of latency for each instruction executed by the VPU once the image is loaded into memory, and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
 
 %! ---------------------------------------------------------------------------------------------------------------------------------

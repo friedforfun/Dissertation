@@ -197,7 +197,7 @@ The label names were changed to improve the readability of this dissertation, Ta
 
 
 \subsubsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
-This model was created during the `no-retraining' experiment, very low pruning parameters with a low Top1, and fairly low Latency.\\
+This model was created during the `no-retraining' experiment, very light pruning parameters with a low Top1, and fairly low Latency. We can see how just a small amount of pruning has a dramatic effect on the accuracy.\\
 Referenced by: [\ref{sec:FastPruningPhase}]
 \begin{table}[H]
     \centering
@@ -225,6 +225,103 @@ Referenced by: [\ref{sec:FastPruningPhase}]
         \end{tabular}
     }
 \end{table}
+
+
+\newpage
+\subsection{Schedule}
+The following is a listing of the `off the shelf' schedule from Distiller. This is a hand written schedule discussed in Section~\textbf{TBD}. 
+\singlespacing
+\begin{minted}[breaklines, linenos]{yaml}
+version: 1
+pruners:
+  filter_pruner_70:
+    class: 'L1RankedStructureParameterPruner'
+    group_type: Filters
+    desired_sparsity: 0.7
+    weights: [
+      module.layer1.0.conv1.weight,
+      module.layer1.1.conv1.weight,
+      module.layer1.2.conv1.weight,
+      module.layer1.3.conv1.weight,
+      module.layer1.4.conv1.weight,
+      module.layer1.5.conv1.weight,
+      module.layer1.6.conv1.weight,
+      module.layer1.7.conv1.weight,
+      module.layer1.8.conv1.weight]
+
+  filter_pruner_60:
+    class: 'L1RankedStructureParameterPruner'
+    group_type: Filters
+    desired_sparsity: 0.6
+    weights: [
+      module.layer2.1.conv1.weight,
+      module.layer2.2.conv1.weight,
+      module.layer2.3.conv1.weight,
+      module.layer2.4.conv1.weight,
+      module.layer2.6.conv1.weight,
+      module.layer2.7.conv1.weight]
+
+  filter_pruner_20:
+    class: 'L1RankedStructureParameterPruner'
+    group_type: Filters
+    desired_sparsity: 0.2
+    weights: [module.layer3.1.conv1.weight]
+
+  filter_pruner_40:
+    class: 'L1RankedStructureParameterPruner'
+    group_type: Filters
+    desired_sparsity: 0.4
+    weights: [
+      module.layer3.2.conv1.weight,
+      module.layer3.3.conv1.weight,
+      module.layer3.5.conv1.weight,
+      module.layer3.6.conv1.weight,
+      module.layer3.7.conv1.weight,
+      module.layer3.8.conv1.weight]
+
+
+extensions:
+  net_thinner:
+      class: 'FilterRemover'
+      thinning_func_str: remove_filters
+      arch: 'resnet56_cifar'
+      dataset: 'cifar10'
+
+lr_schedulers:
+   exp_finetuning_lr:
+     class: ExponentialLR
+     gamma: 0.95
+
+
+policies:
+  - pruner:
+      instance_name: filter_pruner_70
+    epochs: [0]
+
+  - pruner:
+      instance_name: filter_pruner_60
+    epochs: [0]
+
+  - pruner:
+      instance_name: filter_pruner_40
+    epochs: [0]
+
+  - pruner:
+      instance_name: filter_pruner_20
+    epochs: [0]
+
+  - extension:
+      instance_name: net_thinner
+    epochs: [0]
+
+  - lr_scheduler:
+      instance_name: exp_finetuning_lr
+    starting_epoch: 10
+    ending_epoch: 300
+    frequency: 1
+
+\end{minted}
+\doublespacing
 
 \subsection{References}
 \printbibliography
