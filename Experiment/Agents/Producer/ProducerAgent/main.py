@@ -36,71 +36,93 @@ def run(args):
 
         add_compress_classifier_to_path(distiller_path)
 
-        yaml_test = YamlEditor(yaml_path)
-        yaml_test.print()
+        #yaml_test = YamlEditor(yaml_path)
+        #yaml_test.print()
 
 
 
-        print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
+        #print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
 
-        modification_name = 'test'
-        modification_path = ['pruners', 'fc_pruner', 'final_sparsity']
+        #modification_name = 'test'
+        #modification_path = ['pruners', 'fc_pruner', 'final_sparsity']
 
-        yaml_test.add_modification_path(modification_name, modification_path)
+        #yaml_test.add_modification_path(modification_name, modification_path)
 
 
-        yaml_test.set_value_by_id('test', 0.99)
+        #yaml_test.set_value_by_id('test', 0.99)
 
-        print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
+        #print(yaml_test.yaml_object.get('pruners').get('fc_pruner'))
 
-        test_path = yaml_test.write_yaml()
-        print(test_path)
+        #test_path = yaml_test.write_yaml()
+        #print(test_path)
 
-        yaml_path = test_path
+        #yaml_path = test_path
 
-        redis_conn = RedisConnectionManager(AGENT_ID, redis_host, port=redis_port, db=0, password=redis_password)
+        results = []
 
-        watcher = FileCreationWatcher()
-        watcher.add_redis_to_event_handler(redis_conn)
+        for i in range(10):
+            redis_conn = RedisConnectionManager(AGENT_ID, redis_host, port=redis_port, db=0, password=redis_password)
 
-        watcher_thread = Thread(target=watcher.run, daemon=True)
-        watcher_thread.start()
+            watcher = FileCreationWatcher()
+            watcher.add_redis_to_event_handler(redis_conn)
 
-        distiller_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True)
-        compressor = Distiller(distiller_params)
-        compressor.run()
+            watcher_thread = Thread(target=watcher.run, daemon=True)
+            watcher_thread.start()
 
-        watcher.terminate()
-        watcher_thread.join()
-        logger.setLevel(5)
-        if watcher.path is None:
-            raise ValueError('No path for checkpoint!')
-        logger.debug('!! ------------------------------------------------------ !!')
-        logger.debug('Checkpoint path: {}'.format(watcher.path))
-        logger.debug('!! ------------------------------------------------------ !!')
+            distiller_params = CompressionParams(model, data_path, yaml_path, epochs=1, lr=0.3, j=6, deterministic=True)
+            compressor = Distiller(distiller_params)
+            compressor.run()
 
-        watcher = FileCreationWatcher()
-        watcher.add_redis_to_event_handler(redis_conn)
-        watcher_thread = Thread(target=watcher.run, daemon=True)
-        watcher_thread.start()
+            watcher.terminate()
+            watcher_thread.join()
+            logger.setLevel(5)
+            if watcher.path is None:
+                raise ValueError('No path for checkpoint!')
+            logger.debug('!! ------------------------------------------------------ !!')
+            logger.debug('Checkpoint path: {}'.format(watcher.path))
+            logger.debug('!! ------------------------------------------------------ !!')
 
-        distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path)
-        onnx_generator = Distiller(distiller_onnx_params)
-        onnx_generator.run()
+            watcher = FileCreationWatcher()
+            watcher.add_redis_to_event_handler(redis_conn)
+            watcher_thread = Thread(target=watcher.run, daemon=True)
+            watcher_thread.start()
 
-        watcher.terminate()
-        watcher_thread.join()
-        logger.setLevel(0)
-        redis_onnx = str(os.path.abspath(redis_conn.get_onnx().decode('utf-8')))
-        print('ONNX path FROM REDIS: {}'.format(redis_onnx))
-        logger.debug('ONNX path: {}'.format(watcher.onnx_path))
+            distiller_onnx_params = CompressionParams(model, data_path, yaml_path, epochs=2, lr=0.3, j=6, deterministic=True, onnx='test_model.onnx', resume_from=watcher.path, thinnify=True)
+            onnx_generator = Distiller(distiller_onnx_params)
+            onnx_generator.run()
 
-        data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
-        redis_conn.publish_model(data_for_consumer)
+            watcher.terminate()
+            watcher_thread.join()
+            logger.setLevel(0)
 
-        redis_conn.listen_blocking(lambda msg: print(msg), lambda _: True)
-        print('Got response from Benchmarker')
-        
+
+            redis_onnx = redis_conn.get_onnx()
+            if redis_onnx is None:
+                raise ValueError("Missing onnx field from redis, check filewatcher")
+
+            redis_onnx = str(os.path.abspath(redis_onnx.decode('utf-8')))
+            print('ONNX path FROM REDIS: {}'.format(redis_onnx))
+            logger.debug('ONNX path: {}'.format(watcher.onnx_path))
+
+            data_for_consumer = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX': redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
+            redis_conn.publish_model(data_for_consumer)
+
+            redis_conn.listen_blocking(lambda msg: results.append(msg.decode('utf-8')), lambda _: True)
+            print('Got response from Benchmarker')
+            print(' ----------------------------- BENCHMARK COMPLETE -------------------------------')
+
+        print('Results: ')
+        r = []
+        ave_latency = 0
+        for i in results:
+            print(i)
+            t = json.loads(i)
+            r.append(t)
+            ave_latency += float(t.get('Latency'))
+
+        ave_latency = ave_latency / len(r)
+        print('Average Latency: {}'.format(ave_latency))
+
         #watcher = FileCreationWatcher()
         #watcher.run()
         #print('LOG DIR: {}'.format(logdir))
@@ -109,6 +131,8 @@ def run(args):
         logger.exception("Value error caught in run(args) with message: {}".format(v))
     except Exception as e:
         print("Caught exception: {}".format(e))
+
+
 
 def get_lan_ip():
     return [l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2] 
