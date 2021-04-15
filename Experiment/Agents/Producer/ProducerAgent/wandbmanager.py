@@ -109,14 +109,15 @@ def run(args):
         # Instantiate Redis Connection manager
         r_conn = RedisConnectionManager(AGENT_ID, REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD)
 
-        # Instantiate File watcher & add reference to connection manager
+        #! ---------------- Just prune and report -------------------
+                # Instantiate File watcher & add reference to connection manager
         watcher = FileCreationWatcher()
         watcher.add_redis_to_event_handler(r_conn)
         watcher_thread = Thread(target=watcher.run, daemon=True)
         watcher_thread.start()
 
         # Set up distiller CLI params
-        distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic)
+        distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=1, lr=learning_rate, j=j, deterministic=deterministic)
         
         # Start distiller & run
         compressor = Distiller(distiller_params)
@@ -138,6 +139,94 @@ def run(args):
         print('Checkpoint path: {}'.format(checkpoint))
         checkpoint_abs_path = os.path.abspath(checkpoint)
 
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(r_conn)
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
+
+        # Run distiller again but start from checkpoint and export onnx
+        distiller_onnx_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=1, lr=learning_rate, j=j, deterministic=deterministic, onnx='test_model.onnx', thinnify=True, resume_from=checkpoint_abs_path)
+        compressor = Distiller(distiller_onnx_params)
+        compressor.run()
+
+        watcher.terminate()
+        watcher_thread.join()
+        
+
+        redis_onnx = r_conn.get_onnx()
+        if redis_onnx is None:
+            raise ValueError("Missing onnx field from redis, check filewatcher")
+        redis_onnx = str(os.path.abspath(redis_onnx.decode('utf-8')))
+        print('REDIS ONNX: {}'.format(redis_onnx))
+        
+
+
+        consumer_data = json.dumps({'Agent_ID': AGENT_ID, 'Model-UUID': str(compressor.onnx_id), 'ONNX':redis_onnx, 'Sender_IP': get_lan_ip(), 'User': 'sam'})
+
+        r_conn.publish_model(consumer_data)
+        print('Model published.')
+        
+        output_log = r_conn.get_output()
+        if output_log is None:
+            raise ValueError("No output.log found")
+        output_log = str(os.path.abspath(output_log.decode('utf-8')))
+
+        # find testing data accuracy from output.log 
+        test_accuracy = None
+
+        with open(output_log, 'r') as fh:
+            for line in line_contains("==>", fh):
+                read_accuracy = line
+
+        # Record the final top1, top5 and loss
+        test_accuracy = read_accuracy.rstrip().split()
+        print(test_accuracy)
+
+        # Use dummy values incase output.log parse fails
+        upload_data = WandbLogger(-1.0, -1.0, -1.0)
+        if test_accuracy is not None:
+            top1 = float(test_accuracy[2])
+            top5 = float(test_accuracy[4])
+            loss = float(test_accuracy[6])
+            upload_data = WandbLogger(top1, top5, loss)
+
+        # Blocks until a result is sent by the benchmarker
+        r_conn.listen_blocking(upload_data.log_wandb, lambda x: check_data(x))
+
+
+        #! ---------------- Begin retraining ---------------------------------------
+        # Instantiate File watcher & add reference to connection manager
+        watcher = FileCreationWatcher()
+        watcher.add_redis_to_event_handler(r_conn)
+        watcher_thread = Thread(target=watcher.run, daemon=True)
+        watcher_thread.start()
+
+        # Set up distiller CLI params
+        distiller_params = CompressionParams(MODEL, DATA_PATH, YAML_PATH, epochs=epochs, lr=learning_rate, j=j, deterministic=deterministic, resume_from=checkpoint_abs_path)
+        
+        # Start distiller & run
+        compressor = Distiller(distiller_params)
+        compressor.run()
+
+        watcher.terminate()
+        watcher_thread.join()
+
+        # Check if checkpoint path is found
+        if watcher.path is None:
+            checkpoint = r_conn.get_checkpoint()
+
+        else:
+            checkpoint = watcher.path
+        
+        if checkpoint is None:
+            raise ValueError('No path for checkpoint!')
+
+        print('Checkpoint path: {}'.format(checkpoint))
+        checkpoint_abs_path = os.path.abspath(checkpoint)
+
+
+
+        #! ------------------- Benchmark retrained model ------------------------------
         watcher = FileCreationWatcher()
         watcher.add_redis_to_event_handler(r_conn)
         watcher_thread = Thread(target=watcher.run, daemon=True)
