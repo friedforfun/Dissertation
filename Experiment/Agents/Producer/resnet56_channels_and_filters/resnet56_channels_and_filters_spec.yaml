@@ -1,0 +1,57 @@
+version: 1
+filter_pruner_70c: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_70c',
+    'desired_sparsity'
+  ]
+filter_pruner_60c: 
+  type: 'float' 
+  path: [
+    'pruners',
+    'filter_pruner_60c',
+    'desired_sparsity'
+  ]
+filter_pruner_20c: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_20c',
+    'desired_sparsity'
+  ]
+filter_pruner_40c: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_40c',
+    'desired_sparsity'
+  ]
+filter_pruner_70f: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_70f',
+    'desired_sparsity'
+  ]
+filter_pruner_60f: 
+  type: 'float' 
+  path: [
+    'pruners',
+    'filter_pruner_60f',
+    'desired_sparsity'
+  ]
+filter_pruner_20f: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_20f',
+    'desired_sparsity'
+  ]
+filter_pruner_40f: 
+  type: 'float'
+  path: [
+    'pruners',
+    'filter_pruner_40f',
+    'desired_sparsity'
+  ]
