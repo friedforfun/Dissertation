@@ -1,28 +1,23 @@
 program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
-project: Resnet56-Filters-Test
+project: Resnet56-Channels-Filters
 method: bayes
 metric:
-  goal: maximise
-  name: "Top1"
+  goal: minimize
+  name: Latency
 parameters:
-  epochs:
-    min: 70
-    max: 300
-  learning_rate:
-    min: 0.1
-    max: 0.5
   filter_pruner_70:
-    min: 0.88
+    min: 0.0
     max: 0.99
   filter_pruner_60:
-    min: 0.36
+    min: 0.0
     max: 0.99
   filter_pruner_20:
     min: 0.0
     max: 0.99
   filter_pruner_40:
-    min: 0.57
+    min: 0.0
     max: 0.99
+  
 command:
   - ${env}
   - ${interpreter}

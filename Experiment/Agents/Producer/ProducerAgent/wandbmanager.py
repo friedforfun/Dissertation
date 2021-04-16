@@ -36,7 +36,7 @@ def parse_args():
 #LOGS_PATH = '/home/sam/Projects/Dissertation/Experiment/Agents/Producer/'
 
 
-wandb.init(project='Test-Compression')
+wandb.init(project='Custom-Runs')
 config = wandb.config
 
 
