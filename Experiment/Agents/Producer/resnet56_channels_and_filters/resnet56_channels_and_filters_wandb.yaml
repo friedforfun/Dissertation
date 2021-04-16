@@ -1,0 +1,40 @@
+program: /home/sam/Projects/Dissertation/Experiment/Agents/Producer/ProducerAgent/wandbmanager.py
+project: Resnet56-Channels-and-Filters
+method: bayes
+metric:
+  goal: minimize
+  name: "Latency"
+parameters:
+  filter_pruner_70c:
+    min: 0.0
+    max: 0.99
+  filter_pruner_60c:
+    min: 0.0
+    max: 0.99
+  filter_pruner_20c:
+    min: 0.0
+    max: 0.99
+  filter_pruner_40c:
+    min: 0.0
+    max: 0.99
+  filter_pruner_70f:
+    min: 0.0
+    max: 0.99
+  filter_pruner_60f:
+    min: 0.0
+    max: 0.99
+  filter_pruner_20f:
+    min: 0.0
+    max: 0.99
+  filter_pruner_40f:
+    min: 0.0
+    max: 0.99
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - '--model=resnet56_cifar'
+  - '--data=/home/sam/Projects/distiller/datasets/cifar10'
+  - '--yaml_spec=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_channels_and_filters/resnet56_channels_and_filters_spec.yaml'
+  - '--yaml=/home/sam/Projects/Dissertation/Experiment/Agents/Producer/resnet56_channels_and_filters/resnet56_channels_and_filters.yaml'
+  - ${args}

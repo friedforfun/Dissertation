@@ -1,0 +1,36 @@
+version: 1
+layer_1_pruner: 
+  type: 'float'
+  path: [
+    'pruners',
+    'layer_1_pruner',
+    'desired_sparsity'
+  ]
+layer_2_pruner: 
+  type: 'float' 
+  path: [
+    'pruners',
+    'layer_2_pruner',
+    'desired_sparsity'
+  ]
+layer_3.1_pruner: 
+  type: 'float'
+  path: [
+    'pruners',
+    'layer_3.1_pruner',
+    'desired_sparsity'
+  ]
+layer_3.2_pruner: 
+  type: 'float'
+  path: [
+    'pruners',
+    'layer_3.2_pruner',
+    'desired_sparsity'
+  ]
+layer_4_pruner: 
+  type: 'float' 
+  path: [
+    'pruners',
+    'layer_4_pruner',
+    'desired_sparsity'
+  ]
