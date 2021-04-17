@@ -2,86 +2,23 @@
 
 \begin{document}
 
-\subsection{Overview}
-\emph{\color{red}
-\begin{itemize}
-	\item Questions to be addressed
-	\item Metrics to be measured - why
-\end{itemize}
-}
 
-This section will discusss the methodology used to search for lower latency models by tweaking pruning parameters.
+%\emph{\color{red}
+%\begin{itemize}
+%	\item Questions to be addressed%
+%	\item Metrics to be measured - why
+%\end{itemize}
+%}
 
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Experiment descisions {\color{red}(section to be renamed)}}\label{sec:ExperimentDescisions}
-
-\subsubsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
-We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
-We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
-Each filter that gets removed results in the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
-
-
-\begin{singlespace}
-\noindent Li et al~\autocite{liPruningFiltersEfficient2017} defines the procedure for pruning $m$ filters from the $i$th convolutional layer as follows:
-
-\noindent Let $n_i$ denote the number of input channels.
-    \begin{enumerate}
-        \item For each filter $\mathcal{F}_{i,j}$, calculate the sum of its absolute kernel weights $s_{j} = \Sigma_{l=1}^{n_{i}}\Sigma~|\mathcal{K}_{l}|$.
-        \item Sort the filters by $s_j$.
-        \item Prune $m$ filters with the smallest sum values and their corresponding feature maps. The kernels in the next convolutional layer corresponding to the pruned feature maps are also removed.
-        \item A new kernel matrix is created for both the $i$th and $i + 1$th layers, and the remaining kernel weights are copied to the new model.
-    \end{enumerate}
-\end{singlespace}
-
-\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.
-Once pruning is completed we compensate for the performance degredation by retraining the network, 
-
-    \begin{figure}[H]
-        \includegraphics[width=\textwidth]{FilterPruning.jpg}
-        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
-        \label{fig:FeaturemapAndKernel}
-    \end{figure}
-
-
-
+This section will discusss the methodology used to automate the search for lower latency models by tweaking pruning parameters.
+Section~\ref{sec:EngineeringImplementation} explains how the pipeline was implemented, the discrete parts and how they all fit together.
+Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the system, the network model used and pruning algorithms selected.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Model Selection}\label{sec:ModelSelection}
-
-Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
-
-We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
-Performing this experiemnt on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
-
-The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
-It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
-    \caption{A residual block, note the identity feature map skips the weight layers, this is also known as a `skip connection'.}
-    \label{fig:ResidualBlock}
-\end{figure}
-
-\textbf{\color{red}Discuss further how residual blocks effect pruning.}
-ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, Degredation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
-The accuracy degredation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
-
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Model Retraining}
-\textbf{TBD}
-
-
-\newpage
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Engineering/implementation details}
-This section will discuss the specifics of the system engineered to perform the experiments.{\color{red}Rephase needed}
-
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{High level overview of system}
+\subsection{Automation of pruning pipeline}\label{sec:EngineeringImplementation}
 
 We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
-Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the wandb system serves the next set of sweep parameters to each of the `Producer' agents.
+Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
 
 \begin{figure}[H]
     \centering
@@ -90,12 +27,12 @@ Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipel
     \label{fig:agentCommunication}
 \end{figure}
 
-When pruning begins, the producer agent requests the (initially random) pruning parameters from the Weights and Biases Project server, the producer then applies the pruning algorithm and begins retraining the model.
-Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to weights and biases.
-As described in Section~\textbf{(TBD)} the parameter importance and correlation with the target metric is re-computed each time results are logged this can help determine in what direction to tune the paramater settings to minimise (or maximise) the target metric.
+When pruning begins, the producer agent uses initially random pruning parameters, the producer then applies the pruning algorithm, and begins retraining the model.
+Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to \acrshort{wandb}.
+The parameter importance and correlation with the target metric is re-computed on each iteration of the pipeline using results that are logged to \acrshort{wandb} each time a benchmark is performed.
 
-The runtime of a full benchmark for one model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
-To imporve the efficiency of the training we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
+The runtime of a benchmark for a single model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
+Because the training process is so slow we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsubsection{Defining parameters to prune}\label{sec:paramDef}
@@ -224,7 +161,70 @@ We observe three measurements for every model, the end-to-end latency (from load
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \newpage
-\subsection{Experiment metrics and parameters}
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsection{Experiment Design}\label{sec:ExperimentDesign}
+
+\subsubsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
+We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
+We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
+Each filter that gets removed results in the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
+
+
+\begin{singlespace}
+\noindent Li et al~\autocite{liPruningFiltersEfficient2017} defines the procedure for pruning $m$ filters from the $i$th convolutional layer as follows:
+
+\noindent Let $n_i$ denote the number of input channels.
+    \begin{enumerate}
+        \item For each filter $\mathcal{F}_{i,j}$, calculate the sum of its absolute kernel weights $s_{j} = \Sigma_{l=1}^{n_{i}}\Sigma~|\mathcal{K}_{l}|$.
+        \item Sort the filters by $s_j$.
+        \item Prune $m$ filters with the smallest sum values and their corresponding feature maps. The kernels in the next convolutional layer corresponding to the pruned feature maps are also removed.
+        \item A new kernel matrix is created for both the $i$th and $i + 1$th layers, and the remaining kernel weights are copied to the new model.
+    \end{enumerate}
+\end{singlespace}
+
+\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.
+Once pruning is completed we compensate for the performance degredation by retraining the network, 
+
+    \begin{figure}[H]
+        \includegraphics[width=\textwidth]{FilterPruning.jpg}
+        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
+        \label{fig:FeaturemapAndKernel}
+    \end{figure}
+
+
+
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Model Selection}\label{sec:ModelSelection}
+
+Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
+
+We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
+Performing this experiemnt on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
+
+The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
+It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
+    \caption{A residual block, note the identity feature map skips the weight layers, this is also known as a `skip connection'.}
+    \label{fig:ResidualBlock}
+\end{figure}
+
+\textbf{\color{red}Discuss further how residual blocks effect pruning.}
+ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, Degredation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+The accuracy degredation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Model Retraining}
+\textbf{TBD}
+
+
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+\subsubsection{Experiment metrics and parameters}
 
 
 We conducted three experiments using a Resnet56 model with pretrained weights for the CIFAR10 dataset.
