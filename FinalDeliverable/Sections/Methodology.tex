@@ -201,7 +201,7 @@ This involves writing a python script that can run the entire pipeline (pruning,
 
 The sweep configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
 The pipeline script that recieves the arguments from wandb contains a mapping from the wandb arguments to a corresponding value in a distiller compression schedule.
-This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the paramaters from wandb, this new schedule is then provided to Distiller as the compression schedule to use.
+This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the parameters from wandb, this new schedule is then provided to Distiller as the compression schedule to use.
 
 
 
@@ -316,22 +316,22 @@ Note that only the first convolution in each residual block is being pruned (den
 \emph{Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
 \subsubsection{Baseline data}
-For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand picked by an expert in the field (\textbf{\color{red}qualify this?})~\autocite{liPruningFiltersEfficient2017}.
+For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
 
 \begin{table}[H]
-    \begin{tabular}{@{}lccccc@{}}
+    \begin{tabular}{@{}lccp{25mm}p{23mm}p{28mm}@{}}
     \toprule
     \multicolumn{1}{c}{\textbf{Model}} & \textbf{Top1} & \textbf{Top5} & \textbf{Throughput (FPS)} & \textbf{Latency (ms)} & \textbf{Total Latency (ms)} \\ \midrule
     Baseline - no pruning              & 92.58         & 99.78         & 294.08                    & 4.375                 & 13.19                       \\
     Off the shelf - no retraining      & 11.19         & 51.02         & 303.98                    & 3.947                 & 12.89                       \\
-    Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88        & 12.95                           \\ \bottomrule
+    Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88                  & 12.95                           \\ \bottomrule
     \end{tabular}
 \end{table}
 
 \subsubsection{Experiment 1: Rapid pruning, no retraining}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
-Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this experiement, this configuration looks for optimal desired sparsity settings for each of the 4 pruners.
+Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this experiement, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
 
 \singlespacing
 \begin{figure}[H]
@@ -363,14 +363,45 @@ parameters:
 
 \subsubsection{Experiment 2: Target latency, with retraining}
 
-Using the same wandb configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed 70 epochs, and set the learning rate to 0.1.
-This experiment targeted pure inference latency, no information regarding accuracy was encoded in the optimisation metric. 
+Using the same wandb configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed $70$ epochs, and set the learning rate to $0.1$.
+The purpose of this part of the experiment was to observe how well the optimisation process targetting only latency could recover accuracy.
 
 \subsubsection{Experiment 3: Target Top1, with retraining}
+During the third experimental stage we tweaked the configuration file to specify a new target metric: maximise Top1.
+Similarly to Experiment 2 we kept the number of epochs fixed at $70$ and the learning rate at $0.1$.
+During this experiment we were interested in observing how the amount of pruning effected Top1, and if we could improve on our best Top1 score from the second experiment.
+
+\singlespacing
+\begin{figure}[H]
+    \centering
+    \begin{minted}[breaklines]{yaml}
+program: pipeline.py
+method: bayes
+metric:
+  goal: maximize
+  name: Top1
+parameters:
+  filter_pruner_layer_1:
+    min: 0.0
+    max: 0.99
+  filter_pruner_layer_2:
+    min: 0.0
+    max: 0.99
+  filter_pruner_layer_3.1:
+    min: 0.0
+    max: 0.99
+  filter_pruner_layer_3.2:
+    min: 0.0
+    max: 0.99
+    \end{minted}
+    \caption{Targeting Latency sweep config}
+    \label{fig:Top1SweepConfig}
+\end{figure}
+\doublespacing
+
+\subsubsection{Experiment 4: Adding epochs and learning rate to the parameter search}
 
 
-Experiment set the retraining epochs to 0, so we could prune and benchmark rapidly, we set minimisation of latency to be the target.
-For the second experiment we set the target to minimise latency, but this time allowed retraining up to 300 epochs.
-The final (third) experiment was the same as the second but we set the target metric to maximise Top1 accuracy. 
+
 
 \end{document}
