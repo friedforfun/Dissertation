@@ -9,6 +9,7 @@
 	\item (im)practicalities - power consumption? 
 	\item limitations - single optimisation metric
 	\item Criticism of methodology
+	\item Distiller only supports a single kind of network thinning, so mixing channel and filter pruning was not possible at this time
 \end{itemize}
 }
 
@@ -68,6 +69,7 @@ We found that the degree to which we prune was not at all indicative of the resu
     \item The relationship between more pruning and lower latency is not as simple as you get a faster model with fewer tensors
     \item When targeting accuracy we found models with as low latency when targeting latency directly.
     \item When targeting latency we found models with as high accuracy as when targeting accuracy directly.
+    \item Surprising to see that retraining reduces the latency also
 \end{itemize}
 
 \end{document}
