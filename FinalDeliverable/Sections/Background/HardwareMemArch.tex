@@ -5,7 +5,7 @@
 %The explosion of Deep Neural Network applications in recent years has prompted the production of a wave of specialised hardware architectures to improve the efficiency and compute of these kinds of workloads. The mainstay of this form of processing has been until recently been dominated by GPUs.\\
 
 
-\subsubsection{Memory Allocation}\label{sec:MemAlloc}
+\subsection{Memory Allocation}\label{sec:MemAlloc}
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{vDNNperf.png} 
     \caption{vDNN performance, showing the throughput using various memory allocation strategies. \\ \textbf{(Adopted figure from~\autocite{rhuVDNNVirtualizedDeep2016})}}
@@ -28,7 +28,7 @@ In this example the memory allocations are being measured between memory in the 
 \end{figure}
 
 
-\subsubsection{Memory Access}
+\subsection{Memory Access}
 
 A significant portion of DNN computation is matrix-vector multiplication, ideally weight reuse techniques can speed up these operations.
 However some DNNs feature FC layers with more than a hundred million weights (Fig.~\ref{fig:CNNcomplexity}), memory bandwidth here can be an issue since loading these weights can be a significant bottleneck~\autocite{qiuGoingDeeperEmbedded2016}. 

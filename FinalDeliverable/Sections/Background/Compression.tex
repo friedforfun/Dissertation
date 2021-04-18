@@ -6,7 +6,7 @@ Different compression methods can result in variuous underlaying representations
 Compression techniques that preserve the density of the weight matrix tend to result in inference acceleration on general-purpose processors\autocite{lebedevSpeedingupConvolutionalNeural2015,zhangAcceleratingVeryDeep2016}, not all techniques preserve this density and can result in weight matrices with various degrees of sparsity which in turn have varing degrees of regularity. 
 These techniques, the resulting representations of parameters, and their consequences will be discussed in this section.
 
-\subsubsection{Pruning}\label{sec:Pruning}
+\subsection{Pruning}\label{sec:Pruning}
 Network pruning is the process of removing unimportant connections, leaving only the most informative connections.
 Typically pruning is performed by iterating over the following 3 steps: begin by evaluating the importance of parameters, next the least important parameters are pruned, and finally some fine tuning must be performed to recover accuracy.
 There has been a substantial amount of research into how pruning can be used to reduce overfitting and network complexity~\autocite{hansonComparingBiasesMinimal,hassibiSecondOrderDerivatives,lecunOptimalBrainDamage,stromPhonemeProbabilityEstimation1997}, but more recent research shows that some pruning methodologies can produce pruned networks with no loss of accuracy~\autocite{hanLearningBothWeights2015}.
@@ -36,7 +36,7 @@ This style of pruning however can have a significant impact on the accuracy of t
 
 
 
-\subsubsection{Quantisation}\label{sec:Quantisation}
+\subsection{Quantisation}\label{sec:Quantisation}
 %Define Quantisation
 Most off-the-shelf DNNs utilise floating-point-quantisation for their parameters, providing arbitrary precision, the cost of this precision can be quite high in terms of arithmetic operation latency, high resource use and higher power consumption.
 However this arbitrary precision is often unnecesssary, extensive research~\autocite{jacobQuantizationTrainingNeural2018,maOptimizingLoopOperation2017} has shown reducing the precision of parameters can have an extremely small impact on the accuracy.

@@ -15,7 +15,7 @@ Section~\ref{sec:EngineeringImplementation} explains how the pipeline was implem
 Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the system, the network model used and pruning algorithms selected.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Automation of pruning pipeline}\label{sec:EngineeringImplementation}
+\section{Automated pruning pipeline}\label{sec:EngineeringImplementation}
 
 We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
@@ -33,9 +33,10 @@ The parameter importance and correlation with the target metric is re-computed o
 
 The runtime of a benchmark for a single model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
 Because the training process is so slow we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
+To make use of this pipeline 2 files must be provided by the user, a distiller schedule with a definition for which weights will be pruned, and a \acrshort{wandb} configuration file which defines the type and ranges of the parameters it will seek to optimize.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Defining parameters to prune}\label{sec:paramDef}
+\subsection{Defining parameters to prune}\label{sec:paramDef}
 
 \singlespacing
 \begin{figure}[H]
@@ -91,7 +92,7 @@ Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference 
 
 \newpage
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{WandB API}
+\subsection{WandB API}
 
 \singlespacing
 \begin{figure}[H]
@@ -143,7 +144,7 @@ This is accomplished by parsing a base schedule file and identifying which value
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Benchmarking}
+\subsection{Benchmarking}
 
 \begin{figure}[H]
 	\centering
@@ -163,12 +164,12 @@ We observe three measurements for every model, the end-to-end latency (from load
 \newpage
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Experiment Design}\label{sec:ExperimentDesign}
+\section{Experiment Design}\label{sec:ExperimentDesign}
 
-\subsubsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
+\subsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
 We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
 We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
-Each filter that gets removed results in the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
+Each filter that gets removed causes the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
 
 
 \begin{singlespace}
@@ -188,7 +189,7 @@ Once pruning is completed we compensate for the performance degredation by retra
 
     \begin{figure}[H]
         \includegraphics[width=\textwidth]{FilterPruning.jpg}
-        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
+        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}\textbf{\color{red}Include annotations for the feature map and kernel}}
         \label{fig:FeaturemapAndKernel}
     \end{figure}
 
@@ -196,7 +197,7 @@ Once pruning is completed we compensate for the performance degredation by retra
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Model Selection}\label{sec:ModelSelection}
+\subsection{Model Selection}\label{sec:ModelSelection}
 
 Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
 
@@ -218,13 +219,13 @@ ResNets were originally proposed to help address a training accuracy degredation
 The accuracy degredation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Model Retraining}
+\subsection{Model Retraining}
 \textbf{TBD}
 
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsubsection{Experiment metrics and parameters}
+\subsection{Experiment metrics and parameters}
 
 
 We conducted three experiments using a Resnet56 model with pretrained weights for the CIFAR10 dataset.
@@ -252,7 +253,7 @@ This section describes the parameters and metrics that will be either set or obs
 \doublespacing
 
 \newpage
-\subsubsection{Schedules}
+\subsection{Schedules}
 Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labeled for pruning in the selected Resnet56 model, the 4 labelled pruners and their corresponding weights were used in all resnet56 experiments.
 Layers with a similar degree of sensitivity to pruning are grouped together, layers that are omitted from the table have a much higher sensitivity to pruning and are not pruned at all, pruning more sensitive layers can result in a significantly higher probability that pruned neural networks that lose all predictive ability (in other words the network will predict a single class 100\% of the time).
 Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.\\
@@ -312,10 +313,10 @@ Note that only the first convolution in each residual block is being pruned (den
 \end{table}
 \doublespacing
 
-\subsubsection{Passing pruned/trained networks to benchmarker}
+\subsection{Passing pruned/trained networks to benchmarker}
 \emph{Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
-\subsubsection{Baseline data}
+\subsection{Baseline data}
 For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
 
 \begin{table}[H]
@@ -328,7 +329,7 @@ For the purposes of all experiments we compare our results to two baseline sets 
     \end{tabular}
 \end{table}
 
-\subsubsection{Experiment 1: Rapid pruning, no retraining}
+\subsection{Experiment 1: Rapid pruning, no retraining}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
 Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this experiement, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
@@ -361,12 +362,12 @@ parameters:
 \end{figure}
 \doublespacing
 
-\subsubsection{Experiment 2: Target latency, with retraining}
+\subsection{Experiment 2: Target latency, with retraining}
 
 Using the same wandb configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed $70$ epochs, and set the learning rate to $0.1$.
 The purpose of this part of the experiment was to observe how well the optimisation process targetting only latency could recover accuracy.
 
-\subsubsection{Experiment 3: Target Top1, with retraining}
+\subsection{Experiment 3: Target Top1, with retraining}
 During the third experimental stage we tweaked the configuration file to specify a new target metric: maximise Top1.
 Similarly to Experiment 2 we kept the number of epochs fixed at $70$ and the learning rate at $0.1$.
 During this experiment we were interested in observing how the amount of pruning effected Top1, and if we could improve on our best Top1 score from the second experiment.
@@ -399,7 +400,7 @@ parameters:
 \end{figure}
 \doublespacing
 
-\subsubsection{Experiment 4: Adding epochs and learning rate to the parameter search}
+\subsection{Experiment 4: Adding epochs and learning rate to the parameter search}
 
 
 

@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{report}
 \usepackage[table]{xcolor}
 \usepackage[margin=1in]{geometry}
 \usepackage{amsmath}
@@ -114,7 +114,7 @@ Date: .....21/04/2020...............
 \newpage
 \setcounter{page}{1}
 
-\section{Introduction}
+\chapter{Introduction}
 \subfile{Sections/introduction}
 
 \emph{
@@ -130,7 +130,7 @@ Date: .....21/04/2020...............
 
 
 \pagebreak
-\section{Background}
+\chapter{Background}
 \emph{\color{red}
 \begin{itemize}
 	\item Adapt from D1
@@ -145,39 +145,39 @@ Section~\ref{subsec:compressionTypes} - \textbf{Neural Network Compression}: Dis
 Section~\ref{subsec:AIaccelerators} - \textbf{AI accelerators} Covers a few popular AI accelerators architectures, their strengths, weaknesses and specialisms.\\
 Section~\ref{subsec:hardwareArch} - \textbf{Memory factors for Deep Neural Networks}: Describes how DNNs interact with memory, and discusses some of the implications of this.
 
-\subsection{Deep Neural Networks}\label{subsec:deepLearning}
+\section{Deep Neural Networks}\label{subsec:deepLearning}
 \subfile{Sections/Background/DeepNeuralNetworks}
 
 \newpage
-\subsection{Neural Network Compression}\label{subsec:compressionTypes}
+\section{Neural Network Compression}\label{subsec:compressionTypes}
 \subfile{Sections/Background/Compression}
 
 \newpage
-\subsection{AI accelerators}\label{subsec:AIaccelerators}
+\section{AI accelerators}\label{subsec:AIaccelerators}
 \subfile{Sections/Background/AIaccelerators}
 
 \newpage
-\subsection{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
+\section{Memory factors for Deep Neural Networks}\label{subsec:hardwareArch}
 \subfile{Sections/Background/HardwareMemArch}
 
 \newpage
 
 
 
-\section{Methodology}
+\chapter{Methodology}
 \subfile{Sections/Methodology}
 
 
-\section{Evaluation}
+\chapter{Evaluation}
 \subfile{Sections/Evaluation}
 
-\section{Conclusion}
+\chapter{Conclusion}
 \subfile{Sections/Conclusion}
 
 \newpage
 \appendix
-\section{Back matter}
-\subsection{Model Listing}
+\chapter{Back matter}
+\section{Model Listing}
 The following section is a listing of cherry-picked models, with a hyperlink to further details for each model, and a description of the Pruning parameters and observed metrics.
 
 All networks in this section have links to the original data as it was gathered, the pruning schedule labels used in this data are different to those described throughout the dissertation. 
@@ -189,17 +189,17 @@ The label names were changed to improve the readability of this dissertation, Ta
     \begin{tabular}{@{}lll@{}}
     \toprule
     \textbf{Dissertation Label} &                & \textbf{Label in Dataset} \\ \hline
-    Filter Pruner Layer 1       & $\rightarrow$ & filter\_pruner\_20        \\
-    Filter Pruner Layer 2       & $\rightarrow$ & filter\_pruner\_40        \\
-    Filter Pruner Layer 3.1     & $\rightarrow$ & filter\_pruner\_60        \\
-    Filter Pruner Layer 3.2     & $\rightarrow$ & filter\_pruner\_70        \\ \hline
+    Filter Pruner Layer 1       & $\rightarrow$ & filter\_pruner\_70        \\
+    Filter Pruner Layer 2       & $\rightarrow$ & filter\_pruner\_60        \\
+    Filter Pruner Layer 3.1     & $\rightarrow$ & filter\_pruner\_20        \\
+    Filter Pruner Layer 3.2     & $\rightarrow$ & filter\_pruner\_40        \\ \hline
     \end{tabular}
     \caption{Mapping of labels from dissertation to dataset}
     \label{tab:labelMapping}
 \end{table}
 
 
-\subsubsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
+\subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
 This model was created during the `no-retraining' experiment, very light pruning parameters with a low Top1, and fairly low Latency. We can see how just a small amount of pruning has a dramatic effect on the accuracy.\\
 Referenced by: [\ref{sec:FastPruningPhase}]
 \begin{table}[H]
@@ -231,7 +231,7 @@ Referenced by: [\ref{sec:FastPruningPhase}]
 
 
 \newpage
-\subsection{Schedule}\label{apx:Schedule}
+\section{Schedule}\label{apx:Schedule}
 The following is a listing of the `off the shelf' schedule from Distiller. This is a hand written schedule discussed in Section~\textbf{TBD}. 
 \singlespacing
 \begin{minted}[breaklines, linenos]{yaml}
@@ -326,7 +326,6 @@ policies:
 \end{minted}
 \doublespacing
 
-\subsection{References}
 \printbibliography
 
 

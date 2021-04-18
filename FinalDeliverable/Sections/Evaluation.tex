@@ -1,7 +1,15 @@
 \documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
-\subsection{Evaluation of experimental design}
+\section{Evaluation of experimental design}
+\textbf{\color{red}
+\begin{itemize}
+    \item clear result presentation
+    \item explain problems and difficulties
+    \item demonstrate understanding of results
+    \item discuss further work
+\end{itemize}
+}
 \emph{
 \begin{itemize}
 	\item Duration of training
@@ -17,7 +25,7 @@ The size of the pruned networks is not measured.
 
 
 
-\subsection{Evaluation of results}
+\section{Evaluation of results}
 \emph{
 \begin{itemize}
 	\item Summary of results per model/dataset
@@ -28,7 +36,7 @@ The size of the pruned networks is not measured.
 
 We gathered data in 3 phases; a fast pruning phase targeting latency only with no retraining, targeting latency only with retraining, and targeting accuracy only with retraining.
 
-\subsubsection{Experiment 1: Rapid pruning}\label{sec:FastPruningPhase}
+\subsection{Experiment 1: Rapid pruning}\label{sec:FastPruningPhase}
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{TargetSparsityVsLatency_No_Retrain.jpg}
@@ -59,9 +67,9 @@ This chart does obfuscate any relationship between the parameters, however we ca
 It is interesting to note how weakly the pruning targets correlate with Top1 accuracy, this is because any pruning at all is extremely destructive to the networks accuracy. 
 We found that the degree to which we prune was not at all indicative of the resulting accruacy of the network before retraining, for example we found networks with very low sparsity targets accross the board that had a much lower Top1 accuracy, than networks that were pruned with much higher targets (See models~\ref{sec:golden-sweep-523}).
 
-\subsubsection{Experiment 2: Target Latency}
+\subsection{Experiment 2: Target Latency}
 
-\subsubsection{Experiment 3: Target Top1}
+\subsection{Experiment 3: Target Top1}
 
 \textbf{Interesting observations}
 \begin{itemize}

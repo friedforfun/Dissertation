@@ -16,7 +16,7 @@
  Energy consumption is critical to the feasibility of performing inference on mobile devices, the dominant factor in this area is memory access, figure.~\ref{fig:45nmCMOS} shows the energy consumption for a 32 bit floating point add operation and a 32 bit DRAM memory access on a 45nm CMOS chip, they note that DRAM memory access is 3 orders of magnitude of an add operation.
  Hardware is commonly referred to as an AI accelerator, these can be built to accelerate both the \emph{training} and \emph{inference} stages of execution, this section will specifically focus on the \emph{inference} phase, however many modern accelerators are capable of both.
 
-\subsubsection{VPU}
+\subsection{VPU}
 One commercial hardware accelerator using a VPU architecture is the Intel Movidius Neural Compute Stick.
 It is a specialised \acrshort{soc} for computer vision applications, with a peak floating-point computational throughput of 1 \acrshort{tops}, because of reasons described in Section~\ref{sec:MemAlloc} this peak throughput will be hard to achieve in any real world scenario.
 
@@ -34,7 +34,7 @@ A key advantage of using hardware like the VPU is a customised computation pipel
     \label{fig:MyriadX}
 \end{figure}
 
-\subsubsection{TPU}
+\subsection{TPU}
 The \acrshort{tpu} is a custom \acrshort{asic} developed by google, designed specifically for TensorFlow, conventional access to these chips is via a cloud computing service. 
 Google claims~\autocite{GoogleWinsMLPerf}~the latest 4th generation TPUv4 is capable of more than double the matrix multiplication TFLOPs of TPUv3 (Wang et al.~\autocite{wangBenchmarkingTPUGPU2019}~describes a peak of 420 TFLOPs for the TPUv3).
 The TPU implements data parallelism in a manner prioritising batch size, one batch of training data is split evenly and sent to each core of the TPU, so total on-board memory determins the maximum data batch size.

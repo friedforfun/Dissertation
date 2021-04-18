@@ -1,7 +1,7 @@
 \documentclass[../../D1.tex]{subfiles}
 
 \begin{document}
-\subsubsection{Neural Networks \& Deep Learning}
+\subsection{Neural Networks \& Deep Learning}
 
 \begin{figure}[H]
     \centering
@@ -22,7 +22,7 @@ All neruons in a Neural network have weights corresponding to their inputs, thes
 Neural networks and deep neural networks are often reffered to interchangably, they are primarily distinguished by the number of layers, there is no hard rule indicating when a neural network is considered deep but generally a network with more than 3 hidden layers is considered a deep neural network, the rest of this dissertaion will refer to \acrshort{dnn}s for consistency. 
 Each neuron in a \Acrshort{dnn} applies an non-linear activation function to the result of its weighted sum of inputs and randomly initialised weights, without which a \Acrshort{dnn} would just be a linear algebra operation~\autocite{szeEfficientProcessingDeep2017}, the cumulative effect of the activations in each layer results in elabourate causal chains of transormations that influence the aggregate activation of the network.
 
-\subsubsection{Inference and Training}
+\subsection{Inference and Training}
 
 \emph{Training} or learning in the context of DNNs is the process of finding the optimal parameters (value for the weights and bias) in the network.
 Upon completion of training \emph{inference} can be performed, this is where new input data is fed into the network, a series of operations is performed using the trained parameters, and some meaninful output is obtained such as a classification, regression, or function approximation.
@@ -31,7 +31,7 @@ Begin by passing some training data through the network, next the gap between th
 
 
 
-\subsubsection{Convolutional Neural Networks}
+\subsection{Convolutional Neural Networks}
 
 Much like traditional nerual networks the \Acrshort{cnn} architecture was inspired by human and animal brains, the concept of processing the input with local receptive fields is conceptually similar some functionality of the cat's visual cortex~\autocite{hubelReceptiveFieldsBinocular1962,lecunConvolutionalNetworksImages,pouyanfarSurveyDeepLearning2019}. 
 The influential paper by Hubel \& Weisel~\autocite{hubelReceptiveFieldsBinocular1962} ultimately had a significant influence on the design of \Acrshort{cnn}s via the Neocognitron, as proposed by Fukushima in~\autocite{fukushimaNeocognitronSelforganizingNeural1980} and again evaluated in~\autocite{fukushimaNeocognitronHierarchicalNeural1988}, these papers paved the way for the modern CNN. 
@@ -55,7 +55,7 @@ However they are notorious for needing careful tuning of various hyperparameters
 \end{figure}
 
 \newpage
-\subsubsection{Filters and Feature Maps}
+\subsection{Filters and Feature Maps}
 
 \newpage
 

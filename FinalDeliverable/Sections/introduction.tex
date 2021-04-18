@@ -1,7 +1,15 @@
 \documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
-\subsection{Motivation}
+\textbf{\color{red}
+\begin{itemize}
+    \item Clearly state aims and objectives
+    \item identify main areas of investigation
+    \item show ideas/approaches of original thinking
+\end{itemize}
+}
+
+\section{Motivation}
 With the continued revolution of AI technologies a desire to utilise the power of neural networks at the edge is becoming ever more prevalent.
 The argument for localising inference is only becoming stronger with the ever-increasing avaliablilty of computation resources alongside new and constantly evolving AI applications, performing inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
 
@@ -12,7 +20,7 @@ Neural network compression is one avenue to aid bringing inference to the edge, 
 Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression because compression techniques such as pruning can have cascading effects througout a neural network.
 This alone can make compression a daunting task, even for experienced machine learning practicioners, it gets worse however, these compression algorithms often feature complex parameters with implications that may not be revealed until a substantial amount of time has been invested in retraining a compressed model.
 
-\subsection{Terminology}
+\section{Terminology}
 \emph{\color{red}Introduce common terminology}
 
 
@@ -25,10 +33,10 @@ This alone can make compression a daunting task, even for experienced machine le
     \item Tensors
 \end{itemize}
 
-\subsection{Hypothesis}
+\section{Hypothesis}
 \emph{Using a systematic compression method selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and improve inference latency based on an accuracy threshold in a typical edge computing environment.}
 
-\subsection{Research Aims}
+\section{Research Aims}
 %! --------------------------------------------- NEED REVISION ----------------------------------------------
 \textbf{Aim 1}\label{Aim1} - This dissertation will research methodologies for reducing inference latency using a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the layer structure of the neural network.\\ 
 \noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select approriate compression methodologies and reduce the search space down to a single pruning algorithm.\\
