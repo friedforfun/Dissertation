@@ -225,7 +225,7 @@ The accuracy degredation problem with very deep CNNs is common enough that many 
 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Experiment metrics and parameters}
+\subsection{Experiment metrics and parameters}\label{sec:metricsandparams}
 
 
 We conducted three experiments using a Resnet56 model with pretrained weights for the CIFAR10 dataset.
@@ -329,7 +329,7 @@ For the purposes of all experiments we compare our results to two baseline sets 
     \end{tabular}
 \end{table}
 
-\subsection{Experiment 1: Rapid pruning, no retraining}
+\subsection{Experiment 1: Rapid pruning, no retraining}~\label{sec:ex1}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
 Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this experiement, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
@@ -368,7 +368,7 @@ Using the same wandb configuration file as in the first experiment (Figure~\ref{
 The purpose of this part of the experiment was to observe how well the optimisation process targetting only latency could recover accuracy.
 
 \subsection{Experiment 3: Target Top1, with retraining}
-During the third experimental stage we tweaked the configuration file to specify a new target metric: maximise Top1.
+During the third experimental stage we tweaked the configuration file (see Figure~\ref{fig:Top1SweepConfig}) to specify a new target metric: maximise Top1 .
 Similarly to Experiment 2 we kept the number of epochs fixed at $70$ and the learning rate at $0.1$.
 During this experiment we were interested in observing how the amount of pruning effected Top1, and if we could improve on our best Top1 score from the second experiment.
 
