@@ -49,11 +49,11 @@ Section~\ref{sec}
     \label{fig:fastPruneParamVSLatency}
 \end{figure}
 
+As discussed in section~\ref{sec:ex1} for this experiment we set the training epochs to 0 and set the target metric to minimize latency. 
 During this phase of the experiment we gathered data to observe how pruning would affect latency, this was useful as an initial proof of concept.
 This phase of the experiment was very time efficient, we were able to perform 1631 runs with around 18 hours of compute time; each run usually lasted between 24-55 seconds. 
-As discussed in section~\ref{sec:ex1} for this experiment we set the training epochs to 0 and set the target metric to minimize latency. 
 Figure~\ref{fig:fastPruneParamVSLatency} shows the mean Latency computed by using equal width binning, where each bin represents parameter values inside each discretized 0.02 range between 0.0 and 1.0.
-This chart does obfuscate any relationship between the parameters, however we can see how the filter pruner on Layer 3.2 (red) has a much greater impact on latency than the Pruner on Layer 1 (blue), this is also supported by computing the correlation between these values, see Table~\ref{tab:fastPruneCorrelations}, where `Filter Pruner Layer 3.2' has a strong negative correlation with Latency indicating that increasing the desired sparsity has a more dramatic effect on latency than `Filter Pruner Layer 1'.
+This chart does obfuscate any relationship between the parameters, however we can see how the filter pruner on Layer 3.2 (red) plots a more dramatic change in latency than the Pruner on Layer 1 (blue), this is also supported by computing the correlation between these values, see Table~\ref{tab:fastPruneCorrelations}, where `Filter Pruner Layer 3.2' has a strong negative correlation with Latency indicating that increasing the desired sparsity results in an increased tendency to observe a lower latency than `Filter Pruner Layer 1'.
 
 \singlespacing
 \begin{table}[H]
@@ -73,7 +73,9 @@ We found that the degree to which we prune was not at all indicative of the resu
 It is interesting to note how weakly the pruning targets correlate with Top1 accuracy, this indicates that the relationship between accuracy and pruning is more complex than the naive perception that pruning less has a smaller accuracy impact.
 Observation of this weak correlation with Top1 prompted us to begin logging this initial set of metrics in addition to the metrics we logged as described in the Experimental Design Section~\ref{sec:metricsandparams}, we watched this data in the event that some pattern that might be indicative of how well a pruned network can recover accuracy before retraining has begun will emerge.
 
-We were unfortunately unable to identify any such pattern from the data we gathered, due to the stochastic nature of pruning and retraining coupled with the fact that our methodology neccessitated changing the pruning parameters each run
+We were able to identify a case where pruned networks that have a Top1 accuracy of precisely $100 / n$ where $n$ is the number of classes, the network should be pruned again from scratch, our data had no examples of recovery from this condition during retraining.
+Due to the stochastic nature of retraining and the pruning algorithm we selected, coupled with the fact that our methodology neccessitated changing the pruning parameters each run we were unable to identify any other pattern or relationship between initial pruning metrics and the metrics of sucessful or high quality retrained networks from the data we gathered. 
+
 
 
 \subsection{Experiment 2: Target Latency}
