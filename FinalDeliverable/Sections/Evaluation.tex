@@ -29,7 +29,28 @@
 \end{itemize}
 The size of the pruned networks is not measured.
 
+\subsection{Hardware and Software}
+All agents used in this pipeline used Ubuntu 20.04, we used various hardware configurations for the pruning and retraining agents. 
+The benchmarking system was fixed for the duration of the project; a KVM virtual machine, 4 cores/8 threads from a Ryzen 3960X, 8Gb RAM, and the Intel Neural Compute Stick was plugged into a usb controller that was passed through to the VM.
+Originally the benchmarking system was combined with the producer system, however due to library and python version compatibility issues we had to run OpenVino and Distiller independently this naturally led us to split the system into agents (Producer \& Consumer).
 
+\textbf{Producer software}
+\begin{itemize}
+    \item Python 3.7.10
+    \item Distiller | A python package for neural network compression research
+    \item wandb | Weights and biases logging library
+    \item PyYaml | Tools to read and write .yaml files
+    \item Watchdog | Monitoring of file system events
+    \item Redis-py | A python interface to a Redis server
+\end{itemize}
+
+\textbf{Consumer software}
+\begin{itemize}
+    \item Python 3.8.5
+    \item OpenVino | Deep neural network deployment toolkit
+    \item Pandas | Data analysis tool
+    \item Redis-py | A python interface to a Redis server
+\end{itemize}
 
 \section{Evaluation of results}
 \emph{
@@ -39,7 +60,6 @@ The size of the pruned networks is not measured.
 \end{itemize}
 }
 
-Section~\ref{sec}
 
 \subsection{Experiment 1: Rapid pruning}\label{sec:FastPruningPhase}
 

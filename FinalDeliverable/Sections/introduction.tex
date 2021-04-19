@@ -1,17 +1,17 @@
 \documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
-\textbf{\color{red}
-\begin{itemize}
-    \item Clearly state aims and objectives
-    \item identify main areas of investigation
-    \item show ideas/approaches of original thinking
-\end{itemize}
-}
 
 \section{Motivation}
-With the continued revolution of AI technologies a desire to utilise the power of neural networks at the edge is becoming ever more prevalent.
-The argument for localising inference is only becoming stronger with the ever-increasing avaliablilty of computation resources alongside new and constantly evolving AI applications, performing inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
+With the continued revolution of AI technologies a desire to utilise the power of neural networks beyond the traditional datacenter bound systems is becoming ever more prevalent.
+Making use of neural networks locally to the user (in other words at the `edge') is already prevalent in modern life, to name a few; mobile phones, voice assistants and even our televisions are making use of this technology. 
+This trend towards using neural networks at the edge is on the rise due to clear privacy and cost advantages to keeping data and computation local to the device running the neural network, rather than sending data to a remote server.
+
+Computing at the edge can be limiting in terms of avaliable memory space or performance capabilities, computer vision applications especially those working with real time data tend to require low response times
+
+New applications for neural networks are continually being developed, .
+
+Localising inference is only becoming stronger with the ever-increasing avaliablilty of computation resources alongside new and constantly evolving AI applications, performing inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
 
 %\emph{Discuss the cost of running cloud based inference services is econmically impractical for companies that might want to leveage this tech in iot devices, unless a subscription model is used. We want to perform inference on the consumers local machine, so companies dont have to charge subscriptions for cloud subscription serivces such as an ai coffee machine. The most apparent reasons to prune a neural network is either to reduce the size of the neural network or its latency, this dissertation will focus on the latency aspect.}
 
@@ -21,11 +21,9 @@ Utilising neural network compression effectively requires expert level knowledge
 This alone can make compression a daunting task, even for experienced machine learning practicioners, it gets worse however, these compression algorithms often feature complex parameters with implications that may not be revealed until a substantial amount of time has been invested in retraining a compressed model.
 
 \section{Terminology}
-\emph{\color{red}Introduce common terminology}
-
+This section provides a brief introduction to the terminology used throughout this dissertation.
 
 \begin{itemize}
-    \item Edge
     \item Inference
     \item Epochs
     \item Channels
@@ -34,28 +32,27 @@ This alone can make compression a daunting task, even for experienced machine le
 \end{itemize}
 
 \section{Hypothesis}
-\emph{Using a systematic compression method selection process combined with a bayesian optimisation algorithm we can partially automate compression parameter selection and improve inference latency based on an accuracy threshold in a typical edge computing environment.}
+\emph{Using optimisation algorithm we can automate compression parameter selection and improve inference latency in a typical edge computing environment.}
 
 \section{Research Aims}
-%! --------------------------------------------- NEED REVISION ----------------------------------------------
-\textbf{\color{red}Look at relationship between Latency and Accuracy, in terms of pruning}
 
-\textbf{Aim 1}\label{Aim1} - This dissertation will research methodologies for reducing inference latency using a collection of off-the-shelf compression techniques, we will investigate which compression techniques have a positive effect on inference latency, and consider the context of this improvement with respect to the layer structure of the neural network.\\ 
-\noindent\textbf{Aim 2}\label{Aim2} - We will use this contextual information to select approriate compression methodologies and reduce the search space down to a single pruning algorithm.\\
-\noindent\textbf{Aim 3}\label{Aim3} - Maintain a valid testing environment by using an edge based ai accelerator to perform inference, while training and compression will be performed on a GPU.\\
-\noindent\textbf{Aim 4}\label{Aim4} - Develop a platform to optimise compression parameters according to a metric representing the union of accuracy and latency.\\
-\textbf{\large~Objectives}
+\textbf{Aim 1}\label{Aim1} | This dissertation will research a methodology for reducing inference latency using off-the-shelf compression techniques as a starting point.\\
+\noindent\textbf{Aim 2}\label{Aim2} | We will investigate to what degree different parts of the network strucure impact inference latency. 
+
+\section{Objectives}
+
+
 \begin{itemize}
     \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
+    \item \textbf{O1:}\label{obj:BuildPipeline} Develop a pipeline to compress and benchmark a neural network model.
     \item \textbf{O1:}\label{obj:ModelSel} Select at least 1 neural network model to use for testing.
-    \item \textbf{O2:}\label{obj:DataSel} Select 2 suitable datasets for testing with a significant distinction between the cardinality of categories.
-    \item \textbf{O3:}\label{obj:EvalE2E} Evaluate a pool of compression algorithms with respect to end-to-end latency.
-    \item \textbf{O4:}\label{obj:EvalLayer} Measure latency for individual layers during inference.
-    \item \textbf{O5:}\label{obj:EvalComp} Investigate the effect of composing select algorithms from different compression categories. 
-    \item \textbf{O6:}\label{obj:ParaSel} Select compression parameters to optimise.
-    \item \textbf{O7:}\label{obj:CompPara} Develop a interface to parameterise select compression methods.
-    \item \textbf{O8:}\label{obj:TestOpt} Evaluate a model using a bayesian optimisation approach on compression parameters.
+    \item \textbf{O2:}\label{obj:SelCompress} Select an appropriate compression algorithm for the goal of reducing latency.
+    \item \textbf{O3:}\label{obj:OTSparams} Identify an approprate off-the-shelf set of hyperparameters for the selected model.
+    \item \textbf{04:}\label{obj:baselines} Establish baseline measurements in terms of accuracy and latency for both the unpruned and off-the-shelf (pruned) models. 
+    \item \textbf{O6:}\label{obj:AutoParams} Automate compression parameter optimisation by leveraging the pipeline from O1 to test combinations of parameters and empirically evaluate their imact on a target metric (such as latency or accuracy). 
+    \item \textbf{O7:}\label{obj:EvaluateResutls} Evaluate how well the automated system optimizes the compression parameters, by comparing with the baseline and off the shelf measurements.
+
 \end{itemize}
-%! -------------------------------------------------------------------------------------------------------------
+
 
 \end{document}
