@@ -10,12 +10,14 @@
 %\end{itemize}
 %}
 
-This section will discusss the methodology used to automate the search for lower latency models by tweaking pruning parameters.
+This Chapter will discuss the methodology used to automate the search for lower latency models by tweaking pruning parameters.
 Section~\ref{sec:EngineeringImplementation} explains how the pipeline was implemented, the discrete parts and how they all fit together.
 Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the system, the network model used and pruning algorithms selected.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \section{Automated pruning pipeline}\label{sec:EngineeringImplementation}
+
+To achieve Objective~\hyperref[obj:BuildPipeline]{O1} we began by manually running each part of the system separately using the command line interfaces for Distiller \& OpenVino
 
 We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
@@ -33,7 +35,7 @@ The parameter importance and correlation with the target metric is re-computed o
 
 The runtime of a benchmark for a single model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
 Because the training process is so slow we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
-To make use of this pipeline 2 files must be provided by the user, a distiller schedule with a definition for which weights will be pruned, and a \acrshort{wandb} configuration file which defines the type and ranges of the parameters it will seek to optimize.
+To make use of this pipeline 2 files must be provided by the user, a distiller schedule with a definition for which weights will be pruned, and a \acrshort{wandb} configuration file which defines the type and ranges of the parameters it will seek to optimise.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Defining parameters to prune}\label{sec:paramDef}
@@ -71,7 +73,7 @@ To make use of this pipeline 2 files must be provided by the user, a distiller s
 \end{figure}
 \doublespacing
 
-Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance (line 2 - `'\texttt{\color{mintedgreen}layer\_1\_conv\_pruner}'), a single `\texttt{\color{mintedgreen}lr\_scheduler}' instance (line 11 - `\texttt{\color{mintedgreen}exp\_fine\_tuning\_lr}'), and their respecitve policies (explained below).
+Distiller uses a `compression schedule' file to define the behaviour of the compression algorithms used, Figure~\ref{fig:CompressionSchedule} shows a simple example compression schedule, with a definition for a single `pruner' instance (line 2 - `'\texttt{\color{mintedgreen}layer\_1\_conv\_pruner}'), a single `\texttt{\color{mintedgreen}lr\_scheduler}' instance (line 11 - `\texttt{\color{mintedgreen}exp\_fine\_tuning\_lr}'), and their respective policies (explained below).
 
 
 The pruning schedule is composed of lists of sections that describe `{\color{mintedgreen}pruners}', `{\color{mintedgreen}lr-schedulers}', and `{\color{mintedgreen}policies}'. 
@@ -86,7 +88,7 @@ The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} p
     \label{fig:resnet56weightlabels}
 \end{figure}
 
-Each grouping of weights in the network has labels (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which weight matricies are being referenced by the compression schedule. 
+Each grouping of weights in the network has labels (see figure~\ref{fig:resnet56weightlabels}), distiller uses these labels to identify which weight matrices are being referenced by the compression schedule. 
 Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference the weights we wish to prune from the model in Figure~\ref{fig:resnet56weightlabels}.
 
 
@@ -114,8 +116,8 @@ Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference 
 \end{figure}
 \doublespacing
 
-To explore the space of pruning paramater values the hyperparameter optimisation framework exposed by WandB called `Sweeps' was leveraged. 
-This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a desciption of each key in the wandb configuration file with a summary of appropriate arguments. 
+To explore the space of pruning parameter values the hyperparameter optimisation framework exposed by WandB called `Sweeps' was leveraged. 
+This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a description of each key in the wandb configuration file with a summary of appropriate arguments. 
 
 
 % which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
@@ -138,7 +140,7 @@ This involves writing a python script that can run the entire pipeline (pruning,
 
 
 The sweep configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
-The pipeline script that recieves the arguments from wandb contains a mapping from the wandb arguments to a corresponding value in a distiller compression schedule.
+The pipeline script that receives the arguments from wandb contains a mapping from the wandb arguments to a corresponding value in a distiller compression schedule.
 This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the parameters from wandb, this new schedule is then provided to Distiller as the compression schedule to use.
 
 
@@ -156,7 +158,7 @@ This is accomplished by parsing a base schedule file and identifying which value
 
 To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(\color{red}Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
 OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{\color{red}link to example table of HW operations and latency in appendix}. 
-Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimizer, the IR is then read by the Inference Engine and loaded into VPU memory.
+Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimiser, the IR is then read by the Inference Engine and loaded into VPU memory.
 Once the model is ready we load the images that will be used for benchmarking into the VPU memory.
 We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result), the sum of latency for each instruction executed by the VPU once the image is loaded into memory, and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
 
@@ -185,7 +187,7 @@ Each filter that gets removed causes the corresponding feature map to be removed
 \end{singlespace}
 
 \noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.
-Once pruning is completed we compensate for the performance degredation by retraining the network, 
+Once pruning is completed we compensate for the performance degradation by retraining the network, 
 
     \begin{figure}[H]
         \includegraphics[width=\textwidth]{FilterPruning.jpg}
@@ -202,9 +204,9 @@ Once pruning is completed we compensate for the performance degredation by retra
 Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
 
 We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
-Performing this experiemnt on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
+Performing this experiment on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
 
-The pre-tuned pruning schedule publicly avaliable from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
+The pre-tuned pruning schedule publicly available from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
 It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
 
 \begin{figure}[H]
@@ -215,8 +217,8 @@ It is not a trivial task to improve on the pre-existing hand built schedules man
 \end{figure}
 
 \textbf{\color{red}Discuss further how residual blocks effect pruning.}
-ResNets were originally proposed to help address a training accuracy degredation problem that can occur in very deep networks, Degredation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
-The accuracy degredation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
+ResNets were originally proposed to help address a training accuracy degradation problem that can occur in very deep networks, degradation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+The accuracy degradation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Model Retraining}
@@ -234,7 +236,7 @@ This section describes the parameters and metrics that will be either set or obs
 \singlespacing
 \noindent\textbf{Parameters:}
 \begin{itemize}
-    \item \textbf{Desired Sparsity} | Specified on a per-pruner basis, this lets us set a tell the pruning algorithm what proportion of the weights to try and prune (See Section~\ref{sec:paramDef} for more details).
+    \item \textbf{Desired Sparsity} | Specified on a per-pruner basis, this lets us specify to the pruning algorithm what proportion of the weights to try and prune (See Section~\ref{sec:paramDef} for more details).
     \item \textbf{Epochs} | The number of epochs used for retraining, one epoch refers to a single cycle of training through the entire training dataset.
     \item \textbf{Learning Rate} | Used to scale how much the retraining process will adjust the weights during each weight update.
     \item \textbf{Group type} | Specify either `Filters' or `Channels' for pruning. \textbf{\color{red}Extend background with stuff about channels/filters}.
@@ -245,7 +247,7 @@ This section describes the parameters and metrics that will be either set or obs
 \noindent\textbf{Observed metrics:}
 \begin{itemize}
     \item \textbf{Latency} | Computed by calculating the sum of CPU time for hardware operations inside the NCS after the model and images have been loaded into memory.
-    \item \textbf{Total\_Latency} | Measures the full latency to perform inference on an image once a model is optimised and loaded into the NCS, inlcuding loading the image into the stick memory, this is more indicative of real world requirements.
+    \item \textbf{Total\_Latency} | Measures the full latency to perform inference on an image once a model is optimised and loaded into the NCS, including loading the image into the stick memory, this is more indicative of real world requirements.
     \item \textbf{Throughput} | Shows the number of images per second that can be processed by the NCS (Frames Per Second).
     \item \textbf{Top1} | The \% accuracy of the first class predicted by the model.
     \item \textbf{Top5} | The \% accuracy of the first 5 classes the model predicted for a given image.
@@ -313,10 +315,10 @@ Note that only the first convolution in each residual block is being pruned (den
 \end{table}
 \doublespacing
 
-\subsection{Passing pruned/trained networks to benchmarker}
+\subsection{Passing pruned/trained networks to benchmark}
 \emph{Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
-\subsection{Baseline data}
+\subsection{Baseline data}\label{sec:baselineData}
 For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
 
 \begin{table}[H]
@@ -332,7 +334,7 @@ For the purposes of all experiments we compare our results to two baseline sets 
 \subsection{Experiment 1: Rapid pruning, no retraining}~\label{sec:ex1}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
-Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this experiement, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
+Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this degradation, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
 
 \singlespacing
 \begin{figure}[H]
@@ -365,7 +367,7 @@ parameters:
 \subsection{Experiment 2: Target latency, with retraining}
 
 Using the same wandb configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed $70$ epochs, and set the learning rate to $0.1$.
-The purpose of this part of the experiment was to observe how well the optimisation process targetting only latency could recover accuracy.
+The purpose of this part of the experiment was to observe how well the optimisation process targeting only latency could recover accuracy.
 
 \subsection{Experiment 3: Target Top1, with retraining}
 During the third experimental stage we tweaked the configuration file (see Figure~\ref{fig:Top1SweepConfig}) to specify a new target metric: maximise Top1 .

@@ -4,32 +4,21 @@
 
 \section{Motivation}
 With the continued revolution of AI technologies a desire to utilise the power of neural networks beyond the traditional datacenter bound systems is becoming ever more prevalent.
-Making use of neural networks locally to the user (in other words at the `edge') is already prevalent in modern life, to name a few; mobile phones, voice assistants and even our televisions are making use of this technology. 
-This trend towards using neural networks at the edge is on the rise due to clear privacy and cost advantages to keeping data and computation local to the device running the neural network, rather than sending data to a remote server.
+Using neural networks locally as opposed to in a datacenter (in other words at the \emph{edge}) is already prevalent in modern life, to name a few; mobile phones, voice assistants and even our televisions are making use of this technology. 
+Training neural networks is a costly, often slow, process, usually completely invisible to users of a network, so it makes sense to keep training in the datacenter where resources are abundant, however applying the knowledge from a trained neural network (referred to as \emph{inference}) on the other hand has a myriad of advantages when it is performed at the edge.
 
-Computing at the edge can be limiting in terms of avaliable memory space or performance capabilities, computer vision applications especially those working with real time data tend to require low response times
+Keeping data used for inference local to the device that produces this data means we can rely on a consistent inference latency, in particular computer vision applications such as self-driving cars or autonomous manufacturing machines tend to require a consistent low latency and as such cannot rely on cloud services to perform inference. 
+Additional benefits include privacy and security; reducing data sent to datacenters helps mitigate the potential for a major data leak since no data needs to leave the device.
 
-New applications for neural networks are continually being developed, .
+Computing at the edge can be limiting in terms of avaliable memory space or performance capabilities, networks relying on real time data tend to require lower response times, but there is often a locality vs performance tradeoff unless expensive custom solutions are used.
+\acrshort{gpu}s are the most widely used piece of hardware to operate a neural network, however they are often physically large and can consume a considerable amount of power, an alternative to the \acrshort{gpu} is an AI accelerator such as the Intel Neural Compute Stick, or the Nvidia Jetson, these accelerators are purpose built for neural networks, usually have a much smaller form factor and consume considerably less power.
 
-Localising inference is only becoming stronger with the ever-increasing avaliablilty of computation resources alongside new and constantly evolving AI applications, performing inference at the edge can provide better privacy and latency than the remote datacenter alternatives.
-
-%\emph{Discuss the cost of running cloud based inference services is econmically impractical for companies that might want to leveage this tech in iot devices, unless a subscription model is used. We want to perform inference on the consumers local machine, so companies dont have to charge subscriptions for cloud subscription serivces such as an ai coffee machine. The most apparent reasons to prune a neural network is either to reduce the size of the neural network or its latency, this dissertation will focus on the latency aspect.}
-
-
-Neural network compression is one avenue to aid bringing inference to the edge, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency, but this is often not the case.
-Utilising neural network compression effectively requires expert level knowledge of not only the network structure but the consequences of compression because compression techniques such as pruning can have cascading effects througout a neural network.
+Pruning is a compression technique that involves removing weights from a network with the goal of making it smaller, intuitively we might think that a network with a smaller memory footprint would naturally have lower inference latency, but it is often not this simple.
+Utilising neural network compression requires expert level knowledge of not only the network structure but the consequences of compression because compression techniques such as pruning can have cascading effects througout a neural network.
 This alone can make compression a daunting task, even for experienced machine learning practicioners, it gets worse however, these compression algorithms often feature complex parameters with implications that may not be revealed until a substantial amount of time has been invested in retraining a compressed model.
 
-\section{Terminology}
-This section provides a brief introduction to the terminology used throughout this dissertation.
-
-\begin{itemize}
-    \item Inference
-    \item Epochs
-    \item Channels
-    \item Filters
-    \item Tensors
-\end{itemize}
+The most apparent reasons to prune a neural network is either to reduce the size of the neural network or its latency, this dissertation will focus on reducing the latency aspect, starting from a readily avaliable off-the-shelf configuration for a neural network we will attempt to automate the process of optmising compression parameters with the goal of reducing latency, ideally with a minimal loss of accuracy.
+ %! -------------------------------
 
 \section{Hypothesis}
 \emph{Using optimisation algorithm we can automate compression parameter selection and improve inference latency in a typical edge computing environment.}
@@ -43,12 +32,12 @@ This section provides a brief introduction to the terminology used throughout th
 
 
 \begin{itemize}
-    \item \textbf{O0:}\label{obj:VerifyComp} Develop a methodology to verify that the compression methods are actually being applied to the model being represented.
+    \item \textbf{O0:}\label{obj:VerifyComp} Verify the functionality of distiller, check that the pruning methods avaliable function as described in the literature.
     \item \textbf{O1:}\label{obj:BuildPipeline} Develop a pipeline to compress and benchmark a neural network model.
-    \item \textbf{O1:}\label{obj:ModelSel} Select at least 1 neural network model to use for testing.
-    \item \textbf{O2:}\label{obj:SelCompress} Select an appropriate compression algorithm for the goal of reducing latency.
-    \item \textbf{O3:}\label{obj:OTSparams} Identify an approprate off-the-shelf set of hyperparameters for the selected model.
-    \item \textbf{04:}\label{obj:baselines} Establish baseline measurements in terms of accuracy and latency for both the unpruned and off-the-shelf (pruned) models. 
+    \item \textbf{O2:}\label{obj:ModelSel} Select at least 1 neural network model to use for testing.
+    \item \textbf{O3:}\label{obj:SelCompress} Select an appropriate compression algorithm for the goal of reducing latency.
+    \item \textbf{O4:}\label{obj:OTSparams} Identify an approprate off-the-shelf set of hyperparameters for the selected model.
+    \item \textbf{05:}\label{obj:baselines} Establish baseline measurements in terms of accuracy and latency for both the unpruned and off-the-shelf (pruned) models. 
     \item \textbf{O6:}\label{obj:AutoParams} Automate compression parameter optimisation by leveraging the pipeline from O1 to test combinations of parameters and empirically evaluate their imact on a target metric (such as latency or accuracy). 
     \item \textbf{O7:}\label{obj:EvaluateResutls} Evaluate how well the automated system optimizes the compression parameters, by comparing with the baseline and off the shelf measurements.
 

@@ -25,9 +25,24 @@
 \begin{itemize}
     \item Very little activity on the distiller repository in the last 6 months
     \item Distiller bugs - distiller shadows the namespace of the standard library python parser module, the path distiller uses to resume a model that has been thinnified is broken - fixed in my fork
-    \item 
+    \item onnx issues - must be exported from a checkpoint or retraining doesn't work
 \end{itemize}
 The size of the pruned networks is not measured.
+
+\subsection{Pipeline Development challenges}
+\begin{itemize}
+    \item Step 1 | manually prune and retrain with distiller, copy exported model to OpenVino and run the benchmark (baseline and pruned model)
+    \item Step 2 | Write code to automate the process from step 1 with hardcoded settings
+    \item Step 3 | Create a system to read and write from .yaml files so we can pass in any valid pruning schedule
+    \item Step 4 | Integrate this with the wandb sweeps api
+\end{itemize}
+
+In order to accomplish Objective~\hyperref[obj:VerifyComp]{O0} before building the pipeline we manually ran each discrete part of the system (Distiller, and OpenVino). 
+This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning, this issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
+A trial and error approach was taken to find pruning algorithms with a working implementation of `thinnify', we systematically tested each of the pruning algorithms that used coarse grained pruning and eventually identified the algorithm described in Section~\ref{sec:FilterPruningAlgo} as fully functional with `thinnify'.
+
+Once we had a verifiable improvement in latency from the baseline metrics described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}
+
 
 \subsection{Hardware and Software}
 All agents used in this pipeline used Ubuntu 20.04, we used various hardware configurations for the pruning and retraining agents. 
@@ -52,11 +67,13 @@ Originally the benchmarking system was combined with the producer system, howeve
     \item Redis-py | A python interface to a Redis server
 \end{itemize}
 
+
+
 \section{Evaluation of results}
 \emph{
 \begin{itemize}
 	\item Summary of results per model/dataset
-	\item Deep dive into results, detailed visualisations of accuracy \& latency tradeoffs (maybe example with poor quality sensitivity analysis vs higher quality layer selection)
+	\item Deep dive into results, detailed visualisations of accuracy \& latency trade-offs (maybe example with poor quality sensitivity analysis vs higher quality layer selection)
 \end{itemize}
 }
 
@@ -65,7 +82,7 @@ Originally the benchmarking system was combined with the producer system, howeve
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{TargetSparsityVsLatency_No_Retrain.jpg}
-    \caption{Each pruner target sparisity plotted against mean Latency per bin.}
+    \caption{Each pruner target sparsity plotted against mean Latency per bin.}
     \label{fig:fastPruneParamVSLatency}
 \end{figure}
 
@@ -89,12 +106,12 @@ This chart does obfuscate any relationship between the parameters, however we ca
 \end{table}
 \doublespacing
 
-We found that the degree to which we prune was not at all indicative of the resulting accruacy of the network before retraining, for example we observed networks with low desired sparsity accross the board that had a much lower Top1 accuracy, than networks that were pruned with much higher targets (See models~\ref{sec:golden-sweep-523}).
-It is interesting to note how weakly the pruning targets correlate with Top1 accuracy, this indicates that the relationship between accuracy and pruning is more complex than the naive perception that pruning less has a smaller accuracy impact.
+We found that the degree to which we prune was not at all indicative of the resulting accuracy of the network before retraining, for example we observed networks with low desired sparsity across the board that had a much lower Top1 accuracy, than networks that were pruned with much higher targets (See models~\ref{sec:golden-sweep-523}).
+It is interesting to note how weakly the pruning targets correlate with Top1 accuracy, this indicates that the relationship between accuracy and pruning is more complex than the naïve perception that pruning less has a smaller accuracy impact.
 Observation of this weak correlation with Top1 prompted us to begin logging this initial set of metrics in addition to the metrics we logged as described in the Experimental Design Section~\ref{sec:metricsandparams}, we watched this data in the event that some pattern that might be indicative of how well a pruned network can recover accuracy before retraining has begun will emerge.
 
 We were able to identify a case where pruned networks that have a Top1 accuracy of precisely $100 / n$ where $n$ is the number of classes, the network should be pruned again from scratch, our data had no examples of recovery from this condition during retraining.
-Due to the stochastic nature of retraining and the pruning algorithm we selected, coupled with the fact that our methodology neccessitated changing the pruning parameters each run we were unable to identify any other pattern or relationship between initial pruning metrics and the metrics of sucessful or high quality retrained networks from the data we gathered. 
+Due to the stochastic nature of retraining and the pruning algorithm we selected, coupled with the fact that our methodology necessitated changing the pruning parameters each run we were unable to identify any other pattern or relationship between initial pruning metrics and the metrics of successful or high quality retrained networks from the data we gathered. 
 
 
 
