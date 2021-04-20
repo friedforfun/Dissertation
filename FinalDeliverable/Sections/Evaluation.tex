@@ -41,7 +41,11 @@ In order to accomplish Objective~\hyperref[obj:VerifyComp]{O0} before building t
 This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning, this issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
 A trial and error approach was taken to find pruning algorithms with a working implementation of `thinnify', we systematically tested each of the pruning algorithms that used coarse grained pruning and eventually identified the algorithm described in Section~\ref{sec:FilterPruningAlgo} as fully functional with `thinnify'.
 
-Once we had a verifiable improvement in latency from the baseline metrics described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}
+Once we had a verifiable improvement in latency from the baseline metrics described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}.
+Setting up the benchmarking and model queue was very straight forward, for the queue we simply pulled down a docker image of Redis and ran it.
+The OpenVino benchmarking tool was very easy to integrate into the pipeline, we simply cleared and then wrote the relevant arguments to \texttt{sys.argv} (pythons array of command line arguments) and called the main method of the benchmarking tool inside OpenVino and captured the output.
+
+
 
 
 \subsection{Hardware and Software}
@@ -49,7 +53,7 @@ All agents used in this pipeline used Ubuntu 20.04, we used various hardware con
 The benchmarking system was fixed for the duration of the project; a KVM virtual machine, 4 cores/8 threads from a Ryzen 3960X, 8Gb RAM, and the Intel Neural Compute Stick was plugged into a usb controller that was passed through to the VM.
 Originally the benchmarking system was combined with the producer system, however due to library and python version compatibility issues we had to run OpenVino and Distiller independently this naturally led us to split the system into agents (Producer \& Consumer).
 
-\textbf{Producer software}
+\textbf{Prune \& retraining software}
 \begin{itemize}
     \item Python 3.7.10
     \item Distiller | A python package for neural network compression research
@@ -59,7 +63,7 @@ Originally the benchmarking system was combined with the producer system, howeve
     \item Redis-py | A python interface to a Redis server
 \end{itemize}
 
-\textbf{Consumer software}
+\textbf{Benchmarking software}
 \begin{itemize}
     \item Python 3.8.5
     \item OpenVino | Deep neural network deployment toolkit

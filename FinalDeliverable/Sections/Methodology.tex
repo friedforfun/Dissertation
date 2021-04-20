@@ -17,8 +17,6 @@ Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \section{Automated pruning pipeline}\label{sec:EngineeringImplementation}
 
-To achieve Objective~\hyperref[obj:BuildPipeline]{O1} we began by manually running each part of the system separately using the command line interfaces for Distiller \& OpenVino
-
 We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
 
