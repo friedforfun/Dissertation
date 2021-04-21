@@ -14,18 +14,20 @@ This Chapter will discuss the methodology used to automate the search for lower 
 Section~\ref{sec:EngineeringImplementation} explains how the pipeline was implemented, the discrete parts and how they all fit together.
 Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the system, the network model used and pruning algorithms selected.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{./ProducerConsumer}
+    \caption{Diagram showing communication between discrete parts of the system.}
+    \label{fig:agentCommunication}
+\end{figure}
+
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \section{Automated pruning pipeline}\label{sec:EngineeringImplementation}
 
 We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
 Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{./ProducerConsumer}
-    \caption{Diagram showing agent communication}
-    \label{fig:agentCommunication}
-\end{figure}
+
 
 When pruning begins, the producer agent uses initially random pruning parameters, the producer then applies the pruning algorithm, and begins retraining the model.
 Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to \acrshort{wandb}.
@@ -75,7 +77,7 @@ Distiller uses a `compression schedule' file to define the behaviour of the comp
 
 
 The pruning schedule is composed of lists of sections that describe `{\color{mintedgreen}pruners}', `{\color{mintedgreen}lr-schedulers}', and `{\color{mintedgreen}policies}'. 
-A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(Definition required)} algorithm. 
+A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(\color{red}Definition required)} algorithm. 
 Finally each policy references an instance of a pruner or LR-scheduler, and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
 
 The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (as described in Section~\ref{sec:FilterPruningAlgo}) to prune the weights in each of the convolutions described by the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}desired\_sparsity}' indicates how many tensors it will aim to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), desired sparsity should not be confused with an actual change in sparsity | note that filter and channel pruning will always result in a dense layer with an actual sparsity of 0 because this is a form of coarse-grained pruning (see section~\ref{sec:Pruning}).
@@ -134,7 +136,7 @@ This involves writing a python script that can run the entire pipeline (pruning,
 \end{table}
 
 
-%Each set of pruning parameters in this experiment used a bayesian optimisation technique~\autocite{snoekPracticalBayesianOptimization2012}
+%E
 
 
 The sweep configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
@@ -188,7 +190,8 @@ Each filter that gets removed causes the corresponding feature map to be removed
 Once pruning is completed we compensate for the performance degradation by retraining the network, 
 
     \begin{figure}[H]
-        \includegraphics[width=\textwidth]{FilterPruning.jpg}
+        \centering
+        \includegraphics[width=0.8\textwidth]{FilterPruning.jpg}
         \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}\textbf{\color{red}Include annotations for the feature map and kernel}}
         \label{fig:FeaturemapAndKernel}
     \end{figure}
@@ -219,10 +222,13 @@ ResNets were originally proposed to help address a training accuracy degradation
 The accuracy degradation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Model Retraining}
-\textbf{TBD}
+\subsection{Optimisation Process}
+In general machine learning algorithms are expensive to perform, and tend to have an inconsistent execution time, when the cost of retraining is so high it is easy to see why we would want to exchange some extra work up front for finding a good next search point rather than simply relying on the more commonly used hill climbing algorithms that rely more on the local gradient.
+One of the key ideas here is to use all information available from all previous function evaluations, allowing us to model the plausibility of future search points, Bayesian optimisation processes are designed to construct this model by evaluating this prior knowledge about known properties, these are considered to be some of the most effective optimisation approaches in terms of the number of function evaluations required~\autocite{brochuTutorialBayesianOptimization2010}.
 
-
+The specific flavour of Bayesian optimisation process used in this dissertation is based on the method described by Snoek et al.~\autocite{snoekPracticalBayesianOptimization2012} where statistical models are used to find search points heuristically using a Monte Carlo estimate of the expected improvement.
+ 
+Due to the stochastic nature of the pruning methods we have utilised there is a considerable volume of noise in our data because when we perform optimisation we tune all pruners in parallel, each pruner will have a different degree of impact on the target metric
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Experiment metrics and parameters}\label{sec:metricsandparams}
@@ -256,8 +262,7 @@ This section describes the parameters and metrics that will be either set or obs
 \subsection{Schedules}
 Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labeled for pruning in the selected Resnet56 model, the 4 labelled pruners and their corresponding weights were used in all resnet56 experiments.
 Layers with a similar degree of sensitivity to pruning are grouped together, layers that are omitted from the table have a much higher sensitivity to pruning and are not pruned at all, pruning more sensitive layers can result in a significantly higher probability that pruned neural networks that lose all predictive ability (in other words the network will predict a single class 100\% of the time).
-Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.\\
-
+Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.
 Note that only the first convolution in each residual block is being pruned (denoted by `conv1' inside the weight name), because the convolutions following this will also have the kernels removed following the removed feature maps (See Section~\ref{sec:ModelSelection}).
 
 \singlespacing
@@ -314,7 +319,7 @@ Note that only the first convolution in each residual block is being pruned (den
 \doublespacing
 
 \subsection{Passing pruned/trained networks to benchmark}
-\emph{Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
+\emph{\color{red}Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
 \subsection{Baseline data}\label{sec:baselineData}
 For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
