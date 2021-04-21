@@ -116,8 +116,8 @@ Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference 
 \end{figure}
 \doublespacing
 
-To explore the space of pruning parameter values the hyperparameter optimisation framework exposed by WandB called `Sweeps' was leveraged. 
-This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a description of each key in the wandb configuration file with a summary of appropriate arguments. 
+To explore the space of pruning parameter values the hyperparameter optimisation framework exposed by \acrshort{WandB} called `Sweeps' was leveraged. 
+This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a description of each key in the \acrshort{WandB} configuration file with a summary of appropriate arguments. 
 
 
 % which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
@@ -139,9 +139,9 @@ This involves writing a python script that can run the entire pipeline (pruning,
 %E
 
 
-The sweep configuration file tells wandb the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
-The pipeline script that receives the arguments from wandb contains a mapping from the wandb arguments to a corresponding value in a distiller compression schedule.
-This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the parameters from wandb, this new schedule is then provided to Distiller as the compression schedule to use.
+The sweep configuration file tells \acrshort{wandb} the names of the parameters to pass as arguments to the pipeline script with their expected value ranges, such as a list of strings or a min and max number. 
+The pipeline script that receives the arguments from \acrshort{wandb} contains a mapping from the \acrshort{wandb} arguments to a corresponding value in a distiller compression schedule.
+This is accomplished by parsing a base schedule file and identifying which values will be changed, then a new schedule is written with the parameters from \acrshort{wandb}, this new schedule is then provided to Distiller as the compression schedule to use.
 
 
 
@@ -186,7 +186,7 @@ Each filter that gets removed causes the corresponding feature map to be removed
     \end{enumerate}
 \end{singlespace}
 
-\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.
+\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, \textbf{\color{red}in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.}
 Once pruning is completed we compensate for the performance degradation by retraining the network, 
 
     \begin{figure}[H]
@@ -223,13 +223,19 @@ The accuracy degradation problem with very deep CNNs is common enough that many 
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Optimisation Process}
-In general machine learning algorithms are expensive to perform, and tend to have an inconsistent execution time, when the cost of retraining is so high it is easy to see why we would want to exchange some extra work up front for finding a good next search point rather than simply relying on the more commonly used hill climbing algorithms that rely more on the local gradient.
-One of the key ideas here is to use all information available from all previous function evaluations, allowing us to model the plausibility of future search points, Bayesian optimisation processes are designed to construct this model by evaluating this prior knowledge about known properties, these are considered to be some of the most effective optimisation approaches in terms of the number of function evaluations required~\autocite{brochuTutorialBayesianOptimization2010}.
+In general machine learning training is computationally expensive, execution times can commonly be hours or even days, when the cost of retraining is so high it is easy to see why we would want to exchange some extra work up front for finding a good next search point rather than simply opting for the more commonly used hill climbing algorithms that rely more on the local gradient.
+One of the key ideas here is to use all information available from all previous evaluations of the search space, allowing us to model the plausibility of future search points, Bayesian optimisation processes are designed to construct this model by evaluating this prior knowledge about known properties, optimisation processes are considered to be some of the most effective optimisation methods in terms of the number of evaluations required~\autocite{brochuTutorialBayesianOptimization2010}.
 
 The specific flavour of Bayesian optimisation process used in this dissertation is based on the method described by Snoek et al.~\autocite{snoekPracticalBayesianOptimization2012} where statistical models are used to find search points heuristically using a Monte Carlo estimate of the expected improvement.
  
-Due to the stochastic nature of the pruning methods we have utilised there is a considerable volume of noise in our data because when we perform optimisation we tune all pruners in parallel, each pruner will have a different degree of impact on the target metric
-
+Due to the stochastic nature of the pruning methods we have utilised there is a considerable volume of noise in our data because when we perform optimisation we tune all pruners in parallel, each pruner will have a different degree of impact on the target metric.
+This results in a very noisy search surface (See Figure~\ref{fig:roughSurface}), this noise can be challenging to overcome and is the primary reason we selected this optimisation approach.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{RoughSearchLandscape.jpg}
+    \caption{A single pruner search surface showing Latency and Top1. The very spikes would be challenging for many hill climbing algorithms, due to the depth of local maxima.}
+    \label{fig:roughSurface}
+\end{figure}
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Experiment metrics and parameters}\label{sec:metricsandparams}
 
@@ -243,7 +249,6 @@ This section describes the parameters and metrics that will be either set or obs
     \item \textbf{Desired Sparsity} | Specified on a per-pruner basis, this lets us specify to the pruning algorithm what proportion of the weights to try and prune (See Section~\ref{sec:paramDef} for more details).
     \item \textbf{Epochs} | The number of epochs used for retraining, one epoch refers to a single cycle of training through the entire training dataset.
     \item \textbf{Learning Rate} | Used to scale how much the retraining process will adjust the weights during each weight update.
-    \item \textbf{Group type} | Specify either `Filters' or `Channels' for pruning. \textbf{\color{red}Extend background with stuff about channels/filters}.
 \end{itemize}
 \doublespacing
 
@@ -259,8 +264,8 @@ This section describes the parameters and metrics that will be either set or obs
 \doublespacing
 
 \newpage
-\subsection{Schedules}
-Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labeled for pruning in the selected Resnet56 model, the 4 labelled pruners and their corresponding weights were used in all resnet56 experiments.
+\subsection{Schedule}
+Table~\ref{tab:scheduleWeights} shows how the weights are grouped and labelled for pruning in the selected Resnet56 model, the 4 labelled pruners and their corresponding weights were used in all resnet56 experiments.
 Layers with a similar degree of sensitivity to pruning are grouped together, layers that are omitted from the table have a much higher sensitivity to pruning and are not pruned at all, pruning more sensitive layers can result in a significantly higher probability that pruned neural networks that lose all predictive ability (in other words the network will predict a single class 100\% of the time).
 Grouping layers in this way helps us avoid having to use 56 pruning parameters (one for each layer per residual block) and significantly reduces the complexity of the parameter search.
 Note that only the first convolution in each residual block is being pruned (denoted by `conv1' inside the weight name), because the convolutions following this will also have the kernels removed following the removed feature maps (See Section~\ref{sec:ModelSelection}).
@@ -337,7 +342,7 @@ For the purposes of all experiments we compare our results to two baseline sets 
 \subsection{Experiment 1: Rapid pruning, no retraining}~\label{sec:ex1}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
-Figure~\ref{fig:LatencySweepConfig} shows the wandb configuration file used for this degradation, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
+Figure~\ref{fig:LatencySweepConfig} shows the \acrshort{wandb} configuration file used for this part of the experiment, this configuration seeks to optimise the desired sparsity settings for each of the 4 pruners.
 
 \singlespacing
 \begin{figure}[H]
@@ -369,13 +374,13 @@ parameters:
 
 \subsection{Experiment 2: Target latency, with retraining}
 
-Using the same wandb configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed $70$ epochs, and set the learning rate to $0.1$.
-The purpose of this part of the experiment was to observe how well the optimisation process targeting only latency could recover accuracy.
+Using the same \acrshort{wandb} configuration file as in the first experiment (Figure~\ref{fig:LatencySweepConfig}), we again target minimizing latency but this time retrain for a fixed $70$ epochs, and set the learning rate to $0.1$.
+The purpose was to observe how well the network would recover accuracy when we focus purely on Latency.
 
 \subsection{Experiment 3: Target Top1, with retraining}
 During the third experimental stage we tweaked the configuration file (see Figure~\ref{fig:Top1SweepConfig}) to specify a new target metric: maximise Top1 .
 Similarly to Experiment 2 we kept the number of epochs fixed at $70$ and the learning rate at $0.1$.
-During this experiment we were interested in observing how the amount of pruning effected Top1, and if we could improve on our best Top1 score from the second experiment.
+During this experiment we were interested in observing how the optimisation processes effected Top1, and if we could improve on our best Top1 score from the second experiment.
 
 \singlespacing
 \begin{figure}[H]
@@ -405,7 +410,7 @@ parameters:
 \end{figure}
 \doublespacing
 
-\subsection{Experiment 4: Adding epochs and learning rate to the parameter search}
+\subsection{Experiment 4: Improving on the fastest latency settings}
 
 
 
