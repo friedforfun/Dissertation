@@ -190,34 +190,73 @@ The label names were changed to improve the readability of this dissertation, Ta
 
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
-This model was created during the `no-retraining' experiment, very light pruning parameters with a low Top1, and fairly low Latency. We can see how just a small amount of pruning has a dramatic effect on the accuracy.\\
+This model was created during the `no-retraining' experiment, very light pruning parameters with a low Top1, and a latency similar to no pruning. We can see how just a small amount of pruning has a dramatic effect on the accuracy.\\
 Referenced by: [\ref{sec:FastPruningPhase}]
-\begin{table}[H]
-    \centering
-    \subfloat[Pruning parameters]{
-        \begin{tabular}{@{}ll@{}}
-            \toprule
-            \textbf{Parameter Name} & \textbf{Value} \\ \midrule
-            filter\_pruner\_20      & 0.153          \\
-            filter\_pruner\_40      & 0.2536         \\
-            filter\_pruner\_60      & 0.09001        \\
-            filter\_pruner\_70      & 0.09955        \\ \bottomrule
-        \end{tabular}
-    }
-    \hspace{2em}
-    \subfloat[Recorded Metrics]{
-        \begin{tabular}{@{}ll@{}}
-            \toprule
-            \textbf{Metric}    & \textbf{Value} \\ \midrule
-            Latency(ms)        & 4.397          \\
-            Loss               & 1.924          \\
-            Throughput(FPS)    & 302.36         \\
-            Top1               & 27.02          \\
-            Top5               & 83.26          \\
-            Total\_latency(ms) & 13.06          \\ \bottomrule
-        \end{tabular}
-    }
-\end{table}
+\begin{figure}[H]
+    \begin{table}[H]
+        \centering
+        \subfloat[Pruning parameters]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+                filter\_pruner\_20      & 0.153          \\
+                filter\_pruner\_40      & 0.2536         \\
+                filter\_pruner\_60      & 0.09001        \\
+                filter\_pruner\_70      & 0.09955        \\ \bottomrule
+            \end{tabular}
+        }
+        \hspace{2em}
+        \quad
+        \subfloat[Recorded Metrics]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Metric}    & \textbf{Value} \\ \midrule
+                Latency(ms)        & 4.397          \\
+                Loss               & 1.924          \\
+                Throughput(FPS)    & 302.36         \\
+                Top1               & 27.02          \\
+                Top5               & 83.26          \\
+                Total\_latency(ms) & 13.06          \\ \bottomrule
+            \end{tabular}
+        }
+        %\setcounter{subfloat}{0}
+    \end{table}    
+\end{figure}
+
+
+\subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/58wpdzct/overview?workspace=}{\underline{\color{blue}comfy-sweep-1007}}}\label{sec:comfy-sweep-1007}
+This model was created during the `no-retraining' experiment, high desired pruning parameters with a high (untrained) Top1, and fairly low Latency. \\
+Referenced by: [\ref{sec:FastPruningPhase}]
+\begin{figure}[H]
+    \begin{table}[H]
+        \centering
+        \subfloat[Pruning parameters]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+                filter\_pruner\_20      & 0.9403          \\
+                filter\_pruner\_40      & 0.9687         \\
+                filter\_pruner\_60      & 0.3814        \\
+                filter\_pruner\_70      & 0.9707        \\ \bottomrule
+            \end{tabular}
+        }
+        \hspace{2em}
+        \subfloat[Recorded Metrics]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Metric}    & \textbf{Value} \\ \midrule
+                Latency(ms)        & 3.347          \\
+                Loss               & 1.608          \\
+                Throughput(FPS)    & 299.94         \\
+                Top1               & 39.32          \\
+                Top5               & 89.32          \\
+                Total\_latency(ms) & 12.85          \\ \bottomrule
+            \end{tabular}
+        }
+        %\setcounter{subfloat}{0}
+    \end{table}    
+\end{figure}
+
 
 
 \newpage
