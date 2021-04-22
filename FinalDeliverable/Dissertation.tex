@@ -258,6 +258,39 @@ Referenced by: [\ref{sec:FastPruningPhase}]
 \end{figure}
 
 
+\subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Channels-Filters/runs/ptmmklr8?workspace=}{\underline{\color{blue}unique-sweep-182}}}\label{sec:unique-sweep-182}
+This model was created during the second experiment targeting latency with retraining, it achieved an impressively low final latency, and managed to go from 3.529ms before retraining to 3.091ms after.\\
+Referenced by: [\ref{sec:Experiment2}]
+\begin{figure}[H]
+    \begin{table}[H]
+        \centering
+        \subfloat[Pruning parameters]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+                filter\_pruner\_20      & 0.4657          \\
+                filter\_pruner\_40      & 0.8789         \\
+                filter\_pruner\_60      & 0.9352        \\
+                filter\_pruner\_70      & 0.9519        \\ \bottomrule
+            \end{tabular}
+        }
+        \hspace{2em}
+        \subfloat[Recorded Metrics]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Metric}    & \textbf{Value} \\ \midrule
+                Latency(ms)        & 3.091          \\
+                Loss               & 0.539          \\
+                Throughput(FPS)    & 300.58         \\
+                Top1               & 85.48          \\
+                Top5               & 99.36          \\
+                Total\_latency(ms) & 12.78          \\ \bottomrule
+            \end{tabular}
+        }
+        %\setcounter{subfloat}{0}
+    \end{table}    
+\end{figure}
+
 
 \newpage
 \section{Schedule}\label{apx:Schedule}

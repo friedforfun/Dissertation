@@ -158,9 +158,10 @@ This is accomplished by parsing a base schedule file and identifying which value
 
 To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(\color{red}Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
 OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{\color{red}link to example table of HW operations and latency in appendix}. 
-Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the model optimiser, the IR is then read by the Inference Engine and loaded into VPU memory.
+Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the OpenVino model optimiser, the IR is then read by the Inference Engine and loaded into VPU memory.
 Once the model is ready we load the images that will be used for benchmarking into the VPU memory.
-We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result), the sum of latency for each instruction executed by the VPU once the image is loaded into memory, and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
+We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result; referred to as `total latency'), the sum of latency for each instruction executed by the VPU once the image is loaded into memory (referred to as `latency'), and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
+Each time we benchmark a model we run it 100 times and log the mean total latency because we recorded a small run-to-run variance (+-0.3ms), the latency and throughput metrics are unchanged for all 100 runs.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \newpage
@@ -238,7 +239,7 @@ This results in a very noisy search surface (See Figure~\ref{fig:roughSurface}),
 \subsection{Experiment metrics and parameters}\label{sec:metricsandparams}
 
 
-We conducted three experiments using a Resnet56 model with pretrained weights for the CIFAR10 dataset.
+We conducted three experiments using a Resnet56 model with pretrained weights for the CIFAR10 dataset, each experiment was isolated from the others so no prior data could inform the algorithm when starting a new experiment.
 This section describes the parameters and metrics that will be either set or observed during the experiments.
 
 \singlespacing
@@ -326,6 +327,8 @@ Note that only the first convolution in each residual block is being pruned (den
 
 \subsection{Baseline data}\label{sec:baselineData}
 For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
+Because pruning and retraining has stochastic elements we recorded 100 runs of each baseline and recorded the mean in Table~\ref{tab:baselineData}.
+The retrained off-the-shelf version was trained on 70 epochs and a learning rate of 0.1, a Top1 accuracy as high as the baseline with no pruning can be achieved with up to 300 epochs, but this would take 1 hour and 40 mins per run to train which would be unfeasible in the available time frame. 
 
 \begin{table}[H]
     \begin{tabular}{@{}lccp{25mm}p{23mm}p{28mm}@{}}
@@ -335,6 +338,7 @@ For the purposes of all experiments we compare our results to two baseline sets 
     Off the shelf - no retraining      & 11.19         & 51.02         & 303.98                    & 3.947                 & 12.89                       \\
     Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88                  & 12.95                           \\ \bottomrule
     \end{tabular}
+    \label{tab:baselineData}
 \end{table}
 
 \subsection{Experiment 1: Rapid pruning, no retraining}~\label{sec:ex1}

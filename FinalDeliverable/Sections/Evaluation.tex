@@ -91,7 +91,7 @@ Due to the stochastic nature of retraining and the pruning algorithm we selected
 Future investigation in this area should benchmark after every epoch with the intention of gaining some insight into how these metrics change over the retraining process, ideally we would aim to project how well a network might recover during the early stages of retraining, allowing us to make an informed decision on whether to abandon the model and try again or not.
 
 
-\subsection{Experiment 2: Targeting Latency}
+\subsection{Experiment 2: Targeting Latency}\label{sec:Experiment2}
 
 \singlespacing
 \begin{table}[H]
@@ -107,10 +107,17 @@ Future investigation in this area should benchmark after every epoch with the in
 \end{table}
 \doublespacing
 
+As part of Objective~\hyperref[obj:AutoParams]{O6} we extended the first experiment and introduced 70 epochs of retraining to the system. 
+At this stage we observed an interesting relationship between the retraining process and a further reduction in latency; the lowest latency run without retraining was $3.277$ms, out of the 256 successful runs with retraining in this experiment 12 were below the lowest latency from the first experiment.
+This experiment managed to beat the best latency from the first experiment in 131 runs, however these 131 runs took approximately 36 hours of compute time compared to the (approximately) 4.5 hours it took the first experiment to achieve its best latency.
+The lowest latency model (Model~\hyperref[sec:sec:unique-sweep-182]{182}) we recorded achieved an inference latency of $3.091$ms after retraining, this same model logged a latency of $3.529$ms before retraining, approximately 75\% of models in this experiment lost between $0.1$ms and $0.4$ms latency during retraining, the models that gained latency also tended to have a higher initial latency.
+Despite the additional latency reduction as a result of retraining, the correlation (Table~\ref{tab:Ex2PruneCorrelations}) between each pruner and latency remains consistent with our initial observations from the first experiment (Table~\ref{tab:fastPruneCorrelations}), this lends some reliability to our results.
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Ex2_Latency_over_runs_annotated.png}
-    \caption{Number of runs against Latency}
+    \caption{Experiment 2. Number of runs against Latency}
 \end{figure}
 
 \subsection{Experiment 3: Targeting Top1}
@@ -129,11 +136,34 @@ Future investigation in this area should benchmark after every epoch with the in
 \end{table}
 \doublespacing
 
+In this experiment the focus is on Top1 accuracy, similarly to Experiment 2 we use 70 epochs for retraining, and a learning rate of 0.1. 
+In table~\ref{fig:ex3Top1Rate} we see the Bayesian optimisation algorithm's effectiveness, after just 17 runs we find a Top1 of $88.52$ already very close to the global best Top1 of $88.77$ found after 147 runs in this experiment.
+However the cost to latency is significant, only 5 runs had less than $3.5$ms latency, of those 5 only 1 had a Top1 below 86.5.
+The quality of models produced was consistently higher in this experiment than when targeting latency, the mean Top1 was 87.2 and the median was 87.7, which when compared to the mean (85.3) and median (87.1) of Experiment 2 shows how important it is to account for Top1 accuracy when performing this kind of optimisation.
+When we don't consider Top1 in our target metric we observed a 5x higher rate of ruined networks with accuracy that cannot be recovered by retraining.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Ex3_scatterTop1runsAnnotated.png}
-    \caption{Number of runs to achieve best Top1 accuracy}
+    \caption{Experiment 3. Number of runs to achieve best Top1 accuracy.}
+    \label{fig:ex3Top1Rate}
 \end{figure}
+
+\subsection{Comparisons against baseline}
+
+\begin{table}[H]
+    \begin{tabular}{@{}lccp{25mm}p{23mm}p{28mm}@{}}
+    \toprule
+    \multicolumn{1}{c}{\textbf{Model}} & \textbf{Top1} & \textbf{Top5} & \textbf{Throughput (FPS)} & \textbf{Latency (ms)} & \textbf{Total Latency (ms)} \\ \midrule
+    Baseline - no pruning              & 92.58         & 99.78         & 294.08                    & 4.375                 & 13.19                       \\
+    Off the shelf - no retraining      & 11.19         & 51.02         & 303.98                    & 3.947                 & 12.89                       \\
+    Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88                  & 12.95                           \\ \bottomrule
+    \end{tabular}
+    \caption{Baseline data, as gathered in Section~\ref{sec:baselineData}}
+\end{table}
+
+
+
 
 \textbf{Interesting observations}
 \begin{itemize}
