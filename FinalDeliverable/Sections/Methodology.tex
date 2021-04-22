@@ -24,16 +24,16 @@ Section~\ref{sec:ExperimentDesign} discusses the specifics of how we tested the 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \section{Automated pruning pipeline}\label{sec:EngineeringImplementation}
 
-We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data.
-Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrfull{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
+We constructed a pipeline to prune, retrain, benchmark, and record the data from each model, this pipeline consists of 4 separate elements; the systems to prune and retrain, a message queue  (for this we used Redis), a benchmarking system, and finally the cloud service used to store the data called \acrfull{wandb}.
+Figure~\ref{fig:agentCommunication} shows how each system interacts in the pipeline, pruning is handled by the agent/s marked `Producer', benchmarking is handled by the `Consumer' agent, and the \acrshort{wandb} system stores and provides the data used to compute each set of sweep parameters passed to the `Producer' agents on request.
 
 
 
-When pruning begins, the producer agent uses initially random pruning parameters, the producer then applies the pruning algorithm, and begins retraining the model.
+When pruning begins, the producer agent uses initially random pruning parameters, it then applies the pruning algorithm, and begins retraining the model.
 Upon completion of retraining the model is exported into ONNX format and added to a queue for the consumer (the benchmarking agent) to benchmark and record the results, these results are then logged to \acrshort{wandb}.
 The parameter importance and correlation with the target metric is re-computed on each iteration of the pipeline using results that are logged to \acrshort{wandb} each time a benchmark is performed.
 
-The runtime of a benchmark for a single model on the NCS is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
+The runtime of a benchmark for a single model on the benchmarking device is usually at most 5 seconds, retraining the network however can take between 20 - 120 mins depending on the network size and number of epochs, the one-shot pruning method utilised in this experiment usually takes less than 5 seconds. 
 Because the training process is so slow we separated the benchmarking system (consumer) from the pruning and retraining systems (producer), this made it easy to add additional pruning and retraining agents to a single experiment or run multiple experiments in parallel.
 To make use of this pipeline 2 files must be provided by the user, a distiller schedule with a definition for which weights will be pruned, and a \acrshort{wandb} configuration file which defines the type and ranges of the parameters it will seek to optimise.
 
@@ -77,7 +77,7 @@ Distiller uses a `compression schedule' file to define the behaviour of the comp
 
 
 The pruning schedule is composed of lists of sections that describe `{\color{mintedgreen}pruners}', `{\color{mintedgreen}lr-schedulers}', and `{\color{mintedgreen}policies}'. 
-A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the \textbf{learning-rate decay(\color{red}Definition required)} algorithm. 
+A `{\color{mintedgreen}pruner}' defines a pruning algorithm and the layers on which that pruning algorithm will be applied, `LR-schedulers' define the learning-rate decay algorithm which gradually adjusts the learning rate over the course of training. 
 Finally each policy references an instance of a pruner or LR-scheduler, and controls when the respective algorithm will be applied, such as the start and end epoch, and the frequency of application.
 
 The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (as described in Section~\ref{sec:FilterPruningAlgo}) to prune the weights in each of the convolutions described by the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}desired\_sparsity}' indicates how many tensors it will aim to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), desired sparsity should not be confused with an actual change in sparsity | note that filter and channel pruning will always result in a dense layer with an actual sparsity of 0 because this is a form of coarse-grained pruning (see section~\ref{sec:Pruning}).
@@ -155,11 +155,11 @@ This is accomplished by parsing a base schedule file and identifying which value
 	\label{fig:OpenVinoWorkflow}
 \end{figure}
 
-
-To pass the pruned and trained model to the Neural Compute stick OpenVino was used, it is a toolkit providing a high level \textbf{inference engine(\color{red}Definition needed)} API, this facilitates the process of optimising the model for specialised hardware (in this case the NCS), and loading the optimised model into the hardware. 
-OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU~\textbf{\color{red}link to example table of HW operations and latency in appendix}. 
+We used the Intel \acrfull{ncs} as the benchmarking device, this is a device that might realistically be used in an edge computing scenario.
+To pass the pruned and trained model to the \acrshort{ncs} OpenVino was used, it is a toolkit providing a high level inference engine (this converts a model to specialised hardware such as the \acrshort{ncs}) API, this facilitates the process of optimising the model for specialised hardware (in this case the \acrshort{ncs}), and loading the optimised model into the hardware. 
+OpenVino itself has a benchmarking tool that we leveraged to access detailed latency and throughput metrics; from end to end latency all the way down to the latency of each instruction used for inference on the VPU. 
 Before starting the benchmark we convert the ONNX model into an Intermediate Representation (IR) format by running it through the OpenVino model optimiser, the IR is then read by the Inference Engine and loaded into VPU memory.
-Once the model is ready we load the images that will be used for benchmarking into the VPU memory.
+Once the model is ready and loaded into the VPU we begin benchmarking and load the images that will be used for benchmarking into the VPU memory.
 We observe three measurements for every model, the end-to-end latency (from loading an image into the model until getting a result; referred to as `total latency'), the sum of latency for each instruction executed by the VPU once the image is loaded into memory (referred to as `latency'), and finally we also measure the throughput (the number of images (frames) that can be processed per second or FPS).
 Each time we benchmark a model we run it 100 times and log the mean total latency because we recorded a small run-to-run variance (+-0.3ms), the latency and throughput metrics are unchanged for all 100 runs.
 
@@ -173,7 +173,7 @@ Each time we benchmark a model we run it 100 times and log the mean total latenc
 
 Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
 
-We selected ResNet56 (Objective~\hyperref[obj:obj:ModelSel]{O2}) as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
+We selected ResNet56 (Objective~\hyperref[obj:ModelSel]{O2}) as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
 Performing this experiment on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
 
 The pre-tuned pruning schedule publicly available from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
@@ -214,7 +214,7 @@ Each filter that gets removed causes the corresponding feature map to be removed
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.8\textwidth]{FilterPruning.jpg}
-        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}\textbf{\color{red}Include annotations for the feature map and kernel}}
+        \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}}
         \label{fig:FeaturemapAndKernel}
     \end{figure}
 
@@ -230,7 +230,7 @@ This results in a very noisy search surface (See Figure~\ref{fig:roughSurface}),
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{RoughSearchLandscape.jpg}
-    \caption{A single pruner search surface showing Latency and Top1. The very spikes would be challenging for many hill climbing algorithms, due to the depth of local maxima.}
+    \caption{A single pruner search surface showing Latency and Top1. The spikey surface would be challenging for many hill climbing algorithms, due to the frequency and height of local maxima.}
     \label{fig:roughSurface}
 \end{figure}
 %! ---------------------------------------------------------------------------------------------------------------------------------
@@ -333,9 +333,10 @@ The retrained off-the-shelf version was trained on 70 epochs and a learning rate
     Off the shelf - no retraining      & 11.19         & 51.02         & 303.98                    & 3.947                 & 12.89                       \\
     Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88                  & 12.95                           \\ \bottomrule
     \end{tabular}
+    \caption{Record of baseline data recording the best models found in a sample of 100.}
     \label{tab:baselineData}
 \end{table}
-
+\newpage
 \subsection{Experiment 1: Rapid pruning, no retraining}~\label{sec:ex1}
 Targeting the weights described in table~\ref{tab:scheduleWeights} (the full schedule is listed in appendix~\ref{apx:Schedule}) we repeatedly pruned networks without performing any training to regain accuracy, we set the target metric to minimize Latency, the number of epochs to $0$, and the learning rate to $0.1$.
 The goal at this stage was to observe any reduction in latency, with the added benefit of allowing us to gather a large volume of data very quickly.
@@ -407,37 +408,6 @@ parameters:
 \end{figure}
 \doublespacing
 
-\subsection{Experiment 4: Improving on the fastest latency settings}
-For this final experiment we set the pruner parameters to the configuration with which we observed the lowest latency, and we sought to maximise Top1 by searching over the learning rate and number of epochs.
-\singlespacing
-\begin{figure}[H]
-    \centering
-    \begin{minted}[breaklines]{yaml}
-program: pipeline.py
-method: bayes
-metric:
-  goal: maximize
-  name: Top1
-parameters:
-  epochs:
-    min: 35
-    max: 120
-  learning_rate:
-    min: 0.1
-    max: 0.5
-  filter_pruner_layer_1:
-    values: [0.9519]
-  filter_pruner_layer_2:
-    values: [0.9352]
-  filter_pruner_layer_3.1:
-    values: [0.4657]
-  filter_pruner_layer_3.2:
-    values: [0.8789]
-    \end{minted}
-    \caption{This configuration fixes the previously found lowest latency set of parameters, we search instead for an improvement in epochs and learning rate.}
-    \label{fig:FinalSweepConfig}
-\end{figure}
-\doublespacing
 
 
 \end{document}

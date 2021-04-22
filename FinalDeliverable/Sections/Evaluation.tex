@@ -59,7 +59,7 @@ As discussed in section~\ref{sec:ex1} for this experiment we set the training ep
 During this phase of the experiment we gathered data to observe how pruning would affect latency, this was useful as an initial proof of concept.
 This phase of the experiment was very time efficient, we were able to perform 1631 runs with around 18 hours of compute time; each run usually lasted between 24-55 seconds. 
 Figure~\ref{fig:fastPruneParamVSLatency} shows the mean Latency computed by using equal width binning, where each bin represents parameter values inside each discretized 0.02 range between 0.0 and 1.0.
-This chart does obfuscate any relationship between the parameters, however we can see how the filter pruner on Layer 3.2 (red) plots a more dramatic change in latency than the Pruner on Layer 1 (blue), this is also supported by computing the correlation between these values, see Table~\ref{tab:fastPruneCorrelations}, where `Filter Pruner Layer 3.2' has a strong negative correlation with Latency indicating that increasing the desired sparsity results in an increased tendency to observe a lower latency than `Filter Pruner Layer 1'.
+This chart does obfuscate any relationship between the parameters, however we can see how the filter pruner on Layer 1 (red) plots a more dramatic change in latency than the Pruner on Layer 3.1 (blue), this is also supported by computing the correlation between these values, see Table~\ref{tab:fastPruneCorrelations}, where `Filter Pruner Layer 1' has a strong negative correlation with Latency indicating that increasing the desired sparsity results in an increased tendency to observe a lower latency than `Filter Pruner Layer 1'.
 
 \singlespacing
 \begin{table}[H]
@@ -101,7 +101,7 @@ Future investigation in this area should benchmark after every epoch with the in
 \doublespacing
 
 As part of Objective~\hyperref[obj:AutoParams]{O6} we extended the first experiment and introduced 70 epochs of retraining to the system. 
-At this stage we observed an interesting relationship between the retraining process and a further reduction in latency; the lowest latency run without retraining was $3.277$ms, out of the 256 successful runs with retraining in this experiment 12 were below the lowest latency from the first experiment.
+At this stage we observed an interesting relationship between the retraining process and a further reduction in latency; the lowest latency run without retraining was $3.277$ms, out of the 256 successful runs with retraining in this experiment, 12 were below the lowest latency from the first experiment.
 This experiment managed to beat the best latency from the first experiment in 131 runs, however these 131 runs took approximately 36 hours of compute time compared to the (approximately) 4.5 hours it took the first experiment to achieve its best latency.
 The lowest latency model (Model~\hyperref[sec:sec:unique-sweep-182]{182}) we recorded achieved an inference latency of $3.091$ms after retraining, this same model logged a latency of $3.529$ms before retraining, the majority of models in this experiment lost between $0.1$ms and $0.4$ms latency during retraining, the models that gained latency also tended to have a higher initial latency.
 Despite the additional latency reduction as a result of retraining, the correlation (Table~\ref{tab:Ex2PruneCorrelations}) between each pruner and latency remains consistent with our initial observations from the first experiment (Table~\ref{tab:fastPruneCorrelations}), this lends some reliability to our results.

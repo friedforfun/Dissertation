@@ -4,7 +4,7 @@
 \section{Future work}
 
 This dissertation certainly falls short in that it only evaluates this technique on a single model and dataset, it would be hugely beneficial to evaluate this system against other network structures or a different cardinality of classes in the training data.
-Section~\ref{sec:exp3} touches on how important it is to consider Top1 when pruning, this fundamentally should be a multi-objective optimisation problem, we suggest constructing a cost function based on normalised values of Top1 and latency that can be targeted by the Bayesian optimisation algorithm.
+Section~\ref{sec:exp3} touches on how important it is to consider Top1 when pruning, fundamentally this should be a multi-objective optimisation problem, we suggest constructing a cost function based on normalised values of Top1 and latency that can be targeted by the Bayesian optimisation algorithm.
 
 An alternative path for continued development of this system would be to expand the pruning algorithm search space such as automating selection of channel or filter pruning, we did briefly investigate this but unfortunately Distiller only supports a single thinnify algorithm at a time, so the simplest step would be to set all the pruners to channel pruning or all to filter pruning and match with the corresponding network thinner.
 
