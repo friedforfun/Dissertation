@@ -36,7 +36,7 @@ The most apparent reasons to prune a neural network is either to reduce the size
     \item \textbf{O1:}\label{obj:BuildPipeline} Develop a pipeline to compress and benchmark a neural network model.
     \item \textbf{O2:}\label{obj:ModelSel} Select at least 1 neural network model to use for testing.
     \item \textbf{O3:}\label{obj:SelCompress} Select an appropriate compression algorithm for the goal of reducing latency.
-    \item \textbf{O4:}\label{obj:OTSparams} Identify an appropriate off-the-shelf set of hyperparameters for the selected model.
+    \item \textbf{O4:}\label{obj:OTSparams} Identify an off-the-shelf set of hyperparameters for the selected model.
     \item \textbf{05:}\label{obj:baselines} Establish baseline measurements in terms of accuracy and latency for both the unpruned and off-the-shelf (pruned) models. 
     \item \textbf{O6:}\label{obj:AutoParams} Automate compression parameter optimisation by leveraging the pipeline from O1 to test combinations of parameters and empirically evaluate their impact on a target metric (such as latency or accuracy). 
     \item \textbf{O7:}\label{obj:EvaluateResutls} Evaluate how well the automated system optimizes the compression parameters, by comparing with the baseline and off the shelf measurements.

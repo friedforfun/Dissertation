@@ -17,11 +17,13 @@ In order to accomplish Objective~\hyperref[obj:VerifyComp]{O0} before building t
 This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning, this issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
 A trial and error approach was taken to find pruning algorithms with a working implementation of `thinnify', we systematically tested each of the pruning algorithms that used coarse grained pruning and eventually identified the algorithm described in Section~\ref{sec:FilterPruningAlgo} as fully functional with `thinnify'.
 
-Once we had a verifiable improvement in latency from the baseline metrics described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}.
+Once we had a verifiable improvement in latency from the `no-pruning' baseline described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}.
 Setting up the benchmarking and model queue was very straight forward, for the queue we simply pulled down a docker image of Redis and ran it.
 The OpenVino benchmarking tool was very easy to integrate into the pipeline, we simply cleared and then wrote the relevant arguments to \texttt{sys.argv} (pythons array of command line arguments), called the main method of the benchmarking tool inside OpenVino, and captured the output.
 
 Development of the Pruning \& retraining part of the pipeline was considerably more challenging, we encountered a couple of issues that we resolved on our own \href{https://github.com/friedforfun/distiller?organization=friedforfun&organization=friedforfun}{\underline{\color{blue}fork of Distiller}}; the namespace of the python standard library \texttt{parser} module is shadowed by distiller which caused issues with our implementation, we also resolved an issue where Distiller would not correctly construct the path to model checkpoints once they were thinnified.
+We had persistent issues capturing the output of Distiller (and therefore the location of the models and checkpoint files) because it uses a custom logging solution that overwrites any redirects from the standard output, we resorted to using a file watcher to detect the location of checkpoint files and exported models.
+ 
 
 
 \subsection{Hardware and Software}
@@ -52,7 +54,7 @@ Originally the benchmarking system was combined with the pruning system, however
 
 \section{Evaluation of results}
 
-\subsection{Experiment 1: Rapid pruning}\label{sec:FastPruningPhase}
+\subsection{Experiment 1: Targeting Latency with no retraining}\label{sec:FastPruningPhase}
 
 \begin{figure}[H]
     \includegraphics[width=1\textwidth]{TargetSparsityVsLatency_No_Retrain.jpg}
@@ -72,8 +74,8 @@ This chart does obfuscate any relationship between the parameters, however we ca
     \begin{tabular}{@{}cp{26mm}p{26mm}p{26mm}p{26mm}@{}}
     \toprule
     \textbf{Metric}  & \textbf{Filter Pruner  Layer 1} & \textbf{Filter Pruner Layer 2} & \textbf{Filter Pruner Layer 3.1} & \textbf{Filter Pruner Layer 3.2} \\ \midrule
-    \textbf{Latency} & $-0.11259$                        & $-0.552583$                      & $-0.40775$                         & $-0.80726$                         \\
-    \textbf{Top1}    & $0.004462$                        & $-0.071923$                      & $-0.104505$                        & $-0.152767$                        \\ \bottomrule
+    \textbf{Latency} & $-0.80726$                        & $-0.40775$                      & $-0.11259$                         & $-0.552583$                         \\
+    \textbf{Top1}    & $-0.152767$                       & $-0.104505$                     & $0.004462$                        & $-0.071923$                     \\ \bottomrule
     \end{tabular}
     \caption{Correlations between each target sparsity parameter and the metric being measured.}
     \label{tab:fastPruneCorrelations}
@@ -85,18 +87,52 @@ It is interesting to note how weakly the pruning targets correlate with Top1 acc
 Observation of this weak correlation with Top1 prompted us to begin logging this initial set of metrics in addition to the metrics we logged as described in the Experimental Design Section~\ref{sec:metricsandparams} for experiments following this, we watched this data in the event that some pattern that might be indicative of how well a pruned network can recover accuracy before retraining has begun will emerge.
 
 We observed a case where pruned networks that start with a Top1 accuracy of precisely $100 / n$ where $n$ is the number of classes would (according to our data) never recover any accuracy during retraining.
-Due to the stochastic nature of retraining and the pruning algorithm we selected, coupled with the fact that our methodology necessitated changing the pruning parameters each run we were unable to identify any other pattern or relationship between initial pruning metrics and the metrics of successful or high quality retrained networks from the data we gathered. 
-Future investigation in this area should benchmark after each epoch with the intention of gaining some insight into how these metrics change over the retraining process, ideally we would aim to project how well a network might recover during the early stages of retraining, allowing us to make an informed decision on whether to abandon the model and try again or not.
+Due to the stochastic nature of retraining and the pruning algorithm we selected coupled with the fact that our methodology necessitated changing the pruning parameters each run we were unable to identify any other pattern or relationship between initial pruning metrics and the metrics of successful or high quality retrained networks from the data we gathered. 
+Future investigation in this area should benchmark after every epoch with the intention of gaining some insight into how these metrics change over the retraining process, ideally we would aim to project how well a network might recover during the early stages of retraining, allowing us to make an informed decision on whether to abandon the model and try again or not.
 
 
-\subsection{Experiment 2: Target Latency}
+\subsection{Experiment 2: Targeting Latency}
 
-\subsection{Experiment 3: Target Top1}
+\singlespacing
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}cp{26mm}p{26mm}p{26mm}p{26mm}@{}}
+    \toprule
+    \textbf{Metric}  & \textbf{Filter Pruner  Layer 1} & \textbf{Filter Pruner Layer 2} & \textbf{Filter Pruner Layer 3.1} & \textbf{Filter Pruner Layer 3.2} \\ \midrule
+    \textbf{Latency} & $-0.827473$                        & $-0.500734$                      & $-0.138894$                         & $-0.503688$                         \\
+    \textbf{Top1}    & $-0.804794$                        & $-0.451589$                      & $-0.086224$                        & $-0.441157$                        \\ \bottomrule
+    \end{tabular}
+    \caption{Correlations between each target sparsity parameter and the metric being measured.}
+    \label{tab:Ex2PruneCorrelations}
+\end{table}
+\doublespacing
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{scatterTop1runsAnnotated.png}
-    \caption{Number of runs to achieve best Top1 accuracy found}
+    \includegraphics[width=\textwidth]{Ex2_Latency_over_runs_annotated.png}
+    \caption{Number of runs against Latency}
+\end{figure}
+
+\subsection{Experiment 3: Targeting Top1}
+
+\singlespacing
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}cp{26mm}p{26mm}p{26mm}p{26mm}@{}}
+    \toprule
+    \textbf{Metric}  & \textbf{Filter Pruner  Layer 1} & \textbf{Filter Pruner Layer 2} & \textbf{Filter Pruner Layer 3.1} & \textbf{Filter Pruner Layer 3.2} \\ \midrule
+    \textbf{Latency} & $-0.764499$                        & $-0.18715$                      & $-0.143377$                         & $-0.378644$                         \\
+    \textbf{Top1}    & $-0.661244$                        & $-0.213514$                      & $-0.066348$                        & $-0.283732$                        \\ \bottomrule
+    \end{tabular}
+    \caption{Correlations between each target sparsity parameter and the metric being measured.}
+    \label{tab:Ex3PruneCorrelations}
+\end{table}
+\doublespacing
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Ex3_scatterTop1runsAnnotated.png}
+    \caption{Number of runs to achieve best Top1 accuracy}
 \end{figure}
 
 \textbf{Interesting observations}

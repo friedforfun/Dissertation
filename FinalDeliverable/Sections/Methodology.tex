@@ -83,8 +83,8 @@ Finally each policy references an instance of a pruner or LR-scheduler, and cont
 The example compression schedule shown in Figure~\ref{fig:CompressionSchedule} provides instructions to Distiller to use the `L1RankedStructureParameterPruner' algorithm (as described in Section~\ref{sec:FilterPruningAlgo}) to prune the weights in each of the convolutions described by the `weights' array, in this case `\texttt{\color{mintedgreen}group\_type}' specifies filter pruning and `\texttt{\color{mintedgreen}desired\_sparsity}' indicates how many tensors it will aim to remove (0.9 indicates the algorithm will attempt to remove 90\% of the tensors), desired sparsity should not be confused with an actual change in sparsity | note that filter and channel pruning will always result in a dense layer with an actual sparsity of 0 because this is a form of coarse-grained pruning (see section~\ref{sec:Pruning}).
 
 \begin{figure}[H]
-    \includegraphics[width=\textwidth]{temp_pruning_layers.png}
-    \caption{Resnet56 fragment showing first 2 residual block with the corresponding weights matrices labelled. \textbf{(TODO: rescale and redraw to highlight pertinent information)}}
+    \includegraphics[width=\textwidth]{resnet56_zoomed.png}
+    \caption{Resnet56 fragment showing first residual block with the corresponding weights matrices labelled, this pattern continues for all 56 residual blocks.}
     \label{fig:resnet56weightlabels}
 \end{figure}
 
@@ -116,8 +116,8 @@ Lines 7 and 8 in the schedule in Figure~\ref{fig:CompressionSchedule} reference 
 \end{figure}
 \doublespacing
 
-To explore the space of pruning parameter values the hyperparameter optimisation framework exposed by \acrshort{WandB} called `Sweeps' was leveraged. 
-This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a description of each key in the \acrshort{WandB} configuration file with a summary of appropriate arguments. 
+To explore the space of pruning parameter values the hyperparameter optimisation framework exposed by \acrshort{wandb} called `Sweeps' was leveraged. 
+This involves writing a python script that can run the entire pipeline (pruning, training \& benchmarking) and record the results, to accomplish this each sweep needs a configuration file (see Figure~\ref{fig:sweepConfig}), table~\ref{tab:WandBConfig} shows a description of each key in the \acrshort{wandb} configuration file with a summary of appropriate arguments. 
 
 
 % which needs a definition to the python script being run (program), the search strategy (method, either grid, random, or bayes), a metric  
@@ -168,8 +168,31 @@ We observe three measurements for every model, the end-to-end latency (from load
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \section{Experiment Design}\label{sec:ExperimentDesign}
 
+\subsection{Model Selection}\label{sec:ModelSelection}
+
+Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
+
+We selected ResNet56 (Objective~\hyperref[obj:obj:ModelSel]{O2}) as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
+Performing this experiment on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
+
+The pre-tuned pruning schedule publicly available from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
+It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
+    \caption{A residual block, note the identity feature map skips the weight layers, this is also known as a `skip connection'.}
+    \label{fig:ResidualBlock}
+\end{figure}
+
+\textbf{\color{red}Discuss further how residual blocks effect pruning.}
+ResNets were originally proposed to help address a training accuracy degradation problem that can occur in very deep networks, degradation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
+The accuracy degradation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
+
+%! ---------------------------------------------------------------------------------------------------------------------------------
+
 \subsection{Filter Pruning algorithm}\label{sec:FilterPruningAlgo}
-We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
+We selected the one-shot pruning algorithm dubbed `L1RankedStructureParameterPruner' (Objective~\hyperref[obj:SelCompress]{O3}) by Distiller, this is based on the algorithm described by Li et al. in Pruning Filters for Efficient Convnets~\autocite{liPruningFiltersEfficient2017}. 
 We prune the filters that are expected to have the smallest impact on the accuracy of the network, this is determined by computing the sum of the absolute weights in each filter $\Sigma~|\mathcal{F}_{i,j}|$, sorting them, and pruning the filters starting with the smallest sum values.
 Each filter that gets removed causes the corresponding feature map to be removed, along with its corresponding kernel in the next convolutional layer, see Figure~\ref{fig:FeaturemapAndKernel}. \\
 
@@ -195,31 +218,6 @@ Once pruning is completed we compensate for the performance degradation by retra
         \caption{Pruning a filter results in removal of its corresponding feature map and related kernels in the next layer.~\autocite{liPruningFiltersEfficient2017}\textbf{\color{red}Include annotations for the feature map and kernel}}
         \label{fig:FeaturemapAndKernel}
     \end{figure}
-
-
-
-
-%! ---------------------------------------------------------------------------------------------------------------------------------
-\subsection{Model Selection}\label{sec:ModelSelection}
-
-Pruning CNNs like AlexNet, or VGGNet is fairly straightforward, we can prune filters in any layer without worrying about damaging the fundamental structure of the network, however this is not the case with ResNets (short for Residual Networks),  a very popular type of CNN that makes use of what is known as a `residual block' (Figure~\ref{fig:ResidualBlock} shows a residual block) which, from the perspective of pruning, adds additional interdependencies between layers.
-
-We selected ResNet56 as the target network because it is one of the few networks with prebuilt `off-the-shelf' schedules that also uses residual blocks. 
-Performing this experiment on networks using residual blocks is important because the necessity of using compression techniques such as pruning increases as networks get larger, these residual blocks are very common in very large networks today. 
-
-The pre-tuned pruning schedule publicly available from Distiller has been hand built by an expert in the field, providing a solid baseline for comparison.
-It is not a trivial task to improve on the pre-existing hand built schedules manually without extensive understanding of layer sensitivities.  
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{ResidualBlock.jpg}
-    \caption{A residual block, note the identity feature map skips the weight layers, this is also known as a `skip connection'.}
-    \label{fig:ResidualBlock}
-\end{figure}
-
-\textbf{\color{red}Discuss further how residual blocks effect pruning.}
-ResNets were originally proposed to help address a training accuracy degradation problem that can occur in very deep networks, degradation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
-The accuracy degradation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
 %! ---------------------------------------------------------------------------------------------------------------------------------
 \subsection{Optimisation Process}
@@ -411,8 +409,36 @@ parameters:
 \doublespacing
 
 \subsection{Experiment 4: Improving on the fastest latency settings}
-
-
+For this final experiment we set the pruner parameters to the configuration with which we observed the lowest latency, and we sought to maximise Top1 by searching over the learning rate and number of epochs.
+\singlespacing
+\begin{figure}[H]
+    \centering
+    \begin{minted}[breaklines]{yaml}
+program: pipeline.py
+method: bayes
+metric:
+  goal: maximize
+  name: Top1
+parameters:
+  epochs:
+    min: 35
+    max: 120
+  learning_rate:
+    min: 0.1
+    max: 0.5
+  filter_pruner_layer_1:
+    values: [0.9519]
+  filter_pruner_layer_2:
+    values: [0.9352]
+  filter_pruner_layer_3.1:
+    values: [0.4657]
+  filter_pruner_layer_3.2:
+    values: [0.8789]
+    \end{minted}
+    \caption{This configuration fixes the previously found lowest latency set of parameters, we search instead for an improvement in epochs and learning rate.}
+    \label{fig:FinalSweepConfig}
+\end{figure}
+\doublespacing
 
 
 \end{document}
