@@ -92,12 +92,17 @@ my own words. Any uses made within it of the works of other authors in any form 
 equations, figures, text, tables, programs) are properly acknowledged at any point of their
 use. A list of the references employed is included.\\
 Signed: .....Sam Fay-Hunt...........\\
-Date: .....21/04/2020...............
+Date: .....21/04/2021...............
 \thispagestyle{empty}
 \pagebreak
 
-\textbf{Abstract:} 
-\emph{Abstract here}
+\emph{Abstract} \\
+Computer vision applications are transitioning from being specialised tools only for experts into common place systems that we interact with daily. 
+As these systems get more and more sophisticated they tend to get larger and more complex, this can be a problem when we need them to perform their functionality rapidly on low powered devices.
+This dissertation aims to help reduce the complexities of applying compression techniques effectively and tuning compression hyperparameters, we investigate a method to automatically refine a pre-configured (off-the-shelf) compression algorithm with the goal of improving network latency.
+We developed a pipeline that brings together parameter selection, pruning, retraining, and benchmarking.
+We found models that successfully reduced latency by 20\% against the original configuration of the algorithm, at the cost of 2.24\% accuracy.
+We outline the direction future work in this area could go, and conclude that while this system has some issues due to the stochastic nature of pruning and training, this work can improve your chances of finding a desirable pruned model. 
 
 
 
@@ -121,14 +126,7 @@ Date: .....21/04/2020...............
 
 \pagebreak
 \chapter{Background}
-\emph{\color{red}
-\begin{itemize}
-	\item Adapt from D1
-	\item rewrite with more of a focus on the concrete channel and pruning methodology used
-	\item Would be good to include wandb bayes hyperparam optimisation details
-	\item Discuss filters and channels in more depth
-\end{itemize}
-}
+
 This Chapter is split into 4 sections:\\
 Section~\ref{subsec:deepLearning} | \textbf{Deep Learning}: An overview of the basic components of a deep neural network and the \acrshort{cnn} model.\\
 Section~\ref{subsec:compressionTypes} | \textbf{Neural Network Compression}: Discusses neural network compression techniques and on how they change the underlying representations of DNNs.\\
@@ -188,10 +186,12 @@ The label names were changed to improve the readability of this dissertation, Ta
     \label{tab:labelMapping}
 \end{table}
 
+\newpage
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/eje5tk6m/overview?workspace=}{\underline{\color{blue}Golden-sweep-523}}}\label{sec:golden-sweep-523}
 This model was created during the `no-retraining' experiment, very light pruning parameters with a low Top1, and a latency similar to no pruning. We can see how just a small amount of pruning has a dramatic effect on the accuracy.\\
 Referenced by: [\ref{sec:FastPruningPhase}]
+\singlespacing
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -222,11 +222,13 @@ Referenced by: [\ref{sec:FastPruningPhase}]
         %\setcounter{subfloat}{0}
     \end{table}    
 \end{figure}
+\doublespacing
 
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/58wpdzct/overview?workspace=}{\underline{\color{blue}comfy-sweep-1007}}}\label{sec:comfy-sweep-1007}
 This model was created during the `no-retraining' experiment, high desired pruning parameters with a high (untrained) Top1, and fairly low Latency. \\
 Referenced by: [\ref{sec:FastPruningPhase}]
+\singlespacing
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -256,11 +258,15 @@ Referenced by: [\ref{sec:FastPruningPhase}]
         %\setcounter{subfloat}{0}
     \end{table}    
 \end{figure}
+\doublespacing
+
+\newpage
 
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Channels-Filters/runs/ptmmklr8?workspace=}{\underline{\color{blue}unique-sweep-182}}}\label{sec:unique-sweep-182}
 This model was created during the second experiment targeting latency with retraining, it achieved an impressively low final latency, and managed to go from 3.529ms before retraining to 3.091ms after.\\
 Referenced by: [\ref{sec:Experiment2}, \ref{sec:vsBaseline}]
+\singlespacing
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -290,11 +296,13 @@ Referenced by: [\ref{sec:Experiment2}, \ref{sec:vsBaseline}]
         %\setcounter{subfloat}{0}
     \end{table}    
 \end{figure}
+\doublespacing
 
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Channels-Filters/runs/drh6012i/overview?workspace=}{\underline{\color{blue}rural-sweep-89}}}\label{sec:rural-sweep-89}
 This model was created during the third experiment targeting Top1 with retraining, it achieved a solid balance of Top1 and latency, one of the best all round networks we created.\\
 Referenced by: [\ref{sec:vsBaseline}]
+\singlespacing
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -324,10 +332,13 @@ Referenced by: [\ref{sec:vsBaseline}]
         %\setcounter{subfloat}{0}
     \end{table}    
 \end{figure}
+\doublespacing
+\newpage
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/a09xglnd/overview?workspace=}{\underline{\color{blue}fiery-sweep-333}}}\label{sec:fiery-sweep-333}
 This model was created outside of the experiments described in the dissertation, it is a good demonstration of the performance available with a higher number of epochs, its best Top1 is on epoch 257, there may be room for further improvement from training. \\
 Referenced by: [\ref{sec:vsBaseline}]
+\singlespacing
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -359,6 +370,7 @@ Referenced by: [\ref{sec:vsBaseline}]
         %\setcounter{subfloat}{0}
     \end{table}    
 \end{figure}
+\doublespacing
 
 \newpage
 \section{Schedule}\label{apx:Schedule}

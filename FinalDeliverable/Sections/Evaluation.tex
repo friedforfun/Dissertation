@@ -7,17 +7,17 @@ This section will discuss challenges encountered and handled during development,
 \subsection{Pipeline Development challenges}
 
 In order to accomplish Objective~\hyperref[obj:VerifyComp]{O0} before building the pipeline we manually ran each discrete part of the system (Distiller, and OpenVino). 
-This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning, this issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
+This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning. 
+This issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
 A trial and error approach was taken to find pruning algorithms with a working implementation of `thinnify', we systematically tested each of the pruning algorithms that used coarse grained pruning and eventually identified the algorithm described in Section~\ref{sec:FilterPruningAlgo} as fully functional with `thinnify'.
 
 Once we had a verifiable improvement in latency from the `no-pruning' baseline described in Section~\ref{sec:baselineData}, we proceeded to develop the pipeline according to Objective~\hyperref[obj:BuildPipeline]{O2}.
 Setting up the benchmarking and model queue was very straight forward, for the queue we simply pulled down a docker image of Redis and ran it.
 The OpenVino benchmarking tool was very easy to integrate into the pipeline, we simply cleared and then wrote the relevant arguments to \texttt{sys.argv} (pythons array of command line arguments), called the main method of the benchmarking tool inside OpenVino, and captured the output.
 
-Development of the Pruning \& retraining part of the pipeline was considerably more challenging, we encountered a couple of issues that we resolved on our own \href{https://github.com/friedforfun/distiller?organization=friedforfun&organization=friedforfun}{\underline{\color{blue}fork of Distiller}}; the namespace of the python standard library \texttt{parser} module is shadowed by distiller which caused issues with our implementation, we also resolved an issue where Distiller would not correctly construct the path to model checkpoints once they were thinnified.
+Development of the Pruning \& retraining part of the pipeline was considerably more challenging, we encountered a couple of issues that we resolved on our own \href{https://github.com/friedforfun/distiller?organization=friedforfun&organization=friedforfun}{\underline{\color{blue}fork of Distiller}}. The namespace of the python standard library \texttt{parser} module is shadowed by distiller which caused issues with our implementation.
+We also resolved an issue where Distiller would not correctly construct the path to model checkpoints once they were thinnified.
 We had persistent issues capturing the output of Distiller (and therefore the location of the models and checkpoint files) because it uses a custom logging solution that overwrites any redirects from the standard output, we resorted to using a file watcher to detect the location of checkpoint files and exported models.
- 
-
 
 \subsection{Hardware and Software}
 Both the pruning and benchmarking software runs on Ubuntu 20.04, we used various hardware configurations for the pruning and retraining agents. 
@@ -110,10 +110,10 @@ Despite the additional latency reduction as a result of retraining, the correlat
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{Ex2_Latency_over_runs_annotated.png}
-    \caption{Experiment 2. Number of runs against Latency}
+    \caption{Experiment 2. Number of runs against Latency.}
 \end{figure}
 
-\subsection{Experiment 3: Targeting Top1}
+\subsection{Experiment 3: Targeting Top1}\label{sec:exp3}
 
 \singlespacing
 \begin{table}[H]
@@ -152,7 +152,7 @@ When we don't consider Top1 in our target metric we observed a 5x higher rate of
     Off the shelf - no retraining      & 11.19         & 51.02         & 303.98                    & 3.947                 & 12.89                       \\
     Off the shelf - retrained          &  87.72        & 99.47         & 305.27                    & 3.88                  & 12.95                           \\ \bottomrule
     \end{tabular}
-    \caption{Baseline data, as gathered in Section~\ref{sec:baselineData}}
+    \caption{Baseline data, as gathered in Section~\ref{sec:baselineData}.}
 \end{table}
 
 We were unable to produce any models with as good accuracy as the baseline unpruned network, however we only encountered 2 sweeps with a worse latency than the baseline out of all runs in experiments 2 and 3.
@@ -163,36 +163,5 @@ Experiment 2 (targeting latency) managed to find 5 networks that were superior t
 The absolute best (Model~\hyperref[sec:unique-sweep-182]{182}) improvement in latency we achieved was a 20\% improvement, with $3.091$ms but at the cost of 2.24\% Top1 accuracy.
 
 Experiment 3 (targeting Top1) performed better, finding 9 networks that were superior to the baseline off-the-shelf retrained network in both Top1 and latency, the best out of this group (Model~\hyperref[sec:rural-sweep-89]{89}) managed a latency of $3.557$ms and a Top1 of $88.08$, this is an 8.8\% improvement in latency and 0.36\% improvement in Top1.
-
-\textbf{Interesting observations}
-\begin{itemize}
-    \item The models that lost all predictive power due to overpruning were not the fastest, even when targeting only latency.
-    \item The relationship between more pruning and lower latency is not as simple as you get a faster model with fewer tensors
-    \item When targeting accuracy we found models with as low latency when targeting latency directly.
-    \item When targeting latency we found models with as high accuracy as when targeting accuracy directly.
-\end{itemize}
-
-\section{Further work}
-\emph{
-\begin{itemize}
-	\item Suggested improvements for methodology
-	\item Next steps
-\end{itemize}
-}
-
-\begin{itemize}
-    \item More datasets need to be tested
-    \item More models should be used
-    \item Layer selection should be automated
-    \item how well does this system generalise?
-    \item Further investigation should look at a relationship between higher accuracy models after only pruning and how they recover vs low accuracy models after pruning
-    \item Why are there so few completely ruined networks before retraining compared to after retraining?
-    \item Using this data to train a reinforcement learning dnn
-\end{itemize}
-
-Further investigation to identify which untrained pruned models will respond well to retraining (particularly with one-shot pruning methods) would be valuable because retraining is expensive and one-shot pruning is (comparatively) cheap.
-This could help inform researchers or users of pruning systems weather they should try and prune again or 
-
-
 
 \end{document}

@@ -1,13 +1,26 @@
 \documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
+\section{Future work}
+
+This dissertation certainly falls short in that it only evaluates this technique on a single model and dataset, it would be hugely beneficial to evaluate this system against other network structures or a different cardinality of classes in the training data.
+Section~\ref{sec:exp3} touches on how important it is to consider Top1 when pruning, this fundamentally should be a multi-objective optimisation problem, we suggest constructing a cost function based on normalised values of Top1 and latency that can be targeted by the Bayesian optimisation algorithm.
+
+An alternative path for continued development of this system would be to expand the pruning algorithm search space such as automating selection of channel or filter pruning, we did briefly investigate this but unfortunately Distiller only supports a single thinnify algorithm at a time, so the simplest step would be to set all the pruners to channel pruning or all to filter pruning and match with the corresponding network thinner.
+
+Further investigation to identify which untrained pruned models will respond well to retraining (particularly with one-shot pruning methods) would be valuable because retraining is expensive and one-shot pruning is (comparatively) cheap.
+In Section~\ref{sec:FastPruningPhase} we raise the idea of attempting to predict the quality of a network so we can terminate retraining early and save time, and electricity.
+This aligns well with the Bayesian optimisation methodology outlined in this dissertation, where we try to perform up-front computation to reduce the more expensive computation later on. 
+As it stands the process described here is exorbitantly inefficient, it is not inconceivable that a user could retrain a network for days or even weeks and have nothing usable to show for it.
 
 \section{Discussion}
-\emph{
-\begin{itemize}
-	\item Discuss results
-\end{itemize}
-What were the actual latency improvements over baseline?
-}
+
+The core aim of this dissertation was to improve on the performance of a prebuilt (off-the-shelf) compression technique, we selected a \href{https://github.com/friedforfun/distiller/blob/master/examples/pruning_filters_for_efficient_convnets/resnet56_cifar_filter_rank_v2.yaml}{filter pruning schedule} for ResNet56 and developed a system that uses a Bayesian statistical modelling algorithm to tune the settings defined by the schedule.
+We found we were able to significantly reduce our inference latency by as much as 20\% at the cost of 2.24\% accuracy against the off-the-shelf default pruning configuration network, however this off-the-shelf network already starts out with a 4.86\% accuracy penalty against the baseline unpruned network, making the net loss in accuracy potentially undesirable depending on your use case.
+Managing the lost accuracy is key here, by attempting to mitigate the accuracy loss during pruning we managed to produce a network with a much smaller 8.8\% latency reduction and a very small gain of 0.36\% accuracy.
+
+We found some supporting evidence for our hypothesis, but it is nearly impossible to get the same model twice, even with precisely the same hyperparameters because both the pruning, and retraining process is stochastic. 
+However we can increase our chances of finding a desirable model by using the system outlined in this dissertation.
+The next steps will be to investigate if this methodology generalises well and to profile the quality of models as soon as they have been pruned to mitigate unnecessary retraining.
 
 \end{document}
