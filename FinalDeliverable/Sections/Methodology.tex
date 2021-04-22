@@ -186,7 +186,6 @@ It is not a trivial task to improve on the pre-existing hand built schedules man
     \label{fig:ResidualBlock}
 \end{figure}
 
-\textbf{\color{red}Discuss further how residual blocks effect pruning.}
 ResNets were originally proposed to help address a training accuracy degradation problem that can occur in very deep networks, degradation (or accuracy saturation) occurs when adding more layers to a suitably deep model leads to higher training error~\autocite{heDeepResidualLearning2016}.
 The accuracy degradation problem with very deep CNNs is common enough that many new deep networks in research and production make use of them today.
 
@@ -210,8 +209,7 @@ Each filter that gets removed causes the corresponding feature map to be removed
     \end{enumerate}
 \end{singlespace}
 
-\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy, \textbf{\color{red}in general pruning the more resilient layers once and retraining can result in much of the lost accuracy to be regained.}
-Once pruning is completed we compensate for the performance degradation by retraining the network, 
+\noindent Upon completion of pruning the filters we now retrain the network to regain lost accuracy and compensate for the performance degradation.
 
     \begin{figure}[H]
         \centering
@@ -321,9 +319,6 @@ Note that only the first convolution in each residual block is being pruned (den
     \label{tab:scheduleWeights}
 \end{table}
 \doublespacing
-
-\subsection{Passing pruned/trained networks to benchmark}
-\emph{\color{red}Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
 \subsection{Baseline data}\label{sec:baselineData}
 For all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.

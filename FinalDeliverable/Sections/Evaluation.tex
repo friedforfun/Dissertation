@@ -1,17 +1,10 @@
 \documentclass[../Dissertation.tex]{subfiles}
 
 \begin{document}
-\section{Evaluation of experimental design}
-\textbf{\color{red}
-\begin{itemize}
-    \item clear result presentation
-    \item explain problems and difficulties
-    \item demonstrate understanding of results
-    \item discuss further work
-\end{itemize}
-}
-\subsection{Pipeline Development challenges}
+\section{Evaluation of development}
+This section will discuss challenges encountered and handled during development, and offer a description of the required hardware and software.
 
+\subsection{Pipeline Development challenges}
 
 In order to accomplish Objective~\hyperref[obj:VerifyComp]{O0} before building the pipeline we manually ran each discrete part of the system (Distiller, and OpenVino). 
 This immediately highlighted a critical issue; Distiller by default only zeros out the weights when pruning, it doesn't actually remove them from the model so unless a special flag is used with Distiller called `thinnify' there is no measurable benefit to pruning, this issue is exacerbated by the fact that not all pruning algorithms have been implemented to work with `thinnify' and there is little to no documentation on which are compatible. 
