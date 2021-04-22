@@ -260,7 +260,7 @@ Referenced by: [\ref{sec:FastPruningPhase}]
 
 \subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Channels-Filters/runs/ptmmklr8?workspace=}{\underline{\color{blue}unique-sweep-182}}}\label{sec:unique-sweep-182}
 This model was created during the second experiment targeting latency with retraining, it achieved an impressively low final latency, and managed to go from 3.529ms before retraining to 3.091ms after.\\
-Referenced by: [\ref{sec:Experiment2}]
+Referenced by: [\ref{sec:Experiment2}, \ref{sec:vsBaseline}]
 \begin{figure}[H]
     \begin{table}[H]
         \centering
@@ -291,6 +291,74 @@ Referenced by: [\ref{sec:Experiment2}]
     \end{table}    
 \end{figure}
 
+
+\subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Channels-Filters/runs/drh6012i/overview?workspace=}{\underline{\color{blue}rural-sweep-89}}}\label{sec:rural-sweep-89}
+This model was created during the third experiment targeting Top1 with retraining, it achieved a solid balance of Top1 and latency, one of the best all round networks we created.\\
+Referenced by: [\ref{sec:vsBaseline}]
+\begin{figure}[H]
+    \begin{table}[H]
+        \centering
+        \subfloat[Pruning parameters]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+                filter\_pruner\_20      & 0.6756         \\
+                filter\_pruner\_40      & 0.1964         \\
+                filter\_pruner\_60      & 0.3058         \\
+                filter\_pruner\_70      & 0.8031         \\ \bottomrule
+            \end{tabular}
+        }
+        \hspace{2em}
+        \subfloat[Recorded Metrics]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Metric}    & \textbf{Value} \\ \midrule
+                Latency(ms)        & 3.557          \\
+                Loss               & 0.533          \\
+                Throughput(FPS)    & 302.02         \\
+                Top1               & 88.08          \\
+                Top5               & 99.66          \\
+                Total\_latency(ms) & 13.07          \\ \bottomrule
+            \end{tabular}
+        }
+        %\setcounter{subfloat}{0}
+    \end{table}    
+\end{figure}
+
+\subsection*{\protect\href{https://wandb.ai/samfh/Resnet56-Filters-Test/runs/a09xglnd/overview?workspace=}{\underline{\color{blue}fiery-sweep-333}}}\label{sec:fiery-sweep-333}
+This model was created outside of the experiments described in the dissertation, it is a good demonstration of the performance available with a higher number of epochs, its best Top1 is on epoch 257, there may be room for further improvement from training. \\
+Referenced by: [\ref{sec:vsBaseline}]
+\begin{figure}[H]
+    \begin{table}[H]
+        \centering
+        \subfloat[Pruning parameters]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Parameter Name} & \textbf{Value} \\ \midrule
+                epochs                  & 285            \\
+                learning\_rate          & 0.3013         \\
+                filter\_pruner\_20      & 0.6756         \\
+                filter\_pruner\_40      & 0.1964         \\
+                filter\_pruner\_60      & 0.3058         \\
+                filter\_pruner\_70      & 0.8031         \\ \bottomrule
+            \end{tabular}
+        }
+        \hspace{2em}
+        \subfloat[Recorded Metrics]{
+            \begin{tabular}{@{}ll@{}}
+                \toprule
+                \textbf{Metric}    & \textbf{Value} \\ \midrule
+                Latency(ms)        & 3.265          \\
+                Loss               & 0.521          \\
+                Throughput(FPS)    & 304.52         \\
+                Top1               & 88.04          \\
+                Top5               & 99.48          \\
+                Total\_latency(ms) & 12.92          \\ \bottomrule
+            \end{tabular}
+        }
+        %\setcounter{subfloat}{0}
+    \end{table}    
+\end{figure}
 
 \newpage
 \section{Schedule}\label{apx:Schedule}

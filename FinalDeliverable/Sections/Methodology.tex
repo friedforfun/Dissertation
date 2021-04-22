@@ -326,8 +326,8 @@ Note that only the first convolution in each residual block is being pruned (den
 \emph{\color{red}Discuss reading/writing yaml files, outputting .onnx files, redis to pass messages between agents}
 
 \subsection{Baseline data}\label{sec:baselineData}
-For the purposes of all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
-Because pruning and retraining has stochastic elements we recorded 100 runs of each baseline and recorded the mean in Table~\ref{tab:baselineData}.
+For all experiments we compare our results to two baseline sets of data, first the basic ResNets56 network with pretrained weights for CIFAR10 no pruning, and second an `off-the-shelf' version of ResNet56 with pruning parameters hand-picked by the researcher responsible for development of Distiller (thus it is highly likely to be used as a starting point for new users to distiller)~\autocite{liPruningFiltersEfficient2017}.
+Because pruning and retraining has stochastic elements we recorded 100 runs of each baseline and recorded the maximum found in Table~\ref{tab:baselineData}.
 The retrained off-the-shelf version was trained on 70 epochs and a learning rate of 0.1, a Top1 accuracy as high as the baseline with no pruning can be achieved with up to 300 epochs, but this would take 1 hour and 40 mins per run to train which would be unfeasible in the available time frame. 
 
 \begin{table}[H]

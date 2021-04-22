@@ -110,7 +110,7 @@ Future investigation in this area should benchmark after every epoch with the in
 As part of Objective~\hyperref[obj:AutoParams]{O6} we extended the first experiment and introduced 70 epochs of retraining to the system. 
 At this stage we observed an interesting relationship between the retraining process and a further reduction in latency; the lowest latency run without retraining was $3.277$ms, out of the 256 successful runs with retraining in this experiment 12 were below the lowest latency from the first experiment.
 This experiment managed to beat the best latency from the first experiment in 131 runs, however these 131 runs took approximately 36 hours of compute time compared to the (approximately) 4.5 hours it took the first experiment to achieve its best latency.
-The lowest latency model (Model~\hyperref[sec:sec:unique-sweep-182]{182}) we recorded achieved an inference latency of $3.091$ms after retraining, this same model logged a latency of $3.529$ms before retraining, approximately 75\% of models in this experiment lost between $0.1$ms and $0.4$ms latency during retraining, the models that gained latency also tended to have a higher initial latency.
+The lowest latency model (Model~\hyperref[sec:sec:unique-sweep-182]{182}) we recorded achieved an inference latency of $3.091$ms after retraining, this same model logged a latency of $3.529$ms before retraining, the majority of models in this experiment lost between $0.1$ms and $0.4$ms latency during retraining, the models that gained latency also tended to have a higher initial latency.
 Despite the additional latency reduction as a result of retraining, the correlation (Table~\ref{tab:Ex2PruneCorrelations}) between each pruner and latency remains consistent with our initial observations from the first experiment (Table~\ref{tab:fastPruneCorrelations}), this lends some reliability to our results.
 
 
@@ -138,8 +138,8 @@ Despite the additional latency reduction as a result of retraining, the correlat
 
 In this experiment the focus is on Top1 accuracy, similarly to Experiment 2 we use 70 epochs for retraining, and a learning rate of 0.1. 
 In table~\ref{fig:ex3Top1Rate} we see the Bayesian optimisation algorithm's effectiveness, after just 17 runs we find a Top1 of $88.52$ already very close to the global best Top1 of $88.77$ found after 147 runs in this experiment.
-However the cost to latency is significant, only 5 runs had less than $3.5$ms latency, of those 5 only 1 had a Top1 below 86.5.
-The quality of models produced was consistently higher in this experiment than when targeting latency, the mean Top1 was 87.2 and the median was 87.7, which when compared to the mean (85.3) and median (87.1) of Experiment 2 shows how important it is to account for Top1 accuracy when performing this kind of optimisation.
+However the cost to latency is significant, only 5 runs had less than $3.5$ms latency, of those 5 only 1 had a Top1 below $86.5$.
+The quality of models produced was consistently higher in this experiment than when targeting latency, the mean Top1 was $87.2$ and the median was $87.7$, which when compared to the mean ($85.3$) and median ($87.1$) of Experiment 2 shows how important it is to account for Top1 accuracy when performing this kind of optimisation.
 When we don't consider Top1 in our target metric we observed a 5x higher rate of ruined networks with accuracy that cannot be recovered by retraining.
 
 \begin{figure}[H]
@@ -149,7 +149,7 @@ When we don't consider Top1 in our target metric we observed a 5x higher rate of
     \label{fig:ex3Top1Rate}
 \end{figure}
 
-\subsection{Comparisons against baseline}
+\subsection{Comparisons against baseline}\label{sec:vsBaseline}
 
 \begin{table}[H]
     \begin{tabular}{@{}lccp{25mm}p{23mm}p{28mm}@{}}
@@ -162,8 +162,14 @@ When we don't consider Top1 in our target metric we observed a 5x higher rate of
     \caption{Baseline data, as gathered in Section~\ref{sec:baselineData}}
 \end{table}
 
+We were unable to produce any models with as good accuracy as the baseline unpruned network, however we only encountered 2 sweeps with a worse latency than the baseline out of all runs in experiments 2 and 3.
+The fastest network (Model~\hyperref[sec:unique-sweep-182]{182}) achieved an improvement of 29\% over the unpruned baseline at a cost of 7.1\% Top1 accuracy.
+An accuracy hit of 7\% is hard to swallow, but it is important to reiterate that this is with a fixed 70 epochs, increasing the upper bound on epochs would open up the possibility of considerably more appealing networks such as Model~\hyperref[sec:fiery-sweep-333]{333} which was trained outside the experiment conditions, it achieved a Top1 of 88.04, and a Latency of $3.265$ms with 285 epochs of training a 25\% improved latency at the cost of 4.54\% Top1 accuracy.
 
+Experiment 2 (targeting latency) managed to find 5 networks that were superior to the baseline off-the-shelf retrained network in both Top1 and latency, however they are only marginally better with the fastest of the group achieving a latency of $3.694$ms with an accuracy of $87.85$. 
+The absolute best (Model~\hyperref[sec:unique-sweep-182]{182}) improvement in latency we achieved was a 20\% improvement, with $3.091$ms but at the cost of 2.24\% Top1 accuracy.
 
+Experiment 3 (targeting Top1) performed better, finding 9 networks that were superior to the baseline off-the-shelf retrained network in both Top1 and latency, the best out of this group (Model~\hyperref[sec:rural-sweep-89]{89}) managed a latency of $3.557$ms and a Top1 of $88.08$, this is an 8.8\% improvement in latency and 0.36\% improvement in Top1.
 
 \textbf{Interesting observations}
 \begin{itemize}
@@ -171,7 +177,6 @@ When we don't consider Top1 in our target metric we observed a 5x higher rate of
     \item The relationship between more pruning and lower latency is not as simple as you get a faster model with fewer tensors
     \item When targeting accuracy we found models with as low latency when targeting latency directly.
     \item When targeting latency we found models with as high accuracy as when targeting accuracy directly.
-    \item Surprising to see that retraining reduces the latency also
 \end{itemize}
 
 \section{Further work}
